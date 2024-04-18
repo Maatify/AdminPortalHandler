@@ -105,4 +105,9 @@ class Settings extends DbPortalHandler
         return $this->ColThisTable('default_value', ' `default_key` = ? ', [$default_key]);
     }
 
+    protected function ReturnColValueByID(string $setting_id): string
+    {
+        return $this->ColThisTable('default_value', ' `setting_id` = ? ', [$setting_id]);
+    }
+
 }

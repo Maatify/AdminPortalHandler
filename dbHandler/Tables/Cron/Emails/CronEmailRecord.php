@@ -58,4 +58,24 @@ class CronEmailRecord extends CronEmail
     {
         $this->AddCron($ct_id, $name, $email, $message, $subject, 7);
     }
+
+
+
+    public function RecordDashboardConfirmLink(int $ct_id,string $email, string $message, $name = ''): void
+    {
+        if(empty($name)){
+            $name = $email;
+        }
+
+        $this->AddCron($ct_id, $name, $email, $message, 'Confirm Mail', 5);
+    }
+
+    public function RecordDashboardForgetLink(int $ct_id,string $email, string $message, $name = ''): void
+    {
+        if(empty($name)){
+            $name = $email;
+        }
+
+        $this->AddCron($ct_id, $name, $email, $message, 'Reset Password', 6);
+    }
 }

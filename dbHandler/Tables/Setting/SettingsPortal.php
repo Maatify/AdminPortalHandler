@@ -70,8 +70,8 @@ class SettingsPortal extends ParentClassHandler
         [$tables, $cols] = $this->HandleThisTableJoins();
         $result = $this->ArrayPaginationThisTableFilter($tables,
             $cols,
-            "",
-            [],
+            "`$this->tableName`.`$this->identify_table_id_col_name` > ? ",
+            [0],
             "ORDER BY `$this->identify_table_id_col_name` ASC"
         );
         $result['data'] = array_map(

@@ -11,7 +11,10 @@
 
 namespace Maatify\Portal\Admin;
 
+use \App\Assist\Encryptions\ConfirmEmailEncryption;
+use \App\Assist\Jwt\JWTAssistance;
 use Maatify\Json\Json;
+use Maatify\Portal\Cron\Emails\CronEmailRecord;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;
 

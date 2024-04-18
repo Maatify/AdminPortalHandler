@@ -11,7 +11,10 @@
 
 namespace Maatify\Portal\Logger\LoggerHandler;
 
+use \App\Assist\AppFunctions;
 use \App\DB\DBS\DbLogger;
+use Maatify\Json\Json;
+use Maatify\Portal\Admin\AdminLoginToken;
 
 abstract class DbLogHandler extends DbLogger
 {

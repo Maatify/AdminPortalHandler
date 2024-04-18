@@ -71,7 +71,7 @@ class UploaderWebPPortalHandler extends UploadImageToWebP
 
     public function ImageUpload(int $id, string $file_name, string $current_file): array
     {
-        $file_name = $file_name !== '' ? $file_name . '-' : '';
+        $this->file_name = $file_name !== '' ? $file_name . '-' : '';
         return $this->UploadHandler($current_file);
     }
 

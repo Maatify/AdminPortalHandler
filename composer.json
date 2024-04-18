@@ -1,0 +1,75 @@
+{
+  "name": "maatify/admin-portal-handler",
+  "description": "maatify.com",
+  "version": "1.0.0",
+  "type": "library",
+  "keywords": [
+    "PHP",
+    "AdminPortalHandler",
+    "Admin",
+    "AdminPortal",
+    "Portal",
+    "Handler",
+    "maatify"
+  ],
+  "homepage": "https://github.com/Maatify/",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Mohamed Abdulalim",
+      "email": "mohamed@maatify.dev",
+      "homepage": "https://www.maatify.com/",
+      "role": "Backend Developer"
+    },
+    {
+      "name": "Ahmed Fawzy",
+      "email": "a.fawzy@maatify.dev",
+      "homepage": "https://www.maatify.com/",
+      "role": "Frontend Developer"
+    },
+    {
+      "name": "Ahmed Abdullah",
+      "email": "a.abdullah@maatify.dev",
+      "homepage": "https://www.maatify.com/",
+      "role": "Android Developer"
+    },
+    {
+      "name": "Elmokhtar Ahmed",
+      "email": "mokhtar@maatify.dev",
+      "homepage": "https://www.maatify.com/",
+      "role": "IOS Developer"
+    }
+  ],
+  "require": {
+    "maatify/functions": "^1.2",
+    "maatify/json": "^1.1",
+    "maatify/db-model-v3": "^1.2",
+    "maatify/post-validator-v2": "^1.1",
+    "maatify/failed-login-handler": "^1.0",
+    "maatify/google-auth": "^1.0",
+    "maatify/open-ssl": "^1.0",
+    "maatify/mailer": "^1.1",
+    "maatify/google-recaptcha": "^1.1",
+    "maatify/jwt": "^1.0",
+    "maatify/uploader": "^1.2"
+  },
+  "config": {
+    "platform": {
+      "php": "8.0.0"
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "Maatify\\dBHandler\\": "dbHandler/",
+      "Maatify\\Portal\\Admin\\": "dbHandler/Tables/Admin/",
+      "Maatify\\Portal\\Cron\\": "dbHandler/Tables/Cron/",
+      "Maatify\\Portal\\Queue\\": "dbHandler/Tables/Queue/",
+      "Maatify\\Portal\\Cron\\Emails\\": "dbHandler/Tables/Cron/Emails",
+      "Maatify\\Portal\\Privileges\\": "dbHandler/Tables/Privileges/",
+      "Maatify\\Portal\\DbHandler\\": "dbHandler/DbPortalHandler/",
+      "Maatify\\Portal\\Logger\\": "dbHandler/Logger/",
+      "Maatify\\Portal\\Language\\": "dbHandler/Tables/Language/",
+      "Maatify\\Portal\\Setting\\": "dbHandler/Tables/Setting/"
+    }
+  }
+}

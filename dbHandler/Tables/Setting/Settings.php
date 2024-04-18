@@ -100,7 +100,7 @@ class Settings extends DbPortalHandler
         return $this->default_currency;
     }
 
-    private function ReturnColValue(string $default_key): string
+    protected function ReturnColValue(string $default_key): string
     {
         return $this->ColThisTable('default_value', ' `default_key` = ? ', [$default_key]);
     }

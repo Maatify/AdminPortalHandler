@@ -12,7 +12,7 @@
 namespace Maatify\Portal\Admin;
 
 use App\Assist\Encryptions\AdminAuthEncryption;
-use \App\Assist\Jwt\JWTAssistance;
+use App\Assist\Jwt\JwtAdminKey;
 use Exception;
 use Maatify\GoogleAuth\GoogleAuth;
 use Maatify\Json\Json;
@@ -46,7 +46,7 @@ class Admin2FA extends ParentClassHandler
     public function ResponseAuthMov(array $admin): void
     {
         if (! empty($admin['auth'])) {
-            JWTAssistance::obj()->TokenAuth($admin[$this->identify_table_id_col_name],
+            JwtAdminKey::obj()->TokenAuth($admin[$this->identify_table_id_col_name],
                 $admin['username'],
                 ['next' => 'Auth']);
             Json::GoToMethod('Auth',
@@ -55,7 +55,7 @@ class Admin2FA extends ParentClassHandler
         } else {
             try {
                 $g_2fa_code = GoogleAuth::obj()->GenerateSecret();
-                JWTAssistance::obj()->TokenAuth($admin[$this->identify_table_id_col_name],
+                JwtAdminKey::obj()->TokenAuth($admin[$this->identify_table_id_col_name],
                     $admin['username'],
                     ['secret' => $g_2fa_code, 'next' => 'AuthRegister']);
                 Json::GoToMethod('AuthRegister',
@@ -94,7 +94,7 @@ class Admin2FA extends ParentClassHandler
     {
         $auth_pages = ['AuthRegister', 'Auth'];
         if (! empty($_GET['action']) && in_array($_GET['action'], $auth_pages)) {
-            if (! empty($_SESSION['token']) && $tokens = JWTAssistance::obj()->JwtValidation(__LINE__)) {
+            if (! empty($_SESSION['token']) && $tokens = JwtAdminKey::obj()->JwtValidation(__LINE__)) {
                 if (isset($tokens->token, $tokens->next)) {
                     if (in_array($tokens->next, $auth_pages)) {
                         if ($admin = AdminLoginToken::obj()->ByToken($tokens->token, $this->class_name . __LINE__)) {

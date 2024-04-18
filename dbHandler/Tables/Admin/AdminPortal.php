@@ -12,7 +12,7 @@
 namespace Maatify\Portal\Admin;
 
 use \App\Assist\AppFunctions;
-use \App\Assist\Jwt\JWTAssistance;
+use App\Assist\Jwt\JwtAdminKey;
 use Exception;
 use Maatify\GoogleRecaptcha\V3\GoogleRecaptchaV3Json;
 use Maatify\Json\Json;
@@ -64,20 +64,20 @@ class AdminPortal extends ParentClassHandler
                             } else {
                                 $log['details'] = 'Success Login';
                                 $this->AdminLogger($log, [], 'Login');
-                                JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
+                                JwtAdminKey::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
                                 AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
                                 AdminFailedLogin::obj()->Success($admin['username']);
                             }
                         } else {
                             $log['details'] = 'Success Login';
                             $this->AdminLogger($log, [], 'Login');
-                            JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
+                            JwtAdminKey::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
                             AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
                             AdminFailedLogin::obj()->Success($admin['username']);
                         }
                         Json::Success(AdminLoginToken::obj()->HandleAdminResponse($admin), line: $this->class_name . __LINE__);
                     } else {
-                        JWTAssistance::obj()->TokenConfirmMail($admin[$this->identify_table_id_col_name], $admin['username']);
+                        JwtAdminKey::obj()->TokenConfirmMail($admin[$this->identify_table_id_col_name], $admin['username']);
                         Json::GoToMethod('EmailConfirm', 'Please Confirm Your Email', line: $this->class_name . __LINE__);
                     }
                 } else {

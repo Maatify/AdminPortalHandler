@@ -13,7 +13,7 @@ namespace Maatify\Portal\Admin;
 
 use \App\Assist\AppFunctions;
 use \App\Assist\Encryptions\AdminTokenEncryption;
-use \App\Assist\Jwt\JWTAssistance;
+use App\Assist\Jwt\JwtAdminKey;
 use Maatify\Functions\GeneralFunctions;
 use Maatify\Json\Json;
 use Maatify\Portal\Language\LanguagePortal;
@@ -36,7 +36,7 @@ class AdminLoginToken extends AdminToken
     }
     public function LogoutSilent(): void
     {
-        if (! empty($_SESSION['token']) && $token = JWTAssistance::obj()->JwtValidation($this->class_name . __LINE__)) {
+        if (! empty($_SESSION['token']) && $token = JwtAdminKey::obj()->JwtValidation($this->class_name . __LINE__)) {
             if (! empty($token->token)) {
                 if ($admin = $this->ByToken($token->token, $this->class_name . __LINE__)) {
                     $this->Edit(['token'=>''], "`$this->identify_table_id_col_name` = ? ", [$admin[$this->identify_table_id_col_name]]);
@@ -62,10 +62,10 @@ class AdminLoginToken extends AdminToken
     public function ValidateAdminToken(): array
     {
         if(!empty($_GET['action']) && !in_array($_GET['action'], ['login', 'logout'])) {
-            if (! empty($_SESSION['token']) && $token = JWTAssistance::obj()->JwtValidation($this->class_name . $this->class_name . __LINE__)) {
+            if (! empty($_SESSION['token']) && $token = JwtAdminKey::obj()->JwtValidation($this->class_name . $this->class_name . __LINE__)) {
                 if (! empty($token->token)) {
                     if ($admin = $this->ByToken($token->token, $this->class_name . __LINE__)) {
-                        JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
+                        JwtAdminKey::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
                         $this->row_id = $admin[$this->identify_table_id_col_name];
                         $this->admin_isAdmin = (int)$admin['is_admin'];
                         $this->admin_name = $admin['name'];
@@ -84,7 +84,7 @@ class AdminLoginToken extends AdminToken
 
     public function ValidateSilentAdminTokenPage(): bool
     {
-        if (! empty($_SESSION['token']) && $tokens = JWTAssistance::obj()->JwtValidationForSessionLogin($this->class_name . __LINE__)) {
+        if (! empty($_SESSION['token']) && $tokens = JwtAdminKey::obj()->JwtValidationForSessionLogin($this->class_name . __LINE__)) {
             if (isset($tokens->token)) {
                 if (AdminLoginToken::obj()->ByToken($tokens->token, $this->class_name . __LINE__)) {
                     return true;
@@ -98,7 +98,7 @@ class AdminLoginToken extends AdminToken
     {
         $auth_pages = ['AuthRegister', 'Auth', 'ChangePassword', 'EmailConfirm', 'CheckSession'];
         if(!empty($_GET['action'])) {
-            if (! empty($_SESSION['token']) && $tokens = JWTAssistance::obj()->JwtValidationForSessionLogin($this->class_name . __LINE__)) {
+            if (! empty($_SESSION['token']) && $tokens = JwtAdminKey::obj()->JwtValidationForSessionLogin($this->class_name . __LINE__)) {
                 if (isset($tokens->token)) {
                     if (AdminLoginToken::obj()->ByToken($tokens->token, $this->class_name . __LINE__)) {
                         $type['type'] = (isset($tokens->next) && in_array($tokens->next, $auth_pages) ? 'login' : 'main');

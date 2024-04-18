@@ -11,7 +11,7 @@
 
 namespace Maatify\Portal\Admin;
 
-use App\Assist\Jwt\JWTAssistance;
+use App\Assist\Jwt\JwtAdminKey;
 use Maatify\Json\Json;
 
 class Admin2FAPortal extends Admin2FA
@@ -74,7 +74,7 @@ class Admin2FAPortal extends Admin2FA
     {
         if($admin = $this->ValideToken()){
             if($this->ValidateCode($code, $this->AuthDecode($admin['auth']), $admin['username'])){
-                JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
+                JwtAdminKey::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
                 return $admin;
             }
         }
@@ -89,7 +89,7 @@ class Admin2FAPortal extends Admin2FA
                     if ($this->ValidateCode($code, $admin['secret'], $admin['username'])) {
                         if ($this->NewAuthRecord($admin[$this->identify_table_id_col_name],
                             $admin['secret'])) {
-                            JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
+                            JwtAdminKey::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
                             return $admin;
                         }
                     }

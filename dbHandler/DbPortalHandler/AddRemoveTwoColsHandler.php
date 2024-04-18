@@ -13,6 +13,8 @@ namespace Maatify\Portal\DbHandler;
 
 // Relation between Two table in this Table
 use App\DB\DBS\DbPortalHandler;
+use Maatify\Functions\GeneralFunctions;
+use Maatify\Json\Json;
 
 abstract class AddRemoveTwoColsHandler extends DbPortalHandler
 {

@@ -64,6 +64,12 @@ class CronEmailSender extends CronEmail
                         $type = 'TempPassword';
                         $message = (new CronEmailEncryption())->DeHashed($item['message']);
                         break;
+                    case 5;
+                        $type= 'ConfirmDashboardLink';
+                        break;
+                    case 6;
+                        $type= 'ResetPassDashboardLink';
+                        break;
                     case 7;
                         $type= 'AdminMessage';
                         break;

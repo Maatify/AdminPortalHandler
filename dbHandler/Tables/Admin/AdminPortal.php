@@ -223,6 +223,13 @@ class AdminPortal extends ParentClassHandler
             $where_val = [$master_id];
         }
         $where_to_add = '';
+        if(isset($_POST['user_id'])){
+            $admin_id = $this->postValidator->Optional('user_id', ValidatorConstantsTypes::Int, $this->class_name . __LINE__);
+            if(!empty($admin_id)) {
+                $where_to_add .= " AND `$this->tableName`.`$this->identify_table_id_col_name` = ? ";
+                $where_val[] = $admin_id;
+            }
+        }
         if(isset($_POST['status']) && is_numeric($_POST['status']) && in_array($_POST['status'], [0,1])){
             $where_to_add .= 'AND `status` = ? ';
             $where_val[] = $_POST['status'];
@@ -233,7 +240,10 @@ class AdminPortal extends ParentClassHandler
         }
         Json::Success(
             $this->PaginationHandler(
-                $this->MaxIDThisTable(),
+                $this->CountTableRows($this->tableName,
+                    "`$this->tableName`.`$this->identify_table_id_col_name`",
+                    "`$this->tableName`.`$this->identify_table_id_col_name` > ? $where_to_add ",
+                    $where_val),
                 $this->PaginationRows(
                     $tables,
                     $columns,

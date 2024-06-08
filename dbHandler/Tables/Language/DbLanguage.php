@@ -57,6 +57,11 @@ class DbLanguage extends DbPortalHandler
         return "`$this->tableName`.`short_name` as language";
     }
 
+    public function JoinShortNameWithoutAs(): string
+    {
+        return "`$this->tableName`.`short_name`";
+    }
+
     public function GetCurrentLanguageId(string $short_code): int
     {
         if(!$id = (int)$this->ColThisTable('language_id', '`short_code` = ? ', [strtolower($short_code)])){

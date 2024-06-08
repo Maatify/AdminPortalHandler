@@ -50,25 +50,7 @@ class AdminPortal extends ParentClassHandler
 
                 // =========== getting admin session ===========
 
-                $_SESSION['is_master'] = false;
-
-                if($admin['id'] <= AdminPrivilege::obj()->MasterIds()){
-
-                    $_SESSION['is_master'] = true;
-
-                }else{
-
-                    if($admin['isAdmin']){
-
-                        $_SESSION['is_admin'] = true;
-
-                    }else{
-
-                        $_SESSION['privileges'] = AdminPrivilege::obj()->AllAllowedMethods($admin['id']);
-
-                    }
-                }
-
+                AdminPrivilegeHandler::obj()->storePrivileges($admin[$this->identify_table_id_col_name], $admin['is_admin']);
 
                 $log = [$this->identify_table_id_col_name];
                 $this->logger_keys = $log;
@@ -77,7 +59,7 @@ class AdminPortal extends ParentClassHandler
                     AdminLoginToken::obj()->GenerateToken($admin[$this->identify_table_id_col_name], $admin['username']);
                     if (! empty($admin['confirmed']) || empty($_ENV['EMAIL_CONFIRM_REQUIRED'])) {
                         if ($_ENV['AUTH_2FA_STATUS']) {
-                            if ($_ENV['AUTH_2FA_REQUIRED'] || AdminPrivilege::obj()->IsMaster($admin[$this->identify_table_id_col_name]) || $admin['is_admin'] || $admin['isAuthRequired']) {
+                            if ($_ENV['AUTH_2FA_REQUIRED'] || AdminPrivilegeHandler::obj()->IsMaster($admin[$this->identify_table_id_col_name]) || $admin['is_admin'] || $admin['isAuthRequired']) {
                                 try {
                                     Admin2FA::obj()->ResponseAuthMov($admin);
                                 } catch (Exception $e) {
@@ -183,7 +165,7 @@ class AdminPortal extends ParentClassHandler
             $this->row_id = $admin_id;
         }
         if (
-            (AdminPrivilege::obj()->IsMaster($this->row_id) && ! AdminPrivilege::obj()->IsMaster(AdminLoginToken::obj()->GetAdminID()))
+            (AdminPrivilegeHandler::obj()->IsMaster($this->row_id) && ! AdminPrivilegeHandler::obj()->IsMaster(AdminLoginToken::obj()->GetAdminID()))
             || $this->row_id == AdminLoginToken::obj()->GetAdminID()
             || in_array($this->row_id, [1, 2])
         ) {
@@ -234,7 +216,7 @@ class AdminPortal extends ParentClassHandler
     public function AllUsers(): void
     {
         [$tables, $columns] = $this->UsersTbsCols();
-        $master_id = AdminPrivilege::obj()->MasterIds();
+        $master_id = AdminPrivilegeHandler::obj()->MasterIds();
         if (AdminLoginToken::obj()->GetAdminID() <= $master_id) {
             $where_val = [0];
         } else {

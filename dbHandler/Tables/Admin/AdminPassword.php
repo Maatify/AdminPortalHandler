@@ -56,7 +56,7 @@ class AdminPassword extends ParentClassHandler
 
     public function SetAllMaster(string $password): bool
     {
-        return $this->Edit(['password'=>$this->HashPassword($password)], "`$this->identify_table_id_col_name` <= ?", [AdminPrivilege::obj()->MasterIds()]);
+        return $this->Edit(['password'=>$this->HashPassword($password)], "`$this->identify_table_id_col_name` <= ?", [AdminPrivilegeHandler::obj()->MasterIds()]);
     }
 
     public function Check(int $admin_id, string $password): string

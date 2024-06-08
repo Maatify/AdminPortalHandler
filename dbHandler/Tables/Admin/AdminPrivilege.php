@@ -11,6 +11,7 @@
 
 namespace Maatify\Portal\Admin;
 
+use \App\Assist\AppFunctions;
 use Maatify\Functions\GeneralFunctions;
 use Maatify\Json\Json;
 use Maatify\Portal\DbHandler\AddRemoveTwoColsHandler;
@@ -18,7 +19,7 @@ use Maatify\Portal\Privileges\PrivilegeMethods;
 use Maatify\Portal\Privileges\PrivilegeRoles;
 use Maatify\Portal\Privileges\Privileges;
 
-class AdminPrivilege extends AddRemoveTwoColsHandler
+abstract class AdminPrivilege extends AddRemoveTwoColsHandler
 {
     const TABLE_NAME = 'a_roles';
     protected string $tableName = self::TABLE_NAME;
@@ -26,20 +27,10 @@ class AdminPrivilege extends AddRemoveTwoColsHandler
     protected string $logger_sub_type = 'roles';
     protected string $table_source_class = Admin::class;
     protected string $table_destination_class = PrivilegeRoles::class;
-    private static self $instance;
-
-    public static function obj(): self
-    {
-        if (empty(self::$instance)) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
 
     public function MasterIds(): int
     {
-        return 3;
+        return AppFunctions::admin_master_id;
     }
 
     public function IsMaster(int $admin_id): bool
@@ -62,6 +53,53 @@ class AdminPrivilege extends AddRemoveTwoColsHandler
            INNER JOIN `$tb_privilege_methods` ON `$tb_privilege_methods`.`id` = `$tb_privilege`.`method_id`",
             "`$tb_privilege_methods`.`method`",
             "`$tb_admin_role`.`admin_id` = ? ",
+            [$admin_id]
+        );
+        $final_array = array();
+        foreach ($privileges as $privilege) {
+            $final_array[] = $privilege['method'];
+        }
+        return $final_array;
+    }
+
+    public function AllAllowedPagesAndMethods(int $admin_id): array
+    {
+        $tb_privilege_roles = PrivilegeRoles::obj()->TableName();
+        $tb_privilege = Privileges::obj()->TableName();
+        $tb_privilege_methods = PrivilegeMethods::obj()->TableName();
+        $tb_admin_role = self::TABLE_NAME;
+        $privileges = $this->Rows(
+            "`$tb_privilege_roles` 
+           INNER JOIN `$tb_admin_role` ON `$tb_privilege_roles`.`id` = `$tb_admin_role`.`role_id`
+           INNER JOIN `$tb_privilege` ON `$tb_privilege_roles`.`id` = `$tb_privilege`.`role_id` AND `$tb_privilege`.`granted` = '1'
+           INNER JOIN `$tb_privilege_methods` ON `$tb_privilege_methods`.`id` = `$tb_privilege`.`method_id`",
+            "`$tb_privilege_methods`.`method`, `$tb_privilege_methods`.`page`",
+            "`$tb_admin_role`.`admin_id` = ? ",
+            [$admin_id]
+        );
+        $final_array = array();
+        foreach ($privileges as $privilege) {
+            if (!isset($final_array[$privilege['page']])) {
+                $final_array[$privilege['page']] = [];
+            }
+            $final_array[$privilege['page']][] = $privilege['method'];
+        }
+        return $final_array;
+    }
+
+    public function AllAllowedPages(int $admin_id): array
+    {
+        $tb_privilege_roles = PrivilegeRoles::obj()->TableName();
+        $tb_privilege = Privileges::obj()->TableName();
+        $tb_privilege_methods = PrivilegeMethods::obj()->TableName();
+        $tb_admin_role = self::TABLE_NAME;
+        $privileges = $this->Rows(
+            "`$tb_privilege_roles` 
+           INNER JOIN `$tb_admin_role` ON `$tb_privilege_roles`.`id` = `$tb_admin_role`.`role_id`
+           INNER JOIN `$tb_privilege` ON `$tb_privilege_roles`.`id` = `$tb_privilege`.`role_id` AND `$tb_privilege`.`granted` = '1'
+           INNER JOIN `$tb_privilege_methods` ON `$tb_privilege_methods`.`id` = `$tb_privilege`.`method_id`",
+            "`$tb_privilege_methods`.`page`",
+            "`$tb_admin_role`.`admin_id` = ? GROUP BY `$tb_privilege_methods`.`page`",
             [$admin_id]
         );
         $final_array = array();

@@ -12,6 +12,7 @@
 namespace Maatify\Portal\DbHandler;
 
 // Relation between Two table in this Table
+use App\Assist\AppFunctions;
 use App\DB\DBS\DbPortalHandler;
 use Maatify\Functions\GeneralFunctions;
 use Maatify\Json\Json;
@@ -21,15 +22,15 @@ abstract class AddRemoveTwoColsHandler extends DbPortalHandler
     protected string $logger_type = '';
     protected string $logger_sub_type = '';
     protected string $col_source_name;
-    private int $col_source_val;
+    protected int $col_source_val;
     protected string $table_source_name;
     protected string $table_source_class;
-    private array $current_source;
+    protected array $current_source;
 
-    private string $col_destination_name;
+    protected string $col_destination_name;
     protected int $col_destination_val;
 
-    private string $table_destination_name;
+    protected string $table_destination_name;
     protected string $table_destination_class;
     protected array $current_destination;
     protected array $current_row;
@@ -48,7 +49,6 @@ abstract class AddRemoveTwoColsHandler extends DbPortalHandler
         $this->table_source_name = $this->table_source_class::TABLE_NAME;
         $this->col_source_name = $this->table_source_class::IDENTIFY_TABLE_ID_COL_NAME;
     }
-
 
     protected function ValidatePostedSource(): int
     {
@@ -74,6 +74,7 @@ abstract class AddRemoveTwoColsHandler extends DbPortalHandler
         if (! ($this->RowWithNames($this->table_source_class, $this->col_source_name, $row_id))) {
             Json::Incorrect($posted_col_name, "$posted_col_name Not Found", $this->class_name . __LINE__);
         }
+
         return $row_id;
     }
 
@@ -124,14 +125,16 @@ abstract class AddRemoveTwoColsHandler extends DbPortalHandler
     {
         $this->ValidatePostedSource();
         [$inner_add, $cols_add] = $this->table_destination_class::obj()->InnerLanguageNameTablesAndCols($this->table_destination_name);
-        $this->JsonHandlerWithOther(
-            $this->Rows("`$this->table_destination_name` 
+        $result = $this->Rows("`$this->table_destination_name` 
         LEFT JOIN `$this->tableName` 
         ON `$this->tableName`.`$this->col_destination_name` = `$this->table_destination_name`.`$this->col_destination_name` 
-        AND `$this->table_destination_name`.`$this->col_destination_name` = '$this->col_source_val' " . $inner_add,
-                "`$this->table_destination_name`.* " . $cols_add,
-                " `$this->tableName`.`$this->col_destination_name` IS NULL GROUP BY `$this->table_destination_name`.`$this->col_destination_name` "),
-            $this->current_source,
+        AND `$this->tableName`.`$this->col_source_name` = '$this->col_source_val' " . $inner_add,
+            "`$this->table_destination_name`.* " . $cols_add,
+            " `$this->tableName`.`$this->col_destination_name` IS NULL GROUP BY `$this->table_destination_name`.`$this->col_destination_name` ");
+        $this->JsonHandlerWithOther(
+            AppFunctions::MapArrayImages($result)
+            ,
+            AppFunctions::MapRowImages($this->current_source),
             line: $this->class_name . __LINE__
         );
     }
@@ -140,19 +143,21 @@ abstract class AddRemoveTwoColsHandler extends DbPortalHandler
     {
         $this->ValidatePostedDestination();
         [$inner_add, $cols_add] = $this->table_source_class::obj()->InnerLanguageNameTablesAndCols($this->table_source_name);
-        $this->JsonHandlerWithOther(
-            $this->Rows("`$this->table_source_name` 
+        $result = $this->Rows("`$this->table_source_name` 
         LEFT JOIN `$this->tableName` 
         ON `$this->tableName`.`$this->col_source_name` = `$this->table_source_name`.`$this->col_source_name` 
-        AND `$this->tableName`.`$this->col_source_name` = '$this->col_destination_val' " . $inner_add,
-                "`$this->table_source_name`.* " . $cols_add,
-                "`$this->tableName`.`$this->col_source_name` IS NULL GROUP BY `$this->table_source_name`.`$this->col_source_name` "),
-            $this->current_destination,
+        AND `$this->tableName`.`$this->col_destination_name` = '$this->col_destination_val' " . $inner_add,
+            "`$this->table_source_name`.* " . $cols_add,
+            "`$this->tableName`.`$this->col_source_name` IS NULL GROUP BY `$this->table_source_name`.`$this->col_source_name` ");
+        $this->JsonHandlerWithOther(
+            AppFunctions::MapArrayImages($result)
+            ,
+            AppFunctions::MapRowImages($this->current_destination),
             line: $this->class_name . __LINE__
         );
     }
 
-    public function SwitchAssign(): void
+    public function SwitchAssignSilent(): void
     {
         $this->ValidatePostedSource();
         $this->ValidatePostedDestination();
@@ -223,6 +228,11 @@ abstract class AddRemoveTwoColsHandler extends DbPortalHandler
             ];
         }
         $this->Logger($logger, $changes, $action);
+    }
+
+    public function SwitchAssign(): void
+    {
+        $this->SwitchAssignSilent();
         Json::Success(line: $this->class_name . __LINE__);
     }
 
@@ -324,22 +334,24 @@ abstract class AddRemoveTwoColsHandler extends DbPortalHandler
     {
         $otherTableName = $otherTable::TABLE_NAME;
         if(empty($order_by)){
-           $order_by = "`$otherTableName`.`$other_col_name` ASC";
+            $order_by = "`$otherTableName`.`$other_col_name` ASC";
         }
 
         [$inner_add, $cols_add] = $otherTable::obj()->InnerLanguageNameTablesAndCols($otherTable);
-        $this->JsonHandlerWithOther(
-            $this->Rows("`$otherTableName` 
+        $result = $this->Rows("`$otherTableName` 
             INNER JOIN `$this->tableName` ON 
             `$this->tableName`.`$other_col_name` = `$otherTableName`.`$other_col_name` 
             AND `$this->tableName`.`$this_col_name` = '$this_col_val'
             " . $inner_add,
-                "`$otherTableName`.*, `$this->tableName`.`$this_col_name` IS NOT NULL as assigned" . $cols_add . ", $this->tableName.*",
-                "`$otherTableName`.`$other_col_name` > ? 
+            "`$otherTableName`.*, `$this->tableName`.`$this_col_name` IS NOT NULL as assigned" . $cols_add . ", $this->tableName.*",
+            "`$otherTableName`.`$other_col_name` > ? 
             GROUP BY `$otherTableName`.`$other_col_name` 
             ORDER BY $order_by",
-                [0]),
-            $current
+            [0]);
+        $this->JsonHandlerWithOther(
+            AppFunctions::MapArrayImages($result)
+            ,
+            AppFunctions::MapRowImages($current)
         );
     }
 
@@ -371,18 +383,12 @@ abstract class AddRemoveTwoColsHandler extends DbPortalHandler
             ORDER BY `$otherTableName`.`$other_col_name` ASC",
             [0]);
 
-        array_map(function (array $record) {
-            $record = $this->AddSiteImageUrls($record);
 
-            return $this->DecodeHtmlCols($record);
-        }, $result);
 
         $this->JsonHandlerWithOther(
-            $result,
-            $current
+            AppFunctions::MapArrayImages($result),
+            AppFunctions::MapRowImages($current)
         );
-
-
     }
 
     public function AssignSourceFromOtherSourceId(): void
@@ -419,6 +425,18 @@ abstract class AddRemoveTwoColsHandler extends DbPortalHandler
 
     public function UpdateBySourceAndDestination(): void
     {
+        $edits = $this->UpdateBySourceAndDestinationSilent();
+        if (empty($edits)) {
+            Json::errorNoUpdate(line: $this->class_name . __LINE__);
+        } else {
+            Json::success(line: $this->class_name . __LINE__);
+        }
+    }
+
+
+
+    public function UpdateBySourceAndDestinationSilent(): bool
+    {
         $this->ValidateEditBySourceAndDestination();
         [$edits, $log_keys, $changes] = $this->AddEditValues($this->current_row);
 
@@ -434,13 +452,12 @@ abstract class AddRemoveTwoColsHandler extends DbPortalHandler
             }
         }
         $log_keys = array_merge($this->logger_keys, $log_keys);
-        if (empty($edits)) {
-            Json::errorNoUpdate(line: $this->class_name . __LINE__);
-        } else {
+        if (!empty($edits)) {
             $this->edit($edits, "`$this->col_source_name` = ? AND `$this->col_destination_name` = ? ", [$this->col_source_val, $this->col_destination_val]);
             $this->Logger($log_keys, $changes, 'Update');
-            Json::success(line: $this->class_name . __LINE__);
+            return true;
         }
+        return false;
     }
 
     public function SwitchKeyBySourceAndDestination(string $key = 'status'): void

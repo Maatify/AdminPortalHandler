@@ -1,7 +1,7 @@
 {
   "name": "maatify/admin-portal-handler",
   "description": "maatify.com",
-  "version": "1.1.005",
+  "version": "1.1.006",
   "type": "library",
   "keywords": [
     "PHP",
@@ -71,9 +71,6 @@
     "psr-4": {
       "Maatify\\dBHandler\\": "dbHandler/",
       "Maatify\\Portal\\Admin\\": "dbHandler/Tables/Admin/",
-      "Maatify\\Portal\\Cron\\": "dbHandler/Tables/Cron/",
-      "Maatify\\Portal\\Queue\\": "dbHandler/Tables/Queue/",
-      "Maatify\\Portal\\Cron\\Emails\\": "dbHandler/Tables/Cron/Emails",
       "Maatify\\Portal\\Privileges\\": "dbHandler/Tables/Privileges/",
       "Maatify\\Portal\\DbHandler\\": "dbHandler/DbPortalHandler/",
       "Maatify\\Portal\\Logger\\": "dbHandler/Logger/",

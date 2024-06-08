@@ -38,4 +38,9 @@ abstract class ParentClassHandler extends DbPortalHandler
     // to use in add if child classes have language_id
     protected array $child_classe_languages = [];
 
+    public function MaxIDThisTable(): int
+    {
+        return parent::MaxIDThisTable();
+    }
+
 }

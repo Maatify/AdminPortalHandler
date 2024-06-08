@@ -10,8 +10,7 @@
  */
 
 namespace Maatify\Portal\DbHandler;
-
-use \App\DB\DBS\DbPortalHandler;
+use App\DB\DBS\DbPortalHandler;
 use Maatify\Json\Json;
 use Maatify\Portal\Language\DbLanguage;
 use Maatify\Portal\Language\LanguagePortal;
@@ -23,6 +22,8 @@ abstract class SubClassLanguageHandler extends DbPortalHandler
     protected string $logger_type = '';
     protected string $logger_sub_type = '';
     protected string $parent_class = '';
+
+    protected string $parent_join_col = '';
     protected array $cols_to_add = [[ValidatorConstantsTypes::Name, ValidatorConstantsTypes::Name, '']];
 
     private function RecordEmptyName(int $language_id, int $parent_id): void
@@ -116,6 +117,7 @@ abstract class SubClassLanguageHandler extends DbPortalHandler
             'language_id'                     => $this->language_id,
         ];
         [$edits, $log_keys, $changes] = $this->AddEditValues($row);
+
         $log_keys = array_merge($this->logger_keys, $log_keys);
         if (empty($edits)) {
             Json::errorNoUpdate(line: $this->class_name . __LINE__);
@@ -126,10 +128,28 @@ abstract class SubClassLanguageHandler extends DbPortalHandler
         }
     }
 
+    public function UpdateSilent(): void
+    {
+        $row = $this->ValidateTableRow();
+        $this->logger_keys = [
+            'language'                        => $this->language_short_name,
+            $this->identify_table_id_col_name => $this->row_id,
+            'language_id'                     => $this->language_id,
+        ];
+        [$edits, $log_keys, $changes] = $this->AddEditValues($row);
+
+        $log_keys = array_merge($this->logger_keys, $log_keys);
+        if (!empty($edits)) {
+            $this->edit($edits, "`{$this->identify_table_id_col_name}` = ? AND `language_id` = ?", [$this->row_id, $this->language_id]);
+            $this->Logger($log_keys, $changes, 'Update');
+        }
+    }
+
     private function AllPagination(): void
     {
         [$table, $columns] = $this->getTableAndColumnsWithShortLanguage();
-        $result = $this->PaginationRows($table, $columns, "`$this->identify_table_id_col_name` > ? ORDER BY `$this->identify_table_id_col_name` DESC", [0]);
+        $result = $this->PaginationRows($table, $columns, "`$this->identify_table_id_col_name` > ? 
+        ORDER BY `$this->identify_table_id_col_name` DESC", [0]);
         Json::Success($this->PaginationHandler(
             $this->CountThisTableRows($this->identify_table_id_col_name),
             array_map(function (array $record) {
@@ -138,6 +158,24 @@ abstract class SubClassLanguageHandler extends DbPortalHandler
             }, $result)
         ),
             line: $this->class_name . __LINE__);
+    }
+
+    public function AllLanguagesPagination(): void
+    {
+        [$table, $columns] = $this->getTableAndColumnsWithShortLanguage();
+        $parent_name = $this->parent_class::TABLE_NAME;
+        $table_count = $table;
+        if(!empty($this->parent_join_col)){
+            $table .=  " INNER JOIN `$parent_name` ON `$parent_name`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name`";
+            $columns .= ", `$parent_name`.`$this->parent_join_col` as detail";
+        }
+        $whereCondition = "`$this->tableName`.`$this->identify_table_id_col_name` > ? 
+        ORDER BY `$this->tableName`.`$this->identify_table_id_col_name` DESC";
+        $result = $this->PaginationHandler(
+            $this->CountTableRows($table_count, $this->identify_table_id_col_name, $whereCondition, [0]),
+            $this->PaginationRows($table, $columns, $whereCondition, [0]),
+        );
+        Json::Success($result);
     }
 
 }

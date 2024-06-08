@@ -64,7 +64,7 @@ class DbLanguage extends DbPortalHandler
 
     public function GetCurrentLanguageId(string $short_code): int
     {
-        if(!$id = (int)$this->ColThisTable('language_id', '`short_code` = ? ', [strtolower($short_code)])){
+        if(!$id = (int)$this->ColThisTable('language_id', '`short_name` = ? ', [strtolower($short_code)])){
             $id = 1;
         }
         return $id;

@@ -47,6 +47,29 @@ class AdminPortal extends ParentClassHandler
         $password = $this->postValidator->Require('password', 'password', $this->class_name . __LINE__);
         if ($admin = $this->Login($username)) {
             if (AdminPassword::obj()->Check($admin[$this->identify_table_id_col_name], $password)) {
+
+                // =========== getting admin session ===========
+
+                $_SESSION['is_master'] = false;
+
+                if($admin['id'] <= AdminPrivilege::obj()->MasterIds()){
+
+                    $_SESSION['is_master'] = true;
+
+                }else{
+
+                    if($admin['isAdmin']){
+
+                        $_SESSION['is_admin'] = true;
+
+                    }else{
+
+                        $_SESSION['privileges'] = AdminPrivilege::obj()->AllAllowedMethods($admin['id']);
+
+                    }
+                }
+
+
                 $log = [$this->identify_table_id_col_name];
                 $this->logger_keys = $log;
                 unset($admin['password']);

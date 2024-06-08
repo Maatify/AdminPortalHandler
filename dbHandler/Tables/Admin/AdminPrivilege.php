@@ -49,13 +49,34 @@ class AdminPrivilege extends AddRemoveTwoColsHandler
         }
         return false;
     }
+    public function AllAllowedMethods(int $admin_id): array
+    {
+        $tb_privilege_roles = PrivilegeRoles::obj()->TableName();
+        $tb_privilege = Privileges::obj()->TableName();
+        $tb_privilege_methods = PrivilegeMethods::obj()->TableName();
+        $tb_admin_role = self::TABLE_NAME;
+        $privileges = $this->Rows(
+            "`$tb_privilege_roles` 
+           INNER JOIN `$tb_admin_role` ON `$tb_privilege_roles`.`id` = `$tb_admin_role`.`role_id`
+           INNER JOIN `$tb_privilege` ON `$tb_privilege_roles`.`id` = `$tb_privilege`.`role_id` AND `$tb_privilege`.`granted` = '1'
+           INNER JOIN `$tb_privilege_methods` ON `$tb_privilege_methods`.`id` = `$tb_privilege`.`method_id`",
+            "`$tb_privilege_methods`.`method`",
+            "`$tb_admin_role`.`admin_id` = ? ",
+            [$admin_id]
+        );
+        $final_array = array();
+        foreach ($privileges as $privilege) {
+            $final_array[] = $privilege['method'];
+        }
+        return $final_array;
+    }
 
     private function CheckMyPrivilege(string $privilege_name, int $admin_id, int $is_admin): bool
     {
         $tb_privilege_roles = PrivilegeRoles::TABLE_NAME;
         $tb_privilege = Privileges::TABLE_NAME;
         $tb_privilege_methods = PrivilegeMethods::TABLE_NAME;
-        $tb_admin_role = AdminPrivilege::obj()->TableName();
+        $tb_admin_role = self::TABLE_NAME;
         if(self::IsMaster($admin_id)){
             return true;
         }

@@ -49,8 +49,6 @@ class AdminPasswordPortal extends AdminPassword
         }
     }
 
-
-
     public function SetUserNewPassword(): void
     {
         $this->row_id = $this->ValidatePostedTableId();

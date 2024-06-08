@@ -14,7 +14,7 @@ namespace Maatify\Portal\Cron\Emails;
 use \App\Assist\AppFunctions;
 use \App\DB\DBS\DbConnector;
 
-abstract class CronEmail extends DbConnector
+abstract class CronEmailHandler extends DbConnector
 {
     protected string $tableName = 'cron_email';
 

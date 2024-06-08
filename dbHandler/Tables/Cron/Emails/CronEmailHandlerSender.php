@@ -16,7 +16,7 @@ use \App\Assist\Encryptions\CronEmailEncryption;
 use Maatify\Mailer\Mailer;
 use Maatify\Portal\Queue\EmailQueue;
 
-class CronEmailSender extends CronEmail
+class CronEmailHandlerSender extends CronEmailHandler
 {
     private static self $instance;
 

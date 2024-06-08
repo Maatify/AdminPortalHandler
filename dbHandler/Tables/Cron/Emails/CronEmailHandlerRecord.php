@@ -13,7 +13,7 @@ namespace Maatify\Portal\Cron\Emails;
 
 use \App\Assist\Encryptions\CronEmailEncryption;
 
-class CronEmailRecord extends CronEmail
+class CronEmailHandlerRecord extends CronEmailHandler
 {
     private static self $instance;
 

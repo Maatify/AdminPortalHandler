@@ -219,14 +219,16 @@ class AdminPortal extends ParentClassHandler
         $tb_admin_emails = AdminEmail::TABLE_NAME;
         $tb_admin_auth = Admin2FA::TABLE_NAME;
         [$p_t, $p_c] = AdminPhone::obj()->InnerJoinThisTableWithUniqueCols($this->tableName, ['phone' => 0]);
+        [$t_t, $t_c] = AdminTelegramBot::obj()->LeftJoinThisTableWithoutTableAlias($this->tableName);
 
         return ["`$this->tableName` 
             INNER JOIN `$tb_admin_emails` ON `$tb_admin_emails`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
             INNER JOIN `$tb_admin_auth` ON `$tb_admin_auth`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name`  
-            $p_t ",
+            $p_t 
+            $t_t",
                 "`$this->tableName`.*, `$tb_admin_emails`.`email`, `$tb_admin_emails`.`confirmed`,  
             IF(`$tb_admin_auth`.`auth` = '', 0, 1) as auth,
-            `$tb_admin_auth`.`isAuthRequired`, " . $p_c];
+            `$tb_admin_auth`.`isAuthRequired`, " . $p_c . ', ' . $t_c];
     }
 
     public function AllUsers(): void

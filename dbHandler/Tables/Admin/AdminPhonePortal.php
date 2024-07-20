@@ -47,7 +47,7 @@ class AdminPhonePortal extends DbPortalHandler
         return self::$instance;
     }
 
-    private function PhoneIsExist(string $phone): bool
+    public function PhoneIsExist(string $phone): bool
     {
         return $this->RowIsExistThisTable('`phone` = ? ', [$phone]);
     }

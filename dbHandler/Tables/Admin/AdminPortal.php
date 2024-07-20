@@ -173,6 +173,9 @@ class AdminPortal extends ParentClassHandler
         if ($this->UsernameIsExist($username)) {
             Json::Exist('username');
         }
+        if(!empty($phone) && AdminPhonePortal::obj()->PhoneIsExist($phone)){
+            Json::Exist('phone');
+        }
         $this->cols_to_add = [
             [ValidatorConstantsTypes::Username, ValidatorConstantsTypes::Username, ValidatorConstantsValidators::Require],
             [ValidatorConstantsTypes::Name, ValidatorConstantsTypes::Name, ValidatorConstantsValidators::Require],

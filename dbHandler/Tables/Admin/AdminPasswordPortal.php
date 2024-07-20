@@ -11,6 +11,8 @@
 
 namespace Maatify\Portal\Admin;
 
+use App\Assist\AppFunctions;
+use Maatify\CronTelegramBotAdmin\CronTelegramBotAdminRecord;
 use Maatify\Json\Json;
 
 class AdminPasswordPortal extends AdminPassword
@@ -40,6 +42,14 @@ class AdminPasswordPortal extends AdminPassword
                 $log['change'] = 'Change Password';
                 $this->AdminLogger($log, [['password', 'encrypted', 'encrypted']], $_GET['action']);
                 $this->Set(AdminLoginToken::obj()->GetAdminID(), $password);
+
+                if(!empty($user['telegram_status']) && !empty($user['telegram_chat_id'])){
+                    CronTelegramBotAdminRecord::obj()->RecordMessage(
+                        $this->row_id,
+                        $user['telegram_chat_id'],
+                        'Your Password was Changed Successfully' . PHP_EOL . AppFunctions::CurrentDateTime()
+                    );
+                }
                 AdminLoginToken::obj()->LogoutSilent();
                 Json::ReLogin(__LINE__);
             } else {
@@ -56,6 +66,9 @@ class AdminPasswordPortal extends AdminPassword
         $this->row_id = $this->ValidatePostedTableId();
         $user = AdminPortal::obj()->UserForEdit($this->row_id);
         $otp = AdminPassword::obj()->SetTemp($this->row_id, $user['name'], $user['email'], $user['phone']);
+        if(!empty($user['telegram_status']) && !empty($user['telegram_chat_id'])){
+            CronTelegramBotAdminRecord::obj()->RecordTempPassword($this->row_id, $user['telegram_chat_id'], $otp);
+        }
         $this->logger_keys = [$this->identify_table_id_col_name => $this->row_id];
         $log = $this->logger_keys;
         $log['change'] = 'Generate new default password';

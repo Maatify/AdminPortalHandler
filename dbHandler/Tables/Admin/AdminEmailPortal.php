@@ -11,9 +11,11 @@
 
 namespace Maatify\Portal\Admin;
 
+use App\Assist\AppFunctions;
 use \App\Assist\Encryptions\ConfirmEmailEncryption;
 use App\Assist\Jwt\JWTAssistance;
 use Maatify\CronEmail\CronEmailRecord;
+use Maatify\CronTelegramBotAdmin\CronTelegramBotAdminRecord;
 use Maatify\Json\Json;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;
@@ -68,6 +70,19 @@ class AdminEmailPortal extends AdminEmail
                     Json::Exist('email', line: $this->class_name . __LINE__);
                 }else{
                     $this->Set(AdminLoginToken::obj()->GetAdminID(), $email, AdminLoginToken::obj()->GetAdminName(), AdminLoginToken::obj()->GetAdminUsername());
+                    if(!empty(AdminLoginToken::obj()->GetTelegramStatus())) {
+                        CronTelegramBotAdminRecord::obj()->RecordMessage(
+                            AdminLoginToken::obj()->GetAdminID(),
+                            AdminLoginToken::obj()->GetTelegramChatID(),
+                            'Your Email Was Changed Successfully'
+                            . PHP_EOL
+                            . "new email: " . $email
+                            . PHP_EOL
+                            . "ip: " . AppFunctions::IP()
+                            . PHP_EOL
+                            . "time: " . AppFunctions::CurrentDateTime()
+                        );
+                    }
                     $this->log['email'] = ['from'=> AdminLoginToken::obj()->GetAdminEmail(), 'to'=>$email];
                     $this->AdminLogger($this->log, [['email', AdminLoginToken::obj()->GetAdminEmail(), $email]], 'Update');
                     $this->Success( $this->class_name . __LINE__);
@@ -83,6 +98,15 @@ class AdminEmailPortal extends AdminEmail
     {
         $code = $this->postValidator->Require('code', 'code');
         $this->Confirm($code);
+        if(!empty(AdminLoginToken::obj()->GetTelegramStatus())) {
+            CronTelegramBotAdminRecord::obj()->RecordMessage(
+                AdminLoginToken::obj()->GetAdminID(),
+                AdminLoginToken::obj()->GetTelegramChatID(),
+                'Your Email Was Confirmed Successfully'
+                . PHP_EOL
+                . "time: " . AppFunctions::CurrentDateTime()
+            );
+        }
         $this->log['email'] = ['from' => 'Unverified', 'to' => 'Verified'];
         $this->AdminLogger($this->log, [], 'Verify');
         $this->Success( $this->class_name . __LINE__);

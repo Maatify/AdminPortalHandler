@@ -14,6 +14,7 @@ namespace Maatify\Portal\Admin;
 use \App\Assist\AppFunctions;
 use App\Assist\Jwt\JWTAssistance;
 use Exception;
+use Maatify\CronTelegramBotAdmin\CronTelegramBotAdminRecord;
 use Maatify\GoogleRecaptcha\V3\GoogleRecaptchaV3Json;
 use Maatify\Json\Json;
 use Maatify\Logger\Logger;
@@ -77,12 +78,30 @@ class AdminPortal extends ParentClassHandler
                                 }
                             } else {
                                 $log['details'] = 'Success Login';
+                                CronTelegramBotAdminRecord::obj()->RecordMessage(
+                                    $admin[$this->identify_table_id_col_name],
+                                    $admin['telegram_chat_id'],
+                                    'You have Successfully Login '
+                                    . PHP_EOL
+                                    . "ip: " . AppFunctions::IP()
+                                    . PHP_EOL
+                                    . "time: " . AppFunctions::CurrentDateTime()
+                                );
                                 $this->AdminLogger($log, [], 'Login');
                                 JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
                                 AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
                                 AdminFailedLogin::obj()->Success($admin['username']);
                             }
                         } else {
+                            CronTelegramBotAdminRecord::obj()->RecordMessage(
+                                $admin[$this->identify_table_id_col_name],
+                                $admin['telegram_chat_id'],
+                                'You have Successfully Login '
+                                . PHP_EOL
+                                . "ip: " . AppFunctions::IP()
+                                . PHP_EOL
+                                . "time: " . AppFunctions::CurrentDateTime()
+                            );
                             $log['details'] = 'Success Login';
                             $this->AdminLogger($log, [], 'Login');
                             JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
@@ -98,6 +117,17 @@ class AdminPortal extends ParentClassHandler
                     Json::SuspendedAccount();
                 }
             } else {
+                if(!empty($admin['telegram_status'])) {
+                    CronTelegramBotAdminRecord::obj()->RecordMessage(
+                        $admin[$this->identify_table_id_col_name],
+                        $admin['telegram_chat_id'],
+                        'You have Failed Login '
+                        . PHP_EOL
+                        . "ip: " . AppFunctions::IP()
+                        . PHP_EOL
+                        . "time: " . AppFunctions::CurrentDateTime()
+                    );
+                }
                 AdminFailedLogin::obj()->Failed($admin['username']);
                 Json::Incorrect('credentials', line: $this->class_name . __LINE__);
             }
@@ -111,12 +141,14 @@ class AdminPortal extends ParentClassHandler
     {
         $tb_email = AdminEmail::TABLE_NAME;
         $tb_admin_auth = Admin2FA::TABLE_NAME;
-
+        [$t_t, $t_c] = AdminTelegramBot::obj()->LeftJoinThisTableWithTableAlias($this->tableName);
         return self::Row("`$this->tableName` 
         INNER JOIN `$tb_email` ON `$tb_email`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
         INNER JOIN `$tb_admin_auth` ON `$tb_admin_auth`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
-        ",
-            "`$this->tableName`.*, `$tb_email`.`email`, `$tb_email`.`confirmed`, `$tb_admin_auth`.`auth`, `$tb_admin_auth`.`isAuthRequired`",
+        $t_t ",
+            "`$this->tableName`.*, 
+            `$tb_email`.`email`, `$tb_email`.`confirmed`, 
+            `$tb_admin_auth`.`auth`, `$tb_admin_auth`.`isAuthRequired`, " . $t_c,
             "LCASE(`$this->tableName`.`username`) = ? LIMIT 1 ",
             [strtolower($username)]);
     }

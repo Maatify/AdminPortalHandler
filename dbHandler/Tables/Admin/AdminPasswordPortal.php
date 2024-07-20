@@ -55,7 +55,7 @@ class AdminPasswordPortal extends AdminPassword
     {
         $this->row_id = $this->ValidatePostedTableId();
         $user = AdminPortal::obj()->UserForEdit($this->row_id);
-        $otp = AdminPassword::obj()->SetTemp($this->row_id, $user['name'], $user['email']);
+        $otp = AdminPassword::obj()->SetTemp($this->row_id, $user['name'], $user['email'], $user['phone']);
         $this->logger_keys = [$this->identify_table_id_col_name => $this->row_id];
         $log = $this->logger_keys;
         $log['change'] = 'Generate new default password';

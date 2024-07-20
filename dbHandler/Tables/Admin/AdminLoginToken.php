@@ -24,6 +24,8 @@ class AdminLoginToken extends AdminToken
     private string $admin_name = '';
     private string $admin_username = '';
     private string $admin_email;
+
+    private string $admin_phone;
     private int $admin_isAdmin;
 
     public static function obj(): self
@@ -115,12 +117,15 @@ class AdminLoginToken extends AdminToken
         $tb_admin = Admin::TABLE_NAME;
         $tb_admin_email = AdminEmail::TABLE_NAME;
         $tb_admin_auth = Admin2FA::TABLE_NAME;
+        [$p_t, $p_c] = AdminPassword::obj()->InnerJoinThisTableWithUniqueCols($tb_admin, ['phone'=> 0]);
         $admin = $this->Row("`$this->tableName` 
         INNER JOIN `$tb_admin` ON `$tb_admin`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
         INNER JOIN `$tb_admin_email` ON `$tb_admin_email`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
         INNER JOIN `$tb_admin_auth` ON `$tb_admin_auth`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
+        $p_t
         ",
-            "`$tb_admin`.*, `$tb_admin_email`.`email`, `$tb_admin_email`.`confirmed`, `$tb_admin_auth`.`auth`, `$tb_admin_auth`.`isAuthRequired`",
+            "`$tb_admin`.*, `$tb_admin_email`.`email`, `$tb_admin_email`.`confirmed`, 
+            `$tb_admin_auth`.`auth`, `$tb_admin_auth`.`isAuthRequired`, " . $p_c,
             "`$this->tableName`.`token` = ? AND `$this->tableName`.`token` <> ''",
             [self::TokenSecretKeyEncode($hashed_token)]);
         if($admin){
@@ -132,6 +137,7 @@ class AdminLoginToken extends AdminToken
             $this->admin_name = $admin['name'];
             $this->admin_username = $admin['username'];
             $this->admin_email = $admin['email'];
+            $this->admin_phone = $admin['phone'];
         }
         return $admin;
     }
@@ -207,5 +213,10 @@ class AdminLoginToken extends AdminToken
     public function GetAdminIsAdmin(): int
     {
         return $this->admin_isAdmin;
+    }
+
+    public function GetAdminPhone(): string
+    {
+        return $this->admin_phone;
     }
 }

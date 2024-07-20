@@ -131,9 +131,10 @@ class AdminPortal extends ParentClassHandler
 
     public function AddNewAdmin(): void
     {
-        $email = $this->postValidator->Require('email', 'email');
-        $username = $this->postValidator->Require('username', 'username');
-        $name = $this->postValidator->Require('name', 'name');
+        $email = $this->postValidator->Require(ValidatorConstantsTypes::Email, ValidatorConstantsTypes::Email);
+        $username = $this->postValidator->Require(ValidatorConstantsTypes::Username, ValidatorConstantsTypes::Username);
+        $name = $this->postValidator->Require(ValidatorConstantsTypes::Name, ValidatorConstantsTypes::Name);
+        $phone = $this->postValidator->Optional(ValidatorConstantsTypes::Phone, ValidatorConstantsTypes::Phone);
         if (AdminEmail::obj()->EmailIsExist($email)) {
             Json::Exist('email');
         }
@@ -153,7 +154,11 @@ class AdminPortal extends ParentClassHandler
             AdminEmail::obj()->Add($to_add);
             AdminPassword::obj()->Add($to_add);
             AdminEmail::obj()->SetUser($this->row_id, $email, $name);
-            $otp = AdminPassword::obj()->SetTemp($this->row_id, $name, $email);
+            AdminPhone::obj()->Add([
+                $this->identify_table_id_col_name => $this->row_id,
+                ValidatorConstantsTypes::Phone => $phone,
+            ]);
+            $otp = AdminPassword::obj()->SetTemp($this->row_id, $name, $email, $phone);
             AdminToken::obj()->Add($to_add);
             AdminInfo::obj()->Add(
                 [
@@ -212,14 +217,15 @@ class AdminPortal extends ParentClassHandler
     {
         $tb_admin_emails = AdminEmail::TABLE_NAME;
         $tb_admin_auth = Admin2FA::TABLE_NAME;
+        [$p_t, $p_c] = AdminPassword::obj()->InnerJoinThisTableWithUniqueCols($this->tableName, ['phone' => 0]);
 
         return ["`$this->tableName` 
             INNER JOIN `$tb_admin_emails` ON `$tb_admin_emails`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
-            INNER JOIN `$tb_admin_auth` ON `$tb_admin_auth`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
-            ",
+            INNER JOIN `$tb_admin_auth` ON `$tb_admin_auth`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name`  
+            $p_t ",
                 "`$this->tableName`.*, `$tb_admin_emails`.`email`, `$tb_admin_emails`.`confirmed`,  
             IF(`$tb_admin_auth`.`auth` = '', 0, 1) as auth,
-            `$tb_admin_auth`.`isAuthRequired`"];
+            `$tb_admin_auth`.`isAuthRequired`, " . $p_c];
     }
 
     public function AllUsers(): void

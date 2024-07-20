@@ -14,7 +14,7 @@ namespace Maatify\Portal\Admin;
 use \App\Assist\DefaultPassword;
 use \App\Assist\Encryptions\AdminPasswordEncryption;
 use Maatify\CronEmail\CronEmailRecord;
-use Maatify\Functions\GeneralFunctions;
+use Maatify\CronSms\CronSmsRecord;
 use Maatify\Json\Json;
 use Maatify\Portal\DbHandler\ParentClassHandler;
 
@@ -44,13 +44,16 @@ class AdminPassword extends ParentClassHandler
         return $this->Edit(['password'=>$this->HashPassword($password), 'is_temp'=>0], "`$this->identify_table_id_col_name` = ?", [$admin_id]);
     }
 
-    public function SetTemp(int $admin_id, string $name, string $email): string
+    public function SetTemp(int $admin_id, string $name, string $email, string $phone): string
     {
         $otp = DefaultPassword::GenerateAdminDefaultPassword();
         $this->Edit(['password'=>$this->HashPassword($otp), 'is_temp'=>1], "`$this->identify_table_id_col_name` = ?", [$admin_id]);
         if(!empty($email)) {
             //            Mailer::obj()->TempPassword($name, $email, $otp);
             CronEmailRecord::obj()->RecordTempPassword(0, $email, $otp, $name);
+            if(!empty($_ENV['IS_SMS_ACTIVATE'])){
+                CronSmsRecord::obj()->RecordPassword(0, $phone, $otp);
+            }
         }
         return $otp;
     }
@@ -92,10 +95,5 @@ class AdminPassword extends ParentClassHandler
         if($col = $this->ColThisTable('is_temp', "`$this->identify_table_id_col_name` = ? AND `is_temp` = ?", [$admin_id, 1])){
             Json::GoToMethod('ChangePassword', line: $this->class_name . __LINE__);
         }
-    }
-
-    public function DefaultPassword(): string
-    {
-        return GeneralFunctions::GenerateOTP(8);
     }
 }

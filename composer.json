@@ -1,7 +1,7 @@
 {
   "name": "maatify/admin-portal-handler",
   "description": "maatify.com",
-  "version": "1.1.013",
+  "version": "1.1.014",
   "type": "library",
   "keywords": [
     "PHP",
@@ -61,7 +61,8 @@
     "ext-openssl": "*",
     "maatify/cron-sms": "^1.0",
     "maatify/cron-email": "^1.0",
-    "maatify/queue-manager": "^1.0"
+    "maatify/queue-manager": "^1.0",
+    "maatify/telegram-bot": "^1.6"
   },
   "config": {
     "platform": {

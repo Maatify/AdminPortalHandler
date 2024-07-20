@@ -94,10 +94,9 @@ class AdminTelegramBotPortal extends ParentClassHandler
         $first_name = $this->postValidator->Optional('first_name', ValidatorConstantsTypes::Name, $this->class_name . __LINE__);
         $last_name = $this->postValidator->Optional('last_name', ValidatorConstantsTypes::Name, $this->class_name . __LINE__);
         $username = $this->postValidator->Optional('username', ValidatorConstantsTypes::Username, $this->class_name . __LINE__);
-        $phone = $this->postValidator->Optional(ValidatorConstantsTypes::Phone, ValidatorConstantsTypes::Phone, $this->class_name . __LINE__);
         $photo_url = $this->postValidator->Optional('photo_url', ValidatorConstantsTypes::String, $this->class_name . __LINE__);
         $auth_date = $this->postValidator->Optional('auth_date', ValidatorConstantsTypes::Int, $this->class_name . __LINE__);
-        $this->handleUpdate($admin_id, $chat_id, $first_name, $last_name, $username, $phone, $photo_url, $auth_date);
+        $this->handleUpdate($admin_id, $chat_id, $first_name, $last_name, $username, $photo_url, $auth_date);
         Json::Success(line: $this->class_name . __LINE__);
     }
 
@@ -109,17 +108,16 @@ class AdminTelegramBotPortal extends ParentClassHandler
             $first_name = $auth_data['first_name'] ?? '';
             $last_name = $auth_data['last_name'] ?? '';
             $username = $auth_data['username'] ?? '';
-            $phone = $auth_data['phone'] ?? '';
             $photo_url = $auth_data['photo_url'] ?? '';
             $auth_date = $auth_data['auth_date'] ?? '';
-            $this->handleUpdate($admin_id, $chat_id, $first_name, $last_name, $username, $phone, $photo_url, $auth_date);
+            $this->handleUpdate($admin_id, $chat_id, $first_name, $last_name, $username, $photo_url, $auth_date);
             return true;
         }
 
         return false;
     }
 
-    private function handleUpdate(int $admin_id, string $chat_id, string $first_name, string $last_name, string $username, string $phone, string $photo_url, string $auth_date): void
+    private function handleUpdate(int $admin_id, string $chat_id, string $first_name, string $last_name, string $username, string $photo_url, string $auth_date): void
     {
         $this->current_row = $this->RowThisTable('*', " `$this->identify_table_id_col_name` = ? ", [$admin_id]);
         if (! empty($this->current_row)) {
@@ -133,9 +131,6 @@ class AdminTelegramBotPortal extends ParentClassHandler
             }
             if (! empty($username)) {
                 $array_to_update['username'] = $username;
-            }
-            if (! empty($phone)) {
-                $array_to_update['phone'] = $phone;
             }
             if (! empty($photo_url)) {
                 $array_to_update['photo_url'] = $photo_url;

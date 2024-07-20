@@ -25,7 +25,7 @@ class AdminTelegramBot extends DbConnector
             'username'                       => 0,
             'first_name'                     => 0,
             'last_name'                      => 0,
-            'phone'                          => 0,
+            'photo_url'                      => 0,
             'status'                         => 1,
             'auth_date'                      => 0,
             'time'                           => 0,

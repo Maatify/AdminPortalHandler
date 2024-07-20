@@ -160,6 +160,7 @@ class AdminPortal extends ParentClassHandler
             ]);
             $otp = AdminPassword::obj()->SetTemp($this->row_id, $name, $email, $phone);
             AdminToken::obj()->Add($to_add);
+            AdminTelegramBot::obj()->Add($to_add);
             AdminInfo::obj()->Add(
                 [
                     $this->identify_table_id_col_name => $this->row_id,

@@ -87,7 +87,7 @@ class AdminTelegramBotPortal extends ParentClassHandler
         return self::$instance;
     }
 
-    public function RecordAdminChat(): void
+    public function recordChatByPostedAdmin(): void
     {
         $admin_id = $this->postValidator->Require('user_id', ValidatorConstantsTypes::Int, $this->class_name . __LINE__);
         $chat_id = $this->postValidator->Require('chat_id', ValidatorConstantsTypes::Int, $this->class_name . __LINE__);
@@ -97,23 +97,11 @@ class AdminTelegramBotPortal extends ParentClassHandler
         $phone = $this->postValidator->Optional(ValidatorConstantsTypes::Phone, ValidatorConstantsTypes::Phone, $this->class_name . __LINE__);
         $photo_url = $this->postValidator->Optional('photo_url', ValidatorConstantsTypes::String, $this->class_name . __LINE__);
         $auth_date = $this->postValidator->Optional('auth_date', ValidatorConstantsTypes::Int, $this->class_name . __LINE__);
-        $array_to_add = [
-            self::IDENTIFY_TABLE_ID_COL_NAME => $admin_id,
-            'chat_id'                        => $chat_id,
-            'first_name'                     => $first_name,
-            'last_name'                      => $last_name,
-            'username'                       => $username,
-            'phone'                          => $phone,
-            'photo_url'                      => $photo_url,
-            'auth_date'                      => $auth_date,
-            'status'                         => 1,
-            'time'                           => AppFunctions::CurrentDateTime(),
-        ];
-        $this->AddInfo($admin_id, $array_to_add);
+        $this->handleUpdate($admin_id, $chat_id, $first_name, $last_name, $username, $phone, $photo_url, $auth_date);
         Json::Success(line: $this->class_name . __LINE__);
     }
 
-    public function RegisterByAuth(array $auth_data): bool
+    public function registerByAuth(array $auth_data): bool
     {
         $admin_id = AdminLoginToken::obj()->GetAdminID();
         if (! empty($auth_data['id'])) {
@@ -124,73 +112,47 @@ class AdminTelegramBotPortal extends ParentClassHandler
             $phone = $auth_data['phone'] ?? '';
             $photo_url = $auth_data['photo_url'] ?? '';
             $auth_date = $auth_data['auth_date'] ?? '';
-
-            $this->current_row = $this->RowThisTable('*', " `$this->identify_table_id_col_name` = ? AND `chat_id` = ? ", [$admin_id, $chat_id]);
-            if (! empty($this->current_row)) {
-                $array_to_update = array();
-                if (! empty($first_name)) {
-                    $array_to_update['first_name'] = $first_name;
-                }
-                if (! empty($last_name)) {
-                    $array_to_update['last_name'] = $last_name;
-                }
-                if (! empty($username)) {
-                    $array_to_update['username'] = $username;
-                }
-                if (! empty($phone)) {
-                    $array_to_update['phone'] = $phone;
-                }
-                if (! empty($photo_url)) {
-                    $array_to_update['photo_url'] = $photo_url;
-                }
-                if (! empty($auth_date)) {
-                    $array_to_update['auth_date'] = $auth_date;
-                }
-                $array_to_update['status'] = 1;
-                $this->editInfo($admin_id, $chat_id, $array_to_update);
-            } else {
-                $array_to_add = [
-                    self::IDENTIFY_TABLE_ID_COL_NAME => $this->row_id,
-                    'chat_id'                        => $chat_id,
-                    'first_name'                     => $first_name,
-                    'last_name'                      => $last_name,
-                    'username'                       => $username,
-                    'phone'                          => $phone,
-                    'photo_url'                      => $photo_url,
-                    'auth_date'                      => $auth_date,
-                    'status'                         => 1,
-                    'time'                           => AppFunctions::CurrentDateTime(),
-                ];
-                $this->AddInfo($admin_id, $array_to_add);
-            }
-
+            $this->handleUpdate($admin_id, $chat_id, $first_name, $last_name, $username, $phone, $photo_url, $auth_date);
             return true;
         }
 
         return false;
     }
 
-    private function AddInfo(int $admin_id, array $array_to_add): void
+    private function handleUpdate(int $admin_id, string $chat_id, string $first_name, string $last_name, string $username, string $phone, string $photo_url, string $auth_date): void
     {
-        $this->Add($array_to_add);
-        $this->row_id = $admin_id;
-        $this->logger_keys = [$this->identify_table_id_col_name => $this->row_id];
-        $log = $this->logger_keys;
-        $log['change'] = 'Add Telegram Information';
-        $changes = array();
-        foreach ($array_to_add as $key => $value) {
-            if ($key === 'status') {
-                $changes[] = [$key, '', GeneralFunctions::Bool2String($value)];
-            } else {
-                $changes[] = [$key, '', $value];
+        $this->current_row = $this->RowThisTable('*', " `$this->identify_table_id_col_name` = ? ", [$admin_id]);
+        if (! empty($this->current_row)) {
+            $array_to_update = array();
+            $array_to_update['chat_id'] = $chat_id;
+            if (! empty($first_name)) {
+                $array_to_update['first_name'] = $first_name;
             }
+            if (! empty($last_name)) {
+                $array_to_update['last_name'] = $last_name;
+            }
+            if (! empty($username)) {
+                $array_to_update['username'] = $username;
+            }
+            if (! empty($phone)) {
+                $array_to_update['phone'] = $phone;
+            }
+            if (! empty($photo_url)) {
+                $array_to_update['photo_url'] = $photo_url;
+            }
+            if (! empty($auth_date)) {
+                $array_to_update['auth_date'] = $auth_date;
+            }
+            $array_to_update['status'] = 1;
+            $array_to_update['time'] = AppFunctions::CurrentDateTime();
+            $this->editInfo($admin_id, $array_to_update);
         }
-        $this->Logger($log, $changes, $_GET['action']);
+
     }
 
-    private function editInfo(int $admin_id, int $chat_id, array $array_to_update): void
+    private function editInfo(int $admin_id, array $array_to_update): void
     {
-        $this->Edit($array_to_update, " `$this->identify_table_id_col_name` = ? AND `chat_id` = ? ", [$admin_id, $chat_id]);
+        $this->Edit($array_to_update, " `$this->identify_table_id_col_name` = ? ", [$admin_id]);
         $this->row_id = $admin_id;
         $this->logger_keys = [$this->identify_table_id_col_name => $this->row_id];
         $log = $this->logger_keys;
@@ -206,12 +168,12 @@ class AdminTelegramBotPortal extends ParentClassHandler
         $this->Logger($log, $changes, 'Update Telegram Chat Information');
     }
 
-    public function SendAdminTelegramMessage(int $admin_id, string $message): void
+    public function sendAdminTelegramMessage(int $admin_id, string $message): void
     {
         if(!empty($_ENV['IS_TELEGRAM_ADMIN_ACTIVATE']) && $_ENV['TELEGRAM_API_KEY_ADMIN'])
         {
             $api_key = (new EnvEncryption())->DeHashed($_ENV['TELEGRAM_API_KEY_ADMIN']);
-            $chats = $this->AdminActiveChatList($admin_id);
+            $chats = $this->adminActiveChat($admin_id);
             if (! empty($chats)) {
                 try {
                     $sender = TelegramBotManager::obj($api_key)
@@ -227,8 +189,8 @@ class AdminTelegramBotPortal extends ParentClassHandler
         }
     }
 
-    private function AdminActiveChatList(int $admin_id): array
+    private function adminActiveChat(int $admin_id): array
     {
-        return $this->RowsThisTable('chat_id', "`$this->identify_table_id_col_name` = ? AND `status` = ? ", [$admin_id, 1]);
+        return $this->RowThisTable('chat_id', "`$this->identify_table_id_col_name` = ? AND `status` = ? ", [$admin_id, 1]);
     }
 }

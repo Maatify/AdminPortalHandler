@@ -219,7 +219,7 @@ class AdminPortal extends ParentClassHandler
         $tb_admin_emails = AdminEmail::TABLE_NAME;
         $tb_admin_auth = Admin2FA::TABLE_NAME;
         [$p_t, $p_c] = AdminPhone::obj()->InnerJoinThisTableWithUniqueCols($this->tableName, ['phone' => 0]);
-        [$t_t, $t_c] = AdminTelegramBot::obj()->LeftJoinThisTableWithoutTableAlias($this->tableName);
+        [$t_t, $t_c] = AdminTelegramBot::obj()->LeftJoinThisTableWithTableAlias($this->tableName);
 
         return ["`$this->tableName` 
             INNER JOIN `$tb_admin_emails` ON `$tb_admin_emails`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 

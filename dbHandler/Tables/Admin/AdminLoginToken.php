@@ -117,7 +117,7 @@ class AdminLoginToken extends AdminToken
         $tb_admin = Admin::TABLE_NAME;
         $tb_admin_email = AdminEmail::TABLE_NAME;
         $tb_admin_auth = Admin2FA::TABLE_NAME;
-        [$p_t, $p_c] = AdminPassword::obj()->InnerJoinThisTableWithUniqueCols($tb_admin, ['phone'=> 0]);
+        [$p_t, $p_c] = AdminPhone::obj()->InnerJoinThisTableWithUniqueCols($tb_admin, ['phone'=> 0]);
         $admin = $this->Row("`$this->tableName` 
         INNER JOIN `$tb_admin` ON `$tb_admin`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
         INNER JOIN `$tb_admin_email` ON `$tb_admin_email`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 

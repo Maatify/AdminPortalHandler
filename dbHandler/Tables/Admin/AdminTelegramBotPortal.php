@@ -100,6 +100,12 @@ class AdminTelegramBotPortal extends ParentClassHandler
         Json::Success(line: $this->class_name . __LINE__);
     }
 
+    public function SwitchMyStatus(): void
+    {
+        $_POST[self::IDENTIFY_TABLE_ID_COL_NAME] = AdminLoginToken::obj()->GetAdminID();
+        parent::SwitchStatus();
+    }
+
     public function registerByAuth(array $auth_data): bool
     {
         $admin_id = AdminLoginToken::obj()->GetAdminID();

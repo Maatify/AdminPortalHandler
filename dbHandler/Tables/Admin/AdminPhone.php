@@ -9,9 +9,9 @@
 
 namespace Maatify\Portal\Admin;
 
-use Maatify\Portal\DbHandler\ParentClassHandler;
+use App\DB\DBS\DbConnector;
 
-class AdminPhone extends ParentClassHandler
+class AdminPhone extends DbConnector
 {
     const TABLE_NAME                 = 'a_phone';
     const TABLE_ALIAS                = '';

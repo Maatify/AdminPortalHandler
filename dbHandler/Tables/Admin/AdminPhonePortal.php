@@ -57,7 +57,7 @@ class AdminPhonePortal extends DbPortalHandler
     {
         $phone = $this->postValidator->Require(ValidatorConstantsTypes::Phone, ValidatorConstantsTypes::Phone, $this->class_name . __LINE__);
         $old_phone = AdminLoginToken::obj()->GetAdminPhone();
-        if($old_phone !== $phone) {
+        if($old_phone === $phone) {
             Json::ErrorNoUpdate($this->class_name . __LINE__);
         }else{
             if($this->PhoneIsExist($phone)){

@@ -59,7 +59,6 @@ class AdminEmail extends ParentClassHandler
             $otp = $this->OTP();
             $this->Edit(['token' => $this->HashedOTP($otp)], "`$this->identify_table_id_col_name` = ?", [$admin_id]);
             CronEmailRecord::obj()->RecordConfirmCode(0, $email, $otp, $name);
-//            CronSmsRecord::obj()->RecordOTP(0, $phone, $otp);
         }
     }
 

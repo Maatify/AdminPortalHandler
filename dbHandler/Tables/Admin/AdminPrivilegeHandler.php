@@ -12,6 +12,7 @@ namespace Maatify\Portal\Admin;
 class AdminPrivilegeHandler extends AdminPrivilege
 {
     private static self $instance;
+
     public static function obj(): self
     {
         if (empty(self::$instance)) {

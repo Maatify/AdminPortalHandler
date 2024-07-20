@@ -40,27 +40,6 @@ abstract class AdminPrivilege extends AddRemoveTwoColsHandler
         }
         return false;
     }
-    public function AllAllowedMethods(int $admin_id): array
-    {
-        $tb_privilege_roles = PrivilegeRoles::obj()->TableName();
-        $tb_privilege = Privileges::obj()->TableName();
-        $tb_privilege_methods = PrivilegeMethods::obj()->TableName();
-        $tb_admin_role = self::TABLE_NAME;
-        $privileges = $this->Rows(
-            "`$tb_privilege_roles` 
-           INNER JOIN `$tb_admin_role` ON `$tb_privilege_roles`.`id` = `$tb_admin_role`.`role_id`
-           INNER JOIN `$tb_privilege` ON `$tb_privilege_roles`.`id` = `$tb_privilege`.`role_id` AND `$tb_privilege`.`granted` = '1'
-           INNER JOIN `$tb_privilege_methods` ON `$tb_privilege_methods`.`id` = `$tb_privilege`.`method_id`",
-            "`$tb_privilege_methods`.`method`",
-            "`$tb_admin_role`.`admin_id` = ? ",
-            [$admin_id]
-        );
-        $final_array = array();
-        foreach ($privileges as $privilege) {
-            $final_array[] = $privilege['method'];
-        }
-        return $final_array;
-    }
 
     public function AllAllowedPagesAndMethods(int $admin_id): array
     {
@@ -87,6 +66,31 @@ abstract class AdminPrivilege extends AddRemoveTwoColsHandler
         return $final_array;
     }
 
+
+    /** deprecated */
+    public function AllAllowedMethods(int $admin_id): array
+    {
+        $tb_privilege_roles = PrivilegeRoles::obj()->TableName();
+        $tb_privilege = Privileges::obj()->TableName();
+        $tb_privilege_methods = PrivilegeMethods::obj()->TableName();
+        $tb_admin_role = self::TABLE_NAME;
+        $privileges = $this->Rows(
+            "`$tb_privilege_roles` 
+           INNER JOIN `$tb_admin_role` ON `$tb_privilege_roles`.`id` = `$tb_admin_role`.`role_id`
+           INNER JOIN `$tb_privilege` ON `$tb_privilege_roles`.`id` = `$tb_privilege`.`role_id` AND `$tb_privilege`.`granted` = '1'
+           INNER JOIN `$tb_privilege_methods` ON `$tb_privilege_methods`.`id` = `$tb_privilege`.`method_id`",
+            "`$tb_privilege_methods`.`method`",
+            "`$tb_admin_role`.`admin_id` = ? ",
+            [$admin_id]
+        );
+        $final_array = array();
+        foreach ($privileges as $privilege) {
+            $final_array[] = $privilege['method'];
+        }
+        return $final_array;
+    }
+
+    /** deprecated */
     public function AllAllowedPages(int $admin_id): array
     {
         $tb_privilege_roles = PrivilegeRoles::obj()->TableName();
@@ -104,11 +108,12 @@ abstract class AdminPrivilege extends AddRemoveTwoColsHandler
         );
         $final_array = array();
         foreach ($privileges as $privilege) {
-            $final_array[] = $privilege['method'];
+            $final_array[] = $privilege['page'];
         }
         return $final_array;
     }
 
+    /** deprecated */
     private function CheckMyPrivilege(string $privilege_name, int $admin_id, int $is_admin): bool
     {
         $tb_privilege_roles = PrivilegeRoles::TABLE_NAME;
@@ -131,6 +136,7 @@ abstract class AdminPrivilege extends AddRemoveTwoColsHandler
         return false;
     }
 
+    /** deprecated */
     public function IsAllowedMethod(int $admin_id, int $is_admin): void
     {
         if(empty($_GET['action'])){
@@ -141,6 +147,7 @@ abstract class AdminPrivilege extends AddRemoveTwoColsHandler
         }
     }
 
+    /** deprecated */
     public function IsAdminAllowedMethod(): void
     {
         if(empty($_GET['action'])){
@@ -152,7 +159,7 @@ abstract class AdminPrivilege extends AddRemoveTwoColsHandler
     }
 
 
-
+    /** deprecated */
     public function IsAllowedMethodBooForMe(string $privilege_name): bool
     {
         if(!str_contains(strtolower($privilege_name), 'initialize') && !in_array($privilege_name, ['UserTitle','CustomerTitle'])) {
@@ -165,6 +172,7 @@ abstract class AdminPrivilege extends AddRemoveTwoColsHandler
         return true;
     }
 
+    /** deprecated */
     public function IsAllowedMethodBool(int $admin_id, int $is_admin): bool
     {
         if(empty($_GET['action'])){
@@ -180,6 +188,7 @@ abstract class AdminPrivilege extends AddRemoveTwoColsHandler
         return true;
     }
 
+    /** deprecated */
     public function IsAllowedCustomerDownload(int $admin_id, int $is_admin): void
     {
         if(empty($_GET['action'])){

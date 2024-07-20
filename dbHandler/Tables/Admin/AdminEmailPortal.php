@@ -12,9 +12,9 @@
 namespace Maatify\Portal\Admin;
 
 use \App\Assist\Encryptions\ConfirmEmailEncryption;
-use App\Assist\Jwt\JwtAdminKey;
+use App\Assist\Jwt\JWTAssistance;
+use Maatify\CronEmail\CronEmailRecord;
 use Maatify\Json\Json;
-use Maatify\Portal\Cron\Emails\CronEmailRecord;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;
 
@@ -156,7 +156,7 @@ class AdminEmailPortal extends AdminEmail
     {
         $otp = $this->OTP();
         $this->Edit(['token' => $this->HashedOTP($otp)], "`$this->identify_table_id_col_name` = ?", [$admin_id]);
-        JwtAdminKey::obj()->TokenConfirmMail($admin_id, $username);
+        JWTAssistance::obj()->TokenConfirmMail($admin_id, $username);
         CronEmailRecord::obj()->RecordConfirmCode(0, $email, $otp, $name);
     }
 }

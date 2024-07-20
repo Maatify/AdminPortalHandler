@@ -11,7 +11,7 @@
 
 namespace Maatify\Portal\Admin;
 
-use App\Assist\Jwt\JwtAdminKey;
+use App\Assist\Jwt\JWTAssistance;
 use Maatify\Json\Json;
 
 class Admin2FAPortal extends Admin2FA
@@ -32,7 +32,7 @@ class Admin2FAPortal extends Admin2FA
         $this->row_id = $this->ValidatePostedTableId();
         AdminPortal::obj()->UserForEdit($this->row_id);
         if ($this->current_row['auth']) {
-            Admin2FA::obj()->RemoveAuthCode();
+            $this->RemoveAuthCode();
             $this->logger_keys = [$this->identify_table_id_col_name => $this->row_id];
             $log = $this->logger_keys;
             $log['remove'] = 'Remove Current Auth Code';
@@ -74,7 +74,7 @@ class Admin2FAPortal extends Admin2FA
     {
         if($admin = $this->ValideToken()){
             if($this->ValidateCode($code, $this->AuthDecode($admin['auth']), $admin['username'])){
-                JwtAdminKey::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
+                JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
                 return $admin;
             }
         }
@@ -89,7 +89,7 @@ class Admin2FAPortal extends Admin2FA
                     if ($this->ValidateCode($code, $admin['secret'], $admin['username'])) {
                         if ($this->NewAuthRecord($admin[$this->identify_table_id_col_name],
                             $admin['secret'])) {
-                            JwtAdminKey::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
+                            JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
                             return $admin;
                         }
                     }

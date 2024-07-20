@@ -12,7 +12,7 @@
 namespace Maatify\Portal\Admin;
 
 use \App\Assist\AppFunctions;
-use App\Assist\Jwt\JwtAdminKey;
+use App\Assist\Jwt\JWTAssistance;
 use Exception;
 use Maatify\GoogleRecaptcha\V3\GoogleRecaptchaV3Json;
 use Maatify\Json\Json;
@@ -39,6 +39,12 @@ class AdminPortal extends ParentClassHandler
 
         return self::$instance;
     }
+
+    protected array $cols_to_filter = [
+        [self::IDENTIFY_TABLE_ID_COL_NAME, ValidatorConstantsTypes::Int, ValidatorConstantsValidators::Optional],
+        [ValidatorConstantsTypes::Status, ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
+    ];
+
     public function AdminLogin(): void
     {
         $this->logger_sub_type = 'Login';
@@ -47,16 +53,19 @@ class AdminPortal extends ParentClassHandler
         $password = $this->postValidator->Require('password', 'password', $this->class_name . __LINE__);
         if ($admin = $this->Login($username)) {
             if (AdminPassword::obj()->Check($admin[$this->identify_table_id_col_name], $password)) {
-
-                // =========== getting admin session ===========
-
-                AdminPrivilegeHandler::obj()->storePrivileges($admin[$this->identify_table_id_col_name], $admin['is_admin']);
-
                 $log = [$this->identify_table_id_col_name];
                 $this->logger_keys = $log;
                 unset($admin['password']);
                 if (! empty($admin['status'])) {
                     AdminLoginToken::obj()->GenerateToken($admin[$this->identify_table_id_col_name], $admin['username']);
+
+
+                    // =========== getting admin session ===========
+
+                    AdminPrivilegeHandler::obj()->storePrivileges($admin[$this->identify_table_id_col_name], $admin['is_admin']);
+
+
+
                     if (! empty($admin['confirmed']) || empty($_ENV['EMAIL_CONFIRM_REQUIRED'])) {
                         if ($_ENV['AUTH_2FA_STATUS']) {
                             if ($_ENV['AUTH_2FA_REQUIRED'] || AdminPrivilegeHandler::obj()->IsMaster($admin[$this->identify_table_id_col_name]) || $admin['is_admin'] || $admin['isAuthRequired']) {
@@ -69,20 +78,20 @@ class AdminPortal extends ParentClassHandler
                             } else {
                                 $log['details'] = 'Success Login';
                                 $this->AdminLogger($log, [], 'Login');
-                                JwtAdminKey::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
+                                JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
                                 AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
                                 AdminFailedLogin::obj()->Success($admin['username']);
                             }
                         } else {
                             $log['details'] = 'Success Login';
                             $this->AdminLogger($log, [], 'Login');
-                            JwtAdminKey::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
+                            JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
                             AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
                             AdminFailedLogin::obj()->Success($admin['username']);
                         }
                         Json::Success(AdminLoginToken::obj()->HandleAdminResponse($admin), line: $this->class_name . __LINE__);
                     } else {
-                        JwtAdminKey::obj()->TokenConfirmMail($admin[$this->identify_table_id_col_name], $admin['username']);
+                        JWTAssistance::obj()->TokenConfirmMail($admin[$this->identify_table_id_col_name], $admin['username']);
                         Json::GoToMethod('EmailConfirm', 'Please Confirm Your Email', line: $this->class_name . __LINE__);
                     }
                 } else {

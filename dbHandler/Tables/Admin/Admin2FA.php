@@ -12,7 +12,7 @@
 namespace Maatify\Portal\Admin;
 
 use App\Assist\Encryptions\AdminAuthEncryption;
-use App\Assist\Jwt\JwtAdminKey;
+use App\Assist\Jwt\JWTAssistance;
 use Exception;
 use Maatify\GoogleAuth\GoogleAuth;
 use Maatify\Json\Json;
@@ -46,16 +46,16 @@ class Admin2FA extends ParentClassHandler
     public function ResponseAuthMov(array $admin): void
     {
         if (! empty($admin['auth'])) {
-            JwtAdminKey::obj()->TokenAuth($admin[$this->identify_table_id_col_name],
+            JWTAssistance::obj()->TokenAuth($admin[$this->identify_table_id_col_name],
                 $admin['username'],
                 ['next' => 'Auth']);
             Json::GoToMethod('Auth',
                 'Please Confirm Your Google Authenticator',
-                line: $this->class_name . __LINE__);
+                line: $this->class_name . __FUNCTION__ . '::' . __LINE__);
         } else {
             try {
                 $g_2fa_code = GoogleAuth::obj()->GenerateSecret();
-                JwtAdminKey::obj()->TokenAuth($admin[$this->identify_table_id_col_name],
+                JWTAssistance::obj()->TokenAuth($admin[$this->identify_table_id_col_name],
                     $admin['username'],
                     ['secret' => $g_2fa_code, 'next' => 'AuthRegister']);
                 Json::GoToMethod('AuthRegister',
@@ -67,10 +67,10 @@ class Admin2FA extends ParentClassHandler
                                 trim($g_2fa_code),
                                 trim($_ENV['SITE_PORTAL_NAME'])))),
                     ],
-                    $this->class_name . __LINE__);
+                    $this->class_name . __FUNCTION__ . '::' . __LINE__);
             } catch (Exception $exception) {
                 Logger::RecordLog($exception, 'auth_generator');
-                Json::TryAgain($this->class_name . __LINE__);
+                Json::TryAgain($this->class_name . __FUNCTION__ . '::' . __LINE__);
             }
         }
     }
@@ -94,10 +94,10 @@ class Admin2FA extends ParentClassHandler
     {
         $auth_pages = ['AuthRegister', 'Auth'];
         if (! empty($_GET['action']) && in_array($_GET['action'], $auth_pages)) {
-            if (! empty($_SESSION['token']) && $tokens = JwtAdminKey::obj()->JwtValidation(__LINE__)) {
+            if (! empty($_SESSION['token']) && $tokens = JWTAssistance::obj()->JwtValidation($this->class_name . __FUNCTION__ . '::' . __LINE__)) {
                 if (isset($tokens->token, $tokens->next)) {
                     if (in_array($tokens->next, $auth_pages)) {
-                        if ($admin = AdminLoginToken::obj()->ByToken($tokens->token, $this->class_name . __LINE__)) {
+                        if ($admin = AdminLoginToken::obj()->ByToken($tokens->token, $this->class_name . __FUNCTION__ . '::' . __LINE__)) {
                             if (! empty($tokens->secret)) {
                                 $admin['secret'] = $tokens->secret;
                             }
@@ -108,7 +108,7 @@ class Admin2FA extends ParentClassHandler
             }
         }
         AdminFailedLogin::obj()->Failed('');
-        Json::ReLogin($this->class_name . __LINE__);
+        Json::ReLogin($this->class_name . __FUNCTION__ . '::' . __LINE__);
 
         return [];
     }
@@ -121,7 +121,7 @@ class Admin2FA extends ParentClassHandler
             return true;
         } else {
             AdminFailedLogin::obj()->Failed($username);
-            Json::Incorrect('code', line: $this->class_name . __LINE__);
+            Json::Incorrect('code', line: $this->class_name . __FUNCTION__ . '::' . __LINE__);
 
             return false;
         }

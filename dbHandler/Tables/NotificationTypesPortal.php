@@ -10,6 +10,7 @@
  */
 namespace Maatify\dBHandler\Tables;
 
+use Maatify\Json\Json;
 use Maatify\Portal\DbHandler\ParentClassHandler;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;
@@ -39,14 +40,14 @@ class NotificationTypesPortal extends ParentClassHandler
     protected string $inner_language_name_class = '';
 
     protected array $cols_to_add = [
-        ['type', ValidatorConstantsTypes::Description, ValidatorConstantsValidators::Require],
-        ['sms_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Require],
-        ['telegram_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Require],
-        ['app_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Require],
+        ['type', ValidatorConstantsTypes::Col_Name, ValidatorConstantsValidators::Require],
+        ['sms_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
+        ['telegram_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
+        ['app_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
     ];
 
     protected array $cols_to_edit = [
-        ['type', ValidatorConstantsTypes::Description, ValidatorConstantsValidators::Optional],
+        ['type', ValidatorConstantsTypes::Col_Name, ValidatorConstantsValidators::Optional],
         ['sms_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
         ['telegram_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
         ['app_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
@@ -73,5 +74,29 @@ class NotificationTypesPortal extends ParentClassHandler
         }
 
         return self::$instance;
+    }
+
+    public function Record(): void
+    {
+        $type = $this->postValidator->Require('type', ValidatorConstantsTypes::Col_Name, $this->class_name . __LINE__);
+        $type-$this->jsonValidateTypeExist($type);
+        parent::Record();
+    }
+
+    public function UpdateByPostedId(): void
+    {
+        $this->ValidatePostedTableId();
+        $type = $this->postValidator->Optional('type', ValidatorConstantsTypes::Col_Name, $this->class_name . __LINE__);
+        if(!empty($type) && $type !== $this->current_row['type']) {
+            $type-$this->jsonValidateTypeExist($type);
+        }
+        parent::UpdateByPostedId();
+    }
+
+    private function jsonValidateTypeExist(string $type): void
+    {
+       if($this->RowIsExistThisTable('`type` = ? ', [$type])){
+           Json::Exist('type', 'type already exists', $this->class_name . __LINE__);
+       }
     }
 }

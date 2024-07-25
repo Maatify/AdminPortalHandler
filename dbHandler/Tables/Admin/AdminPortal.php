@@ -59,12 +59,9 @@ class AdminPortal extends ParentClassHandler
                 if (! empty($admin['status'])) {
                     AdminLoginToken::obj()->GenerateToken($admin[$this->identify_table_id_col_name], $admin['username']);
 
-
                     // =========== getting admin session ===========
 
                     AdminPrivilegeHandler::obj()->storePrivileges($admin[$this->identify_table_id_col_name], $admin['is_admin']);
-
-
 
                     if (! empty($admin['confirmed']) || empty($_ENV['EMAIL_CONFIRM_REQUIRED'])) {
                         if ($_ENV['AUTH_2FA_STATUS']) {
@@ -77,20 +74,24 @@ class AdminPortal extends ParentClassHandler
                                 }
                             } else {
                                 $log['details'] = 'Success Login';
-                                AlertAdminTelegramBot::obj()->alertLogin(
-                                    $admin[$this->identify_table_id_col_name],
-                                    $admin['telegram_chat_id'],
-                                );
+                                if(!empty($admin['telegram_status']) && !empty($admin['telegram_chat_id'])) {
+                                    AlertAdminTelegramBot::obj()->alertLogin(
+                                        $admin[$this->identify_table_id_col_name],
+                                        $admin['telegram_chat_id'],
+                                    );
+                                }
                                 $this->AdminLogger($log, [], 'Login');
                                 JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
                                 AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
                                 AdminFailedLogin::obj()->Success($admin['username']);
                             }
                         } else {
-                            AlertAdminTelegramBot::obj()->alertLogin(
-                                $admin[$this->identify_table_id_col_name],
-                                $admin['telegram_chat_id'],
-                            );
+                            if(!empty($admin['telegram_status']) && !empty($admin['telegram_chat_id'])) {
+                                AlertAdminTelegramBot::obj()->alertLogin(
+                                    $admin[$this->identify_table_id_col_name],
+                                    $admin['telegram_chat_id'],
+                                );
+                            }
                             $log['details'] = 'Success Login';
                             $this->AdminLogger($log, [], 'Login');
                             JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
@@ -106,7 +107,7 @@ class AdminPortal extends ParentClassHandler
                     Json::SuspendedAccount();
                 }
             } else {
-                if(!empty($admin['telegram_status'])) {
+                if(!empty($admin['telegram_status']) && !empty($admin['telegram_chat_id'])) {
                     AlertAdminTelegramBot::obj()->alertFailedLogin(
                         $admin[$this->identify_table_id_col_name],
                         $admin['telegram_chat_id'],
@@ -125,14 +126,14 @@ class AdminPortal extends ParentClassHandler
     {
         $tb_email = AdminEmail::TABLE_NAME;
         $tb_admin_auth = Admin2FA::TABLE_NAME;
-        [$t_t, $t_c] = AdminTelegramBot::obj()->LeftJoinThisTableWithTableAlias($this->tableName);
+        [$telegram_t, $telegram_c] = AdminTelegramBot::obj()->LeftJoinThisTableWithTableAlias($this->tableName);
         return self::Row("`$this->tableName` 
         INNER JOIN `$tb_email` ON `$tb_email`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
         INNER JOIN `$tb_admin_auth` ON `$tb_admin_auth`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
-        $t_t ",
+        $telegram_t ",
             "`$this->tableName`.*, 
             `$tb_email`.`email`, `$tb_email`.`confirmed`, 
-            `$tb_admin_auth`.`auth`, `$tb_admin_auth`.`isAuthRequired`, " . $t_c,
+            `$tb_admin_auth`.`auth`, `$tb_admin_auth`.`isAuthRequired`, " . $telegram_c,
             "LCASE(`$this->tableName`.`username`) = ? LIMIT 1 ",
             [strtolower($username)]);
     }

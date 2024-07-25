@@ -30,9 +30,16 @@ class Admin2FAPortal extends Admin2FA
     public function AllowUserToNewAuth(): void
     {
         $this->row_id = $this->ValidatePostedTableId();
-        AdminPortal::obj()->UserForEdit($this->row_id);
+        $admin = AdminPortal::obj()->UserForEdit($this->row_id);
         if ($this->current_row['auth']) {
             $this->RemoveAuthCode();
+            if(!empty($admin['telegram_status']) && !empty($admin['telegram_chat_id'])) {
+                AlertAdminTelegramBot::obj()->alertMessageNoAgent(
+                    $admin[$this->identify_table_id_col_name],
+                    $admin['telegram_chat_id'],
+                    'Your Two-Factor-Authenticator Code was removed from your account, please login to register new code'
+                );
+            }
             $this->logger_keys = [$this->identify_table_id_col_name => $this->row_id];
             $log = $this->logger_keys;
             $log['remove'] = 'Remove Current Auth Code';
@@ -52,6 +59,13 @@ class Admin2FAPortal extends Admin2FA
         $this->row_id = $admin[$this->identify_table_id_col_name];
         $log = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name], 'details' => 'Success Login with Two-Factor-Authenticator'];
         $this->AdminLogger($log, [], 'Login');
+        if(!empty($admin['telegram_status']) && !empty($admin['telegram_chat_id'])) {
+            AlertAdminTelegramBot::obj()->alertMessageNoAgent(
+                $admin[$this->identify_table_id_col_name],
+                $admin['telegram_chat_id'],
+                'You Have Success Login with Two-Factor-Authenticator'
+            );
+        }
         AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
         Json::Success(AdminLoginToken::obj()->HandleAdminResponse($admin));
     }
@@ -66,6 +80,11 @@ class Admin2FAPortal extends Admin2FA
         $log = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name], 'details' => 'Success Register of Two-Factor-Authenticator'];
         $this->AdminLogger($log, [['auth', '', 'set']], 'Register');
         $admin = AdminLoginToken::obj()->ValidateAdminToken();
+        AlertAdminTelegramBot::obj()->alertMessageNoAgent(
+            $admin[$this->identify_table_id_col_name],
+            $admin['telegram_chat_id'],
+            'You Have Success Register of Two-Factor-Authenticator'
+        );
         AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
         Json::Success(AdminLoginToken::obj()->HandleAdminResponse($admin));
     }

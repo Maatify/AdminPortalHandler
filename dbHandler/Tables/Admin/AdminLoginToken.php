@@ -91,7 +91,7 @@ class AdminLoginToken extends AdminToken
     {
         if (! empty($_SESSION['token']) && $tokens = JWTAssistance::obj()->JwtValidationForSessionLogin($this->class_name . __LINE__)) {
             if (isset($tokens->token)) {
-                if (AdminLoginToken::obj()->ByToken($tokens->token, $this->class_name . __LINE__)) {
+                if ($this->ByToken($tokens->token, $this->class_name . __LINE__)) {
                     return true;
                 }
             }
@@ -105,7 +105,7 @@ class AdminLoginToken extends AdminToken
         if(!empty($_GET['action'])) {
             if (! empty($_SESSION['token']) && $tokens = JWTAssistance::obj()->JwtValidationForSessionLogin($this->class_name . __LINE__)) {
                 if (isset($tokens->token)) {
-                    if (AdminLoginToken::obj()->ByToken($tokens->token, $this->class_name . __LINE__)) {
+                    if ($this->ByToken($tokens->token, $this->class_name . __LINE__)) {
                         $type['type'] = (isset($tokens->next) && in_array($tokens->next, $auth_pages) ? 'login' : 'main');
                         Json::Success($type);
                     }

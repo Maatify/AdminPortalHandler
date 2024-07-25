@@ -80,7 +80,7 @@ class AlertAdminTelegramBot extends CronTelegramBotAdminRecord
     {
         $platform = GeneralAgentFunctions::obj()->platform();
         if(!empty($platform)) {
-            return PHP_EOL
+            return PHP_EOL. PHP_EOL
                    . "platform: " . GeneralAgentFunctions::obj()->platform()
                    . PHP_EOL
                    . "browser: " . GeneralAgentFunctions::obj()->browser() . ' ver. (' . GeneralAgentFunctions::obj()->browserVersion() . ')'

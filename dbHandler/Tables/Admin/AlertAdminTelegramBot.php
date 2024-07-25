@@ -78,13 +78,18 @@ class AlertAdminTelegramBot extends CronTelegramBotAdminRecord
 
     private function AddAlertDetails(): string
     {
-        return PHP_EOL
-                 . "platform: " . GeneralAgentFunctions::obj()->platform()
-                 . PHP_EOL
-                 . "browser: " . GeneralAgentFunctions::obj()->browser() . ' ver. (' . GeneralAgentFunctions::obj()->browserVersion() . ')'
-                 . PHP_EOL
-                 . "ip: " . AppFunctions::IP()
-                 . PHP_EOL
-                 . "time: " . AppFunctions::CurrentDateTime();
+        $platform = GeneralAgentFunctions::obj()->platform();
+        if(!empty($platform)) {
+            return PHP_EOL
+                   . "platform: " . GeneralAgentFunctions::obj()->platform()
+                   . PHP_EOL
+                   . "browser: " . GeneralAgentFunctions::obj()->browser() . ' ver. (' . GeneralAgentFunctions::obj()->browserVersion() . ')'
+                   . PHP_EOL
+                   . "ip: " . AppFunctions::IP()
+                   . PHP_EOL
+                   . "time: " . AppFunctions::CurrentDateTime();
+        }else{
+            return '';
+        }
     }
 }

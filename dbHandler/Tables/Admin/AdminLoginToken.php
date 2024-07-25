@@ -230,9 +230,9 @@ class AdminLoginToken extends AdminToken
         return $this->admin_isAdmin;
     }
 
-    public function GetAdminIsMaster(): int
+    public function GetAdminIsMaster(): bool
     {
-        return $this->admin_isMaster;
+        return (bool) $this->admin_isMaster;
     }
 
     public function GetAdminPhone(): string

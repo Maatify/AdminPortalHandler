@@ -57,17 +57,13 @@ class AdminTelegramBotPortal extends ParentClassHandler
         [ValidatorConstantsTypes::Username, ValidatorConstantsTypes::Username, ValidatorConstantsValidators::Optional],
         ['first_name', ValidatorConstantsTypes::Name, ValidatorConstantsValidators::Optional],
         ['last_name', ValidatorConstantsTypes::Name, ValidatorConstantsValidators::Optional],
-        [ValidatorConstantsTypes::Phone, ValidatorConstantsTypes::Phone, ValidatorConstantsValidators::Optional],
-        [ValidatorConstantsTypes::Status, ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
+        [ValidatorConstantsTypes::Status, ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
     ];
 
     protected array $cols_to_filter = [
         [self::IDENTIFY_TABLE_ID_COL_NAME, ValidatorConstantsTypes::Int, ValidatorConstantsValidators::Optional],
         ['chat_id', ValidatorConstantsTypes::Int, ValidatorConstantsValidators::Optional],
         [ValidatorConstantsTypes::Username, ValidatorConstantsTypes::Username, ValidatorConstantsValidators::Optional],
-        ['first_name', ValidatorConstantsTypes::Name, ValidatorConstantsValidators::Optional],
-        ['last_name', ValidatorConstantsTypes::Name, ValidatorConstantsValidators::Optional],
-        [ValidatorConstantsTypes::Phone, ValidatorConstantsTypes::Phone, ValidatorConstantsValidators::Optional],
         [ValidatorConstantsTypes::Status, ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
     ];
 

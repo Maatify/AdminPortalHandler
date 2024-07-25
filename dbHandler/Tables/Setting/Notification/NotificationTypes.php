@@ -9,7 +9,7 @@
  * @Maatify   DB :: AdminPortalHandler
  */
 
-namespace Maatify\dBHandler\Tables;
+namespace Maatify\Portal\Setting\Notification;
 
 use App\DB\DBS\DbConnector;
 

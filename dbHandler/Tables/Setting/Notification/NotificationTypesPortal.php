@@ -8,7 +8,7 @@
  * @link      https://github.com/Maatify/AdminPortalHandler  view project on GitHub
  * @Maatify   DB :: AdminPortalHandler
  */
-namespace Maatify\dBHandler\Tables;
+namespace Maatify\Portal\Setting\Notification;
 
 use Maatify\Json\Json;
 use Maatify\Portal\DbHandler\ParentClassHandler;
@@ -79,7 +79,7 @@ class NotificationTypesPortal extends ParentClassHandler
     public function Record(): void
     {
         $type = $this->postValidator->Require('type', ValidatorConstantsTypes::Col_Name, $this->class_name . __LINE__);
-        $type-$this->jsonValidateTypeExist($type);
+        $this->jsonValidateTypeExist($type);
         parent::Record();
     }
 
@@ -88,14 +88,14 @@ class NotificationTypesPortal extends ParentClassHandler
         $this->ValidatePostedTableId();
         $type = $this->postValidator->Optional('type', ValidatorConstantsTypes::Col_Name, $this->class_name . __LINE__);
         if(!empty($type) && $type !== $this->current_row['type']) {
-            $type-$this->jsonValidateTypeExist($type);
+            $this->jsonValidateTypeExist($type);
         }
         parent::UpdateByPostedId();
     }
 
     private function jsonValidateTypeExist(string $type): void
     {
-       if($this->RowIsExistThisTable('`type` = ? ', [$type])){
+       if($this->RowIsExistThisTable('LOWER(`type`) = ? ', [strtolower($type)])){
            Json::Exist('type', 'type already exists', $this->class_name . __LINE__);
        }
     }

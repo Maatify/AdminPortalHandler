@@ -22,9 +22,14 @@ use Maatify\Portal\Privileges\Privileges;
 abstract class AdminPrivilege extends AddRemoveTwoColsHandler
 {
     const TABLE_NAME = 'a_roles';
+    const IDENTIFY_TABLE_ID_COL_NAME = Admin::IDENTIFY_TABLE_ID_COL_NAME;
+    const LOGGER_TYPE                = Admin::LOGGER_TYPE;
+    const LOGGER_SUB_TYPE            = 'roles';
+
     protected string $tableName = self::TABLE_NAME;
-    protected string $logger_type = Admin::LOGGER_TYPE;
-    protected string $logger_sub_type = 'roles';
+    protected string $identify_table_id_col_name = self::IDENTIFY_TABLE_ID_COL_NAME;
+    protected string $logger_type = self::LOGGER_TYPE;
+    protected string $logger_sub_type = self::LOGGER_SUB_TYPE;
     protected string $table_source_class = Admin::class;
     protected string $table_destination_class = PrivilegeRoles::class;
 
@@ -43,17 +48,19 @@ abstract class AdminPrivilege extends AddRemoveTwoColsHandler
 
     public function AllAllowedPagesAndMethods(int $admin_id): array
     {
-        $tb_privilege_roles = PrivilegeRoles::obj()->TableName();
+        $tb_privilege_roles = PrivilegeRoles::TABLE_NAME;
+        $col_privilege_roles = PrivilegeRoles::IDENTIFY_TABLE_ID_COL_NAME;
         $tb_privilege = Privileges::obj()->TableName();
-        $tb_privilege_methods = PrivilegeMethods::obj()->TableName();
+        $tb_privilege_methods = PrivilegeMethods::TABLE_NAME;
+        $col_privilege_methods = PrivilegeMethods::IDENTIFY_TABLE_ID_COL_NAME;
         $tb_admin_role = self::TABLE_NAME;
         $privileges = $this->Rows(
             "`$tb_privilege_roles` 
-           INNER JOIN `$tb_admin_role` ON `$tb_privilege_roles`.`id` = `$tb_admin_role`.`role_id`
-           INNER JOIN `$tb_privilege` ON `$tb_privilege_roles`.`id` = `$tb_privilege`.`role_id` AND `$tb_privilege`.`granted` = '1'
-           INNER JOIN `$tb_privilege_methods` ON `$tb_privilege_methods`.`id` = `$tb_privilege`.`method_id`",
+           INNER JOIN `$tb_admin_role` ON `$tb_privilege_roles`.`$col_privilege_roles` = `$tb_admin_role`.`$col_privilege_roles`
+           INNER JOIN `$tb_privilege` ON `$tb_privilege_roles`.`$col_privilege_roles` = `$tb_privilege`.`$col_privilege_roles` AND `$tb_privilege`.`granted` = '1'
+           INNER JOIN `$tb_privilege_methods` ON `$tb_privilege_methods`.`$col_privilege_methods` = `$tb_privilege`.`$col_privilege_methods`",
             "`$tb_privilege_methods`.`method`, `$tb_privilege_methods`.`page`",
-            "`$tb_admin_role`.`admin_id` = ? ",
+            "`$tb_admin_role`.`$this->identify_table_id_col_name` = ? ",
             [$admin_id]
         );
         $final_array = array();

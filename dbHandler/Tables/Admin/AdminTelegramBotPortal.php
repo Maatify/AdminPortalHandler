@@ -119,6 +119,23 @@ class AdminTelegramBotPortal extends ParentClassHandler
         return false;
     }
 
+    public function getAdminByChatId(int $chatId): int
+    {
+        return (int)$this->ColThisTable("`$this->identify_table_id_col_name`", '`chat_id` = ? ', [$chatId]);
+    }
+
+    public function checkChatIdUsedByAnotherAdmin(int $chatId, int $adminId): bool
+    {
+        return $this->RowIsExistThisTable(" `chat_id` = ? AND `$this->identify_table_id_col_name` <> ? ", [$chatId, $adminId]);
+    }
+
+    public function ActivateByChatID(int $chatId): void
+    {
+        $this->Edit(
+            ['status' => 1], '`chat_id` = ? ', [$chatId]
+        );
+    }
+
     private function handleUpdate(int $admin_id, string $chat_id, string $first_name, string $last_name, string $username, string $photo_url, string $auth_date): void
     {
         $this->current_row = $this->RowThisTable('*', " `$this->identify_table_id_col_name` = ? ", [$admin_id]);

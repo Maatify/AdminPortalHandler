@@ -48,4 +48,6 @@ class AdminTelegramBot extends DbConnector
 
         return self::$instance;
     }
+
+
 }

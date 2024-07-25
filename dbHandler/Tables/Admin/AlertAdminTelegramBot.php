@@ -61,6 +61,15 @@ class AlertAdminTelegramBot extends CronTelegramBotAdminRecord
         );
     }
 
+    public function alertMessageNoAgent(int $admin_id,int $chat_id, string $message): void
+    {
+        $this->telegram_bot->RecordMessage(
+            $admin_id,
+            $chat_id,
+            $message
+        );
+    }
+
     public function alertTempPassword(int $admin_id,int $chat_id, string $password): void
     {
         $this->telegram_bot->RecordTempPassword($admin_id,$chat_id,$password);

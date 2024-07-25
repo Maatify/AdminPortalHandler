@@ -107,7 +107,7 @@ class AdminPortal extends ParentClassHandler
                 }
             } else {
                 if(!empty($admin['telegram_status'])) {
-                    AlertAdminTelegramBot::obj()->alertLogin(
+                    AlertAdminTelegramBot::obj()->alertFailedLogin(
                         $admin[$this->identify_table_id_col_name],
                         $admin['telegram_chat_id'],
                     );

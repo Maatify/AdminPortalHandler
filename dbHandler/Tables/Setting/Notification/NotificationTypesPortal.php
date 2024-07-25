@@ -41,16 +41,16 @@ class NotificationTypesPortal extends ParentClassHandler
 
     protected array $cols_to_add = [
         ['type', ValidatorConstantsTypes::Col_Name, ValidatorConstantsValidators::Require],
-        ['sms_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
-        ['telegram_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
-        ['app_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
+        ['sms_status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
+        ['telegram_status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
+        ['app_status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
     ];
 
     protected array $cols_to_edit = [
         ['type', ValidatorConstantsTypes::Col_Name, ValidatorConstantsValidators::Optional],
-        ['sms_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
-        ['telegram_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
-        ['app_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
+        ['sms_status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
+        ['telegram_status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
+        ['app_status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
     ];
 
     protected array $cols_to_filter = [

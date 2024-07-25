@@ -50,9 +50,12 @@ abstract class AdminPrivilege extends AddRemoveTwoColsHandler
     {
         $tb_privilege_roles = PrivilegeRoles::TABLE_NAME;
         $col_privilege_roles = PrivilegeRoles::IDENTIFY_TABLE_ID_COL_NAME;
-        $tb_privilege = Privileges::obj()->TableName();
+
+        $tb_privilege = Privileges::TABLE_NAME;
+
         $tb_privilege_methods = PrivilegeMethods::TABLE_NAME;
         $col_privilege_methods = PrivilegeMethods::IDENTIFY_TABLE_ID_COL_NAME;
+
         $tb_admin_role = self::TABLE_NAME;
         $privileges = $this->Rows(
             "`$tb_privilege_roles` 

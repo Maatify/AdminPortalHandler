@@ -60,7 +60,7 @@ abstract class AdminPrivilege extends AddRemoveTwoColsHandler
         $privileges = $this->Rows(
             "`$tb_privilege_roles` 
            INNER JOIN `$tb_admin_role` ON `$tb_privilege_roles`.`$col_privilege_roles` = `$tb_admin_role`.`$col_privilege_roles`
-           INNER JOIN `$tb_privilege` ON `$tb_privilege_roles`.`$col_privilege_roles` = `$tb_privilege`.`$col_privilege_roles` AND `$tb_privilege`.`granted` = '1'
+           INNER JOIN `$tb_privilege` ON `$tb_privilege_roles`.`$col_privilege_roles` = `$tb_privilege`.`$col_privilege_roles`
            INNER JOIN `$tb_privilege_methods` ON `$tb_privilege_methods`.`$col_privilege_methods` = `$tb_privilege`.`$col_privilege_methods`",
             "`$tb_privilege_methods`.`method`, `$tb_privilege_methods`.`page`",
             "`$tb_admin_role`.`$this->identify_table_id_col_name` = ? ",

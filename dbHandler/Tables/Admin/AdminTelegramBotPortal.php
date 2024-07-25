@@ -143,6 +143,12 @@ class AdminTelegramBotPortal extends ParentClassHandler
                 $log['change'] = 'Activate Telegram Chat Status By Telegram bot chat';
                 $this->Logger($log, $changes, 'Update Telegram Chat Information');
             }
+        }else{
+            AlertAdminTelegramBot::obj()->alertMessageOfAgent(
+                $admin[$this->identify_table_id_col_name],
+                $chatId,
+                'Your notification already enabled'
+            );
         }
     }
 
@@ -160,6 +166,12 @@ class AdminTelegramBotPortal extends ParentClassHandler
                 $log['change'] = 'De-Activate Telegram Chat Status By Telegram bot chat';
                 $this->Logger($log, $changes, 'Update Telegram Chat Information');
             }
+        }else{
+            AlertAdminTelegramBot::obj()->alertMessageOfAgent(
+                $admin[$this->identify_table_id_col_name],
+                $chatId,
+                'Your notification already disabled'
+            );
         }
     }
 

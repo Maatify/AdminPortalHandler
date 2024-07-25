@@ -14,7 +14,6 @@ namespace Maatify\Portal\Admin;
 use \App\Assist\AppFunctions;
 use App\Assist\Jwt\JWTAssistance;
 use Exception;
-use Maatify\CronTelegramBotAdmin\CronTelegramBotAdminRecord;
 use Maatify\GoogleRecaptcha\V3\GoogleRecaptchaV3Json;
 use Maatify\Json\Json;
 use Maatify\Logger\Logger;
@@ -78,14 +77,9 @@ class AdminPortal extends ParentClassHandler
                                 }
                             } else {
                                 $log['details'] = 'Success Login';
-                                CronTelegramBotAdminRecord::obj()->RecordMessage(
+                                AlertAdminTelegramBot::obj()->alertLogin(
                                     $admin[$this->identify_table_id_col_name],
                                     $admin['telegram_chat_id'],
-                                    'You have Successfully Login '
-                                    . PHP_EOL
-                                    . "ip: " . AppFunctions::IP()
-                                    . PHP_EOL
-                                    . "time: " . AppFunctions::CurrentDateTime()
                                 );
                                 $this->AdminLogger($log, [], 'Login');
                                 JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
@@ -93,14 +87,9 @@ class AdminPortal extends ParentClassHandler
                                 AdminFailedLogin::obj()->Success($admin['username']);
                             }
                         } else {
-                            CronTelegramBotAdminRecord::obj()->RecordMessage(
+                            AlertAdminTelegramBot::obj()->alertLogin(
                                 $admin[$this->identify_table_id_col_name],
                                 $admin['telegram_chat_id'],
-                                'You have Successfully Login '
-                                . PHP_EOL
-                                . "ip: " . AppFunctions::IP()
-                                . PHP_EOL
-                                . "time: " . AppFunctions::CurrentDateTime()
                             );
                             $log['details'] = 'Success Login';
                             $this->AdminLogger($log, [], 'Login');
@@ -118,14 +107,9 @@ class AdminPortal extends ParentClassHandler
                 }
             } else {
                 if(!empty($admin['telegram_status'])) {
-                    CronTelegramBotAdminRecord::obj()->RecordMessage(
+                    AlertAdminTelegramBot::obj()->alertLogin(
                         $admin[$this->identify_table_id_col_name],
                         $admin['telegram_chat_id'],
-                        'You have Failed Login '
-                        . PHP_EOL
-                        . "ip: " . AppFunctions::IP()
-                        . PHP_EOL
-                        . "time: " . AppFunctions::CurrentDateTime()
                     );
                 }
                 AdminFailedLogin::obj()->Failed($admin['username']);

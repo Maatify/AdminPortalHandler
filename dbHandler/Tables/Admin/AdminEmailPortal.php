@@ -11,11 +11,9 @@
 
 namespace Maatify\Portal\Admin;
 
-use App\Assist\AppFunctions;
 use \App\Assist\Encryptions\ConfirmEmailEncryption;
 use App\Assist\Jwt\JWTAssistance;
 use Maatify\CronEmail\CronEmailRecord;
-use Maatify\CronTelegramBotAdmin\CronTelegramBotAdminRecord;
 use Maatify\Json\Json;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;
@@ -71,16 +69,12 @@ class AdminEmailPortal extends AdminEmail
                 }else{
                     $this->Set(AdminLoginToken::obj()->GetAdminID(), $email, AdminLoginToken::obj()->GetAdminName(), AdminLoginToken::obj()->GetAdminUsername());
                     if(!empty(AdminLoginToken::obj()->GetTelegramStatus())) {
-                        CronTelegramBotAdminRecord::obj()->RecordMessage(
+                        AlertAdminTelegramBot::obj()->alertMessageOfAgent(
                             AdminLoginToken::obj()->GetAdminID(),
                             AdminLoginToken::obj()->GetTelegramChatID(),
                             'Your Email Was Changed Successfully'
                             . PHP_EOL
                             . "new email: " . $email
-                            . PHP_EOL
-                            . "ip: " . AppFunctions::IP()
-                            . PHP_EOL
-                            . "time: " . AppFunctions::CurrentDateTime()
                         );
                     }
                     $this->log['email'] = ['from'=> AdminLoginToken::obj()->GetAdminEmail(), 'to'=>$email];
@@ -99,12 +93,10 @@ class AdminEmailPortal extends AdminEmail
         $code = $this->postValidator->Require('code', 'code');
         $this->Confirm($code);
         if(!empty(AdminLoginToken::obj()->GetTelegramStatus())) {
-            CronTelegramBotAdminRecord::obj()->RecordMessage(
+            AlertAdminTelegramBot::obj()->RecordMessage(
                 AdminLoginToken::obj()->GetAdminID(),
                 AdminLoginToken::obj()->GetTelegramChatID(),
                 'Your Email Was Confirmed Successfully'
-                . PHP_EOL
-                . "time: " . AppFunctions::CurrentDateTime()
             );
         }
         $this->log['email'] = ['from' => 'Unverified', 'to' => 'Verified'];

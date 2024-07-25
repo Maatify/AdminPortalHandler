@@ -129,7 +129,7 @@ class AdminTelegramBotPortal extends ParentClassHandler
         return $this->RowIsExistThisTable(" `chat_id` = ? AND `$this->identify_table_id_col_name` <> ? ", [$chatId, $adminId]);
     }
 
-    public function activateByChatID(int $chatId): void
+    public function activateByChatID(int $chatId): bool
     {
         if($admin = $this->rowByChatId($chatId)) {
             if(!$admin['status']) {
@@ -142,6 +142,7 @@ class AdminTelegramBotPortal extends ParentClassHandler
                 $log = $this->logger_keys;
                 $log['change'] = 'Activate Telegram Chat Status By Telegram bot chat';
                 $this->Logger($log, $changes, 'Update Telegram Chat Information');
+                return true;
             }
         }else{
             AlertAdminTelegramBot::obj()->alertMessageOfAgent(
@@ -150,9 +151,10 @@ class AdminTelegramBotPortal extends ParentClassHandler
                 'Your notification already enabled'
             );
         }
+        return false;
     }
 
-    public function deactivateByChatID(int $chatId): void
+    public function deactivateByChatID(int $chatId): bool
     {
         if($admin = $this->rowByChatId($chatId)) {
             if($admin['status']) {
@@ -165,6 +167,7 @@ class AdminTelegramBotPortal extends ParentClassHandler
                 $log = $this->logger_keys;
                 $log['change'] = 'De-Activate Telegram Chat Status By Telegram bot chat';
                 $this->Logger($log, $changes, 'Update Telegram Chat Information');
+                return true;
             }
         }else{
             AlertAdminTelegramBot::obj()->alertMessageOfAgent(
@@ -173,6 +176,7 @@ class AdminTelegramBotPortal extends ParentClassHandler
                 'Your notification already disabled'
             );
         }
+        return false;
     }
 
     private function handleUpdate(int $admin_id, string $chat_id, string $first_name, string $last_name, string $username, string $photo_url, string $auth_date, int $status = 0): void

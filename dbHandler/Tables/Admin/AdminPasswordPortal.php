@@ -41,7 +41,7 @@ class AdminPasswordPortal extends AdminPassword
                 $this->AdminLogger($log, [['password', 'encrypted', 'encrypted']], $_GET['action']);
                 $this->Set(AdminLoginToken::obj()->GetAdminID(), $password);
 
-                if(!empty($user['telegram_status']) && !empty($user['telegram_chat_id'])){
+                if(!empty($user['telegram_status'])){
                     AlertAdminTelegramBot::obj()->alertMessageOfAgent(
                         $this->row_id,
                         $user['telegram_chat_id'],

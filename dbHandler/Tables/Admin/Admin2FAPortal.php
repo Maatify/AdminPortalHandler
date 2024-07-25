@@ -33,7 +33,7 @@ class Admin2FAPortal extends Admin2FA
         $admin = AdminPortal::obj()->UserForEdit($this->row_id);
         if ($this->current_row['auth']) {
             $this->RemoveAuthCode();
-            if(!empty($admin['telegram_status']) && !empty($admin['telegram_chat_id'])) {
+            if(!empty($admin['telegram_status'])) {
                 AlertAdminTelegramBot::obj()->alertMessageOfAgent(
                     $admin[$this->identify_table_id_col_name],
                     $admin['telegram_chat_id'],
@@ -59,7 +59,7 @@ class Admin2FAPortal extends Admin2FA
         $this->row_id = $admin[$this->identify_table_id_col_name];
         $log = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name], 'details' => 'Success Login with Two-Factor-Authenticator'];
         $this->AdminLogger($log, [], 'Login');
-        if(!empty($admin['telegram_status']) && !empty($admin['telegram_chat_id'])) {
+        if(!empty($admin['telegram_status'])) {
             AlertAdminTelegramBot::obj()->alertMessageOfAgent(
                 $admin[$this->identify_table_id_col_name],
                 $admin['telegram_chat_id'],
@@ -80,11 +80,13 @@ class Admin2FAPortal extends Admin2FA
         $log = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name], 'details' => 'Success Register of Two-Factor-Authenticator'];
         $this->AdminLogger($log, [['auth', '', 'set']], 'Register');
         $admin = AdminLoginToken::obj()->ValidateAdminToken();
-        AlertAdminTelegramBot::obj()->alertMessageOfAgent(
-            $admin[$this->identify_table_id_col_name],
-            $admin['telegram_chat_id'],
-            'You Have Success Register of Two-Factor-Authenticator'
-        );
+        if(!empty($admin['telegram_status'])) {
+            AlertAdminTelegramBot::obj()->alertMessageOfAgent(
+                $admin[$this->identify_table_id_col_name],
+                $admin['telegram_chat_id'],
+                'You Have Success Register of Two-Factor-Authenticator'
+            );
+        }
         AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
         Json::Success(AdminLoginToken::obj()->HandleAdminResponse($admin));
     }

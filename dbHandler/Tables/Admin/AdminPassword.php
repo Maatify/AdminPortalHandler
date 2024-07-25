@@ -14,7 +14,7 @@ namespace Maatify\Portal\Admin;
 use \App\Assist\DefaultPassword;
 use \App\Assist\Encryptions\AdminPasswordEncryption;
 use Maatify\CronEmail\CronEmailRecord;
-use Maatify\CronSms\CronSmsRecord;
+use Maatify\CronSms\CronSmsAdminRecord;
 use Maatify\Json\Json;
 use Maatify\Portal\DbHandler\ParentClassHandler;
 
@@ -52,7 +52,7 @@ class AdminPassword extends ParentClassHandler
             //            Mailer::obj()->TempPassword($name, $email, $otp);
             CronEmailRecord::obj()->RecordTempPassword(0, $email, $otp, $name);
             if(!empty($_ENV['IS_SMS_ACTIVATE'])){
-                CronSmsRecord::obj()->RecordPassword(0, $phone, $otp);
+                CronSmsAdminRecord::obj()->RecordPassword(0, $phone, $otp);
             }
         }
         return $otp;

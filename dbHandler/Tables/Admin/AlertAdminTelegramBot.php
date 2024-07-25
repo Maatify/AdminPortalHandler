@@ -34,45 +34,63 @@ class AlertAdminTelegramBot extends CronTelegramBotAdminRecord
         $this->telegram_bot = CronTelegramBotAdminRecord::obj();
     }
 
+    public function validateTelegramActive(int $admin_id,int $chat_id): bool
+    {
+        if(!empty($_ENV['IS_TELEGRAM_ADMIN_ACTIVATE']) && !empty($admin_id) && !empty($chat_id)) {
+            return true;
+        }
+        return false;
+    }
+
     public function alertLogin(int $admin_id,int $chat_id): void
     {
-        $this->telegram_bot->RecordMessage(
-            $admin_id,
-            $chat_id,
-            'You have Successfully Login ' . $this->AddAlertDetails()
-        );
+        if($this->validateTelegramActive($admin_id, $chat_id)) {
+            $this->telegram_bot->RecordMessage(
+                $admin_id,
+                $chat_id,
+                'You have Successfully Login ' . $this->AddAlertDetails()
+            );
+        }
     }
 
     public function alertFailedLogin(int $admin_id,int $chat_id): void
     {
-        $this->telegram_bot->RecordMessage(
-            $admin_id,
-            $chat_id,
-            'You have Failed Login ' . $this->AddAlertDetails()
-        );
+        if($this->validateTelegramActive($admin_id, $chat_id)) {
+            $this->telegram_bot->RecordMessage(
+                $admin_id,
+                $chat_id,
+                'You have Failed Login ' . $this->AddAlertDetails()
+            );
+        }
     }
 
     public function alertMessageOfAgent(int $admin_id,int $chat_id, string $message): void
     {
-        $this->telegram_bot->RecordMessage(
-            $admin_id,
-            $chat_id,
-            $message . ' ' . $this->AddAlertDetails()
-        );
+        if($this->validateTelegramActive($admin_id, $chat_id)) {
+            $this->telegram_bot->RecordMessage(
+                $admin_id,
+                $chat_id,
+                $message . ' ' . $this->AddAlertDetails()
+            );
+        }
     }
 
     public function alertMessageNoAgent(int $admin_id,int $chat_id, string $message): void
     {
-        $this->telegram_bot->RecordMessage(
-            $admin_id,
-            $chat_id,
-            $message
-        );
+        if($this->validateTelegramActive($admin_id, $chat_id)) {
+            $this->telegram_bot->RecordMessage(
+                $admin_id,
+                $chat_id,
+                $message
+            );
+        }
     }
 
     public function alertTempPassword(int $admin_id,int $chat_id, string $password): void
     {
-        $this->telegram_bot->RecordTempPassword($admin_id,$chat_id,$password);
+        if($this->validateTelegramActive($admin_id, $chat_id)) {
+            $this->telegram_bot->RecordTempPassword($admin_id, $chat_id, $password);
+        }
     }
 
 

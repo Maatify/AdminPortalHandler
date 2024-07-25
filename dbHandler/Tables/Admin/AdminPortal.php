@@ -74,7 +74,7 @@ class AdminPortal extends ParentClassHandler
                                 }
                             } else {
                                 $log['details'] = 'Success Login';
-                                if(!empty($admin['telegram_status']) && !empty($admin['telegram_chat_id'])) {
+                                if(!empty($admin['telegram_status'])) {
                                     AlertAdminTelegramBot::obj()->alertLogin(
                                         $admin[$this->identify_table_id_col_name],
                                         $admin['telegram_chat_id'],
@@ -86,7 +86,7 @@ class AdminPortal extends ParentClassHandler
                                 AdminFailedLogin::obj()->Success($admin['username']);
                             }
                         } else {
-                            if(!empty($admin['telegram_status']) && !empty($admin['telegram_chat_id'])) {
+                            if(!empty($admin['telegram_status'])) {
                                 AlertAdminTelegramBot::obj()->alertLogin(
                                     $admin[$this->identify_table_id_col_name],
                                     $admin['telegram_chat_id'],
@@ -107,7 +107,7 @@ class AdminPortal extends ParentClassHandler
                     Json::SuspendedAccount();
                 }
             } else {
-                if(!empty($admin['telegram_status']) && !empty($admin['telegram_chat_id'])) {
+                if(!empty($admin['telegram_status'])) {
                     AlertAdminTelegramBot::obj()->alertFailedLogin(
                         $admin[$this->identify_table_id_col_name],
                         $admin['telegram_chat_id'],

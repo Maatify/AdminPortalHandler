@@ -69,13 +69,15 @@ class AdminEmailPortal extends AdminEmail
                 }else{
                     $this->Set(AdminLoginToken::obj()->GetAdminID(), $email, AdminLoginToken::obj()->GetAdminName(), AdminLoginToken::obj()->GetAdminUsername());
                     if(!empty(AdminLoginToken::obj()->GetTelegramStatus())) {
-                        AlertAdminTelegramBot::obj()->alertMessageOfAgent(
-                            AdminLoginToken::obj()->GetAdminID(),
-                            AdminLoginToken::obj()->GetTelegramChatID(),
-                            'Your Email Was Changed Successfully'
-                            . PHP_EOL
-                            . "new email: " . $email
-                        );
+                        if(!empty($admin['telegram_status'])) {
+                            AlertAdminTelegramBot::obj()->alertMessageOfAgent(
+                                AdminLoginToken::obj()->GetAdminID(),
+                                AdminLoginToken::obj()->GetTelegramChatID(),
+                                'Your Email Was Changed Successfully'
+                                . PHP_EOL
+                                . "new email: " . $email
+                            );
+                        }
                     }
                     $this->log['email'] = ['from'=> AdminLoginToken::obj()->GetAdminEmail(), 'to'=>$email];
                     $this->AdminLogger($this->log, [['email', AdminLoginToken::obj()->GetAdminEmail(), $email]], 'Update');

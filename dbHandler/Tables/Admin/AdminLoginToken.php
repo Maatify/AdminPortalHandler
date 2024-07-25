@@ -29,6 +29,7 @@ class AdminLoginToken extends AdminToken
     private int $admin_isAdmin;
     private int $telegram_status;
     private int $telegram_chat_id;
+    private int $admin_isMaster;
 
     public static function obj(): self
     {
@@ -137,7 +138,15 @@ class AdminLoginToken extends AdminToken
                 Json::SuspendedAccount($line);
             }
             $this->row_id = $admin[$this->identify_table_id_col_name];
-            $this->admin_isAdmin = (int)$admin['is_admin'];
+
+            if($this->row_id <= AppFunctions::admin_master_id){
+                $this->admin_isMaster = 1;
+                $this->admin_isAdmin = 1;
+            }else{
+                $this->admin_isMaster = 0;
+                $this->admin_isAdmin = (int)$admin['is_admin'];
+            }
+
             $this->admin_name = $admin['name'];
             $this->admin_username = $admin['username'];
             $this->admin_email = $admin['email'];
@@ -219,6 +228,11 @@ class AdminLoginToken extends AdminToken
     public function GetAdminIsAdmin(): int
     {
         return $this->admin_isAdmin;
+    }
+
+    public function GetAdminIsMaster(): int
+    {
+        return $this->admin_isMaster;
     }
 
     public function GetAdminPhone(): string

@@ -15,6 +15,7 @@ namespace Maatify\Portal\Admin;
 use App\DB\DBS\DbConnector;
 use Maatify\Portal\DbHandler\AddRemoveTwoColsHandler;
 use Maatify\Portal\Setting\Notification\NotificationTypes;
+use Maatify\Portal\Setting\Notification\NotificationTypesPortal;
 
 class AdminNotificationType extends DbConnector
 {
@@ -25,8 +26,8 @@ class AdminNotificationType extends DbConnector
     public const IDENTIFY_TABLE_ID_COL_NAME = Admin::IDENTIFY_TABLE_ID_COL_NAME;
     public const COLS                       =
         [
-            Admin::IDENTIFY_TABLE_ID_COL_NAME => 1,
-            NotificationTypes::IDENTIFY_TABLE_ID_COL_NAME  => 1,
+            AdminPortal::IDENTIFY_TABLE_ID_COL_NAME => 1,
+            NotificationTypesPortal::IDENTIFY_TABLE_ID_COL_NAME  => 1,
         ];
 
     protected string $tableName = self::TABLE_NAME;

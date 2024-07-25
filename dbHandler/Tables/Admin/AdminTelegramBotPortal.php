@@ -92,7 +92,7 @@ class AdminTelegramBotPortal extends ParentClassHandler
         $username = $this->postValidator->Optional('username', ValidatorConstantsTypes::Username, $this->class_name . __LINE__);
         $photo_url = $this->postValidator->Optional('photo_url', ValidatorConstantsTypes::String, $this->class_name . __LINE__);
         $auth_date = $this->postValidator->Optional('auth_date', ValidatorConstantsTypes::Int, $this->class_name . __LINE__);
-        $this->handleUpdate($admin_id, $chat_id, $first_name, $last_name, $username, $photo_url, $auth_date);
+        $this->handleUpdate($admin_id, $chat_id, $first_name, $last_name, $username, $photo_url, $auth_date, 1);
         Json::Success(line: $this->class_name . __LINE__);
     }
 
@@ -136,7 +136,7 @@ class AdminTelegramBotPortal extends ParentClassHandler
         );
     }
 
-    private function handleUpdate(int $admin_id, string $chat_id, string $first_name, string $last_name, string $username, string $photo_url, string $auth_date): void
+    private function handleUpdate(int $admin_id, string $chat_id, string $first_name, string $last_name, string $username, string $photo_url, string $auth_date, int $status = 0): void
     {
         $this->current_row = $this->RowThisTable('*', " `$this->identify_table_id_col_name` = ? ", [$admin_id]);
         if (! empty($this->current_row)) {
@@ -157,11 +157,10 @@ class AdminTelegramBotPortal extends ParentClassHandler
             if (! empty($auth_date)) {
                 $array_to_update['auth_date'] = $auth_date;
             }
-            $array_to_update['status'] = 1;
+            $array_to_update['status'] = $status;
             $array_to_update['time'] = AppFunctions::CurrentDateTime();
             $this->editInfo($admin_id, $array_to_update);
         }
-
     }
 
     private function editInfo(int $admin_id, array $array_to_update): void

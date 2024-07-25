@@ -78,6 +78,13 @@ class TelegramBotWebHookAdminController
                         . 'هذا البوت تم تصميمه فقط لإشعارات المستخدمين ولا يقوم برد مختلف في اي وقت عن هذه الرسالة وغير مخصص للمساعدة'
                         . PHP_EOL
                         . 'to start receiving message from bot sent /start';
+                 $keyboard = [
+                     [
+                         ['text' => 'Button 1', 'callback_data' => 'action1'], ['text' => 'Button 2', 'callback_data' => 'action2']
+                     ]
+                 ];
+                    $this->sendUsingTelegramWithKeyboard($chatId, $message, $source_message_id, $keyboard);
+                    return;
 
             }
         }else{
@@ -105,6 +112,14 @@ class TelegramBotWebHookAdminController
         }catch (\Exception $exception){
             Logger::RecordLog($exception, 'telegram_bot_webhook_reply');
         }
+    }
 
+    private function sendUsingTelegramWithKeyboard(int $chat_id, string $text, int $source_message_id, array $keyboard): void{
+        try {
+            $telegramBotManager = new TelegramBotManager($this->api_key);
+            $telegramBotManager->Sender()->SendMessageWithKeyboardMarkup($chat_id, $text, $source_message_id, $keyboard);
+        }catch (\Exception $exception){
+            Logger::RecordLog($exception, 'telegram_bot_webhook_reply');
+        }
     }
 }

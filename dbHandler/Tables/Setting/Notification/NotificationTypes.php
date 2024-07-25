@@ -15,7 +15,7 @@ use App\DB\DBS\DbConnector;
 
 class NotificationTypes extends DbConnector
 {
-    public const IDENTIFY_TABLE_ID_COL_NAME = 'notification_id';
+    public const IDENTIFY_TABLE_ID_COL_NAME = 'type_id';
     public const TABLE_NAME                 = 'notification_type';
     public const TABLE_ALIAS                = '';
     public const LOGGER_TYPE                = self::TABLE_NAME;

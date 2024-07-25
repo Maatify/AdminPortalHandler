@@ -12,13 +12,13 @@
 
 namespace Maatify\Portal\Admin;
 
+use App\DB\DBS\DbConnector;
 use Maatify\Portal\DbHandler\AddRemoveTwoColsHandler;
 use Maatify\Portal\Setting\Notification\NotificationTypes;
 
-class AdminNotificationType extends AddRemoveTwoColsHandler
+class AdminNotificationType extends DbConnector
 {
-    const TABLE_NAME = 'a_notification_type';
-
+    public const TABLE_NAME = 'a_notification_type';
     public const TABLE_ALIAS                = '';
     public const LOGGER_TYPE                = Admin::LOGGER_TYPE;
     public const LOGGER_SUB_TYPE            = 'notification_type';
@@ -35,8 +35,6 @@ class AdminNotificationType extends AddRemoveTwoColsHandler
     protected string $logger_sub_type = self::LOGGER_SUB_TYPE;
     protected string $identify_table_id_col_name = self::IDENTIFY_TABLE_ID_COL_NAME;
     protected array $cols = self::COLS;
-    protected string $table_source_class = Admin::class;
-    protected string $table_destination_class = NotificationTypes::class;
     private static self $instance;
 
     public static function obj(): self

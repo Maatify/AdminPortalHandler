@@ -1,7 +1,7 @@
 {
   "name": "maatify/admin-portal-handler",
   "description": "maatify.com",
-  "version": "1.1.035",
+  "version": "1.1.036",
   "type": "library",
   "keywords": [
     "PHP",

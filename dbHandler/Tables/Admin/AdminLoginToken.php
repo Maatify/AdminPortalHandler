@@ -45,6 +45,7 @@ class AdminLoginToken extends AdminToken
             if (! empty($token->token)) {
                 if ($admin = $this->ByToken($token->token, $this->class_name . __LINE__)) {
                     $this->Edit(['token'=>''], "`$this->identify_table_id_col_name` = ? ", [$admin[$this->identify_table_id_col_name]]);
+                    AdminPassViaTelegramPortal::obj()->clearAdminPendingLogin($admin[$this->identify_table_id_col_name], $admin['chat_id']);
                     $this->row_id = $admin[$this->identify_table_id_col_name];
                     $this->logger_type = Admin::LOGGER_TYPE;
                     $this->logger_sub_type = 'Logout';
@@ -71,6 +72,7 @@ class AdminLoginToken extends AdminToken
                 if (! empty($token->token)) {
                     if ($admin = $this->ByToken($token->token, $this->class_name . __LINE__)) {
                         JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
+
                         $this->row_id = $admin[$this->identify_table_id_col_name];
                         $this->admin_isAdmin = (int)$admin['is_admin'];
                         $this->admin_name = $admin['name'];
@@ -120,17 +122,17 @@ class AdminLoginToken extends AdminToken
         $tb_admin = Admin::TABLE_NAME;
         $tb_admin_email = AdminEmail::TABLE_NAME;
         $tb_admin_auth = Admin2FA::TABLE_NAME;
-        [$p_t, $p_c] = AdminPhone::obj()->InnerJoinThisTableWithUniqueCols($tb_admin, ['phone'=> 0]);
-        [$t_t, $t_c] = AdminTelegramBot::obj()->LeftJoinThisTableWithTableAlias($tb_admin);
+        [$a_phone_table_name, $a_phone_cols] = AdminPhone::obj()->InnerJoinThisTableWithUniqueCols($tb_admin, ['phone'=> 0]);
+        [$a_telegram_table_name, $a_telegram_cols] = AdminTelegramBot::obj()->LeftJoinThisTableWithTableAlias($tb_admin);
         $admin = $this->Row("`$this->tableName` 
         INNER JOIN `$tb_admin` ON `$tb_admin`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
         INNER JOIN `$tb_admin_email` ON `$tb_admin_email`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
         INNER JOIN `$tb_admin_auth` ON `$tb_admin_auth`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
-        $p_t 
-        $t_t
+        $a_phone_table_name 
+        $a_telegram_table_name
         ",
             "`$tb_admin`.*, `$tb_admin_email`.`email`, `$tb_admin_email`.`confirmed`, 
-            `$tb_admin_auth`.`auth`, `$tb_admin_auth`.`isAuthRequired`, " . $p_c . ', ' . $t_c,
+            `$tb_admin_auth`.`auth`, `$tb_admin_auth`.`isAuthRequired`, " . $a_phone_cols . ', ' . $a_telegram_cols,
             "`$this->tableName`.`token` = ? AND `$this->tableName`.`token` <> ''",
             [self::TokenSecretKeyEncode($hashed_token)]);
         if($admin){

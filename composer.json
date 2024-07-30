@@ -1,7 +1,7 @@
 {
   "name": "maatify/admin-portal-handler",
   "description": "maatify.com",
-  "version": "1.1.054",
+  "version": "1.1.055",
   "type": "library",
   "keywords": [
     "PHP",
@@ -71,6 +71,7 @@
   },
   "autoload": {
     "psr-4": {
+      "App\\": "App/",
       "Maatify\\dBHandler\\": "dbHandler/",
       "Maatify\\Portal\\Admin\\": "dbHandler/Tables/Admin/",
       "Maatify\\Portal\\Privileges\\": "dbHandler/Tables/Privileges/",

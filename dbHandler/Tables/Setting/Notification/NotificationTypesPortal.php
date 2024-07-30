@@ -8,6 +8,7 @@
  * @link      https://github.com/Maatify/AdminPortalHandler  view project on GitHub
  * @Maatify   DB :: AdminPortalHandler
  */
+
 namespace Maatify\Portal\Setting\Notification;
 
 use Maatify\Json\Json;
@@ -42,6 +43,7 @@ class NotificationTypesPortal extends ParentClassHandler
     protected array $cols_to_add = [
         ['type', ValidatorConstantsTypes::Col_Name, ValidatorConstantsValidators::Require],
         ['sms_status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
+        ['email_status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
         ['telegram_status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
         ['app_status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
     ];
@@ -49,6 +51,7 @@ class NotificationTypesPortal extends ParentClassHandler
     protected array $cols_to_edit = [
         ['type', ValidatorConstantsTypes::Col_Name, ValidatorConstantsValidators::Optional],
         ['sms_status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
+        ['email_status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
         ['telegram_status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
         ['app_status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
     ];
@@ -56,6 +59,7 @@ class NotificationTypesPortal extends ParentClassHandler
     protected array $cols_to_filter = [
         [self::IDENTIFY_TABLE_ID_COL_NAME, ValidatorConstantsTypes::Int, ValidatorConstantsValidators::Optional],
         ['sms_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
+        ['email_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
         ['telegram_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
         ['app_status', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
     ];
@@ -87,7 +91,7 @@ class NotificationTypesPortal extends ParentClassHandler
     {
         $this->ValidatePostedTableId();
         $type = $this->postValidator->Optional('type', ValidatorConstantsTypes::Col_Name, $this->class_name . __LINE__);
-        if(!empty($type) && $type !== $this->current_row['type']) {
+        if (! empty($type) && $type !== $this->current_row['type']) {
             $this->jsonValidateTypeExist($type);
         }
         parent::UpdateByPostedId();
@@ -95,8 +99,8 @@ class NotificationTypesPortal extends ParentClassHandler
 
     private function jsonValidateTypeExist(string $type): void
     {
-       if($this->RowIsExistThisTable('LOWER(`type`) = ? ', [strtolower($type)])){
-           Json::Exist('type', 'type already exists', $this->class_name . __LINE__);
-       }
+        if ($this->RowIsExistThisTable('LOWER(`type`) = ? ', [strtolower($type)])) {
+            Json::Exist('type', 'type already exists', $this->class_name . __LINE__);
+        }
     }
 }

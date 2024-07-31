@@ -22,6 +22,10 @@ use Maatify\TelegramBot\TelegramBotManager;
 class TelegramBotWebHookAdminController
 {
     private static self $instance;
+    private int $admin_id = 0;
+    private string $admin_first_name = '';
+    private string $admin_last_name = '';
+    private bool $admin_status = false;
 
     public static function obj(): self
     {
@@ -41,31 +45,41 @@ class TelegramBotWebHookAdminController
 
     public function handleMessageFromCommand(int $chatId, string $text): array
     {
-        $admin_id = AdminTelegramBotPortal::obj()->getAdminByChatId($chatId);
-        if (! empty($admin_id)) {
+        if ($admin = AdminTelegramBotPortal::obj()->rowByChatId($chatId)) {
+            $this->admin_id = (int)$admin[Admin::IDENTIFY_TABLE_ID_COL_NAME];
+            $this->admin_first_name = (string)$admin['first_name'];
+            $this->admin_last_name = (string)$admin['last_name'];
+            $this->admin_status = (bool)$admin['status'];
+        }
+        if (! empty($this->admin_id)) {
             switch ($text) {
                 case '/start':
-                    if (AdminTelegramBotPortal::obj()->activateByChatID($chatId)) {
-                        $message = 'Your account notification was enabled';
+                    $message = 'Dear ' . $this->admin_first_name . ' ' . $this->admin_last_name . ',' . PHP_EOL . PHP_EOL;
+                    if (! $this->admin_status) {
+                        AdminTelegramBotPortal::obj()->activateByChatID($chatId);
+                        $message .= '✅ Your account notification was enabled';
                     } else {
-                        $message = 'Your notification already enabled';
+                        $message .= '⚠️ Your notification already enabled';
                     }
                     break;
 
                 case '/stop':
-                    if (AdminTelegramBotPortal::obj()->deactivateByChatID($chatId)) {
-                        $message = 'Your account notification was disabled';
+                    $message = 'Dear ' . $this->admin_first_name . ' ' . $this->admin_last_name . ',' . PHP_EOL . PHP_EOL;
+                    if ($this->admin_status) {
+                        AdminTelegramBotPortal::obj()->deactivateByChatID($chatId);
+                        $message .= '❌ Your account notification was disabled';
                     } else {
-                        $message = 'Your notification already disabled';
+                        $message .= '⚠️ Your notification already disabled';
                     }
                     break;
 
                 case '/send':
-                    $sent = CronTelegramBotAdminSender::obj()->cronSendByAdminIdAndChatId($admin_id, $chatId);
+                    $message = 'Dear ' . $this->admin_first_name . ' ' . $this->admin_last_name . ',' . PHP_EOL . PHP_EOL;
+                    $sent = CronTelegramBotAdminSender::obj()->cronSendByAdminIdAndChatId($this->admin_id, $chatId);
                     if ($sent == 0) {
-                        $message = 'there is no notification for you in queue';
+                        $message .= '⚠️ There is no notification for you in queue';
                     } else {
-                        $message = 'all notifications for your account in queue were sent';
+                        $message .= '✅ All notifications for your account in queue were sent';
                     }
                     break;
 
@@ -75,7 +89,7 @@ class TelegramBotWebHookAdminController
                     break;
 
                 default;
-                    $message = $this->defaultMessage($chatId);
+                    $message = $this->defaultMessage($chatId, $admin['first_name']);
             }
         } else {
             $message = match ($text) {
@@ -84,19 +98,19 @@ class TelegramBotWebHookAdminController
             };
         }
 
-        return [$admin_id, $message];
+        return [$this->admin_id, $message];
     }
 
-    public function defaultMessage(int $chatId): string
+    public function defaultMessage(int $chatId, string $first_name = ''): string
     {
         return 'Welcome to: ' . $_ENV['TELEGRAM_ADMIN_USERNAME']
                . PHP_EOL . PHP_EOL
-               . 'I Don\'t know who you are ⁉️'
+               . (! $first_name ? ('  I Don\'t know who you are ⁉️') : 'Hello! ' . $first_name)
                . PHP_EOL . PHP_EOL
                . 'your chat id : ' . $chatId
                . PHP_EOL
                . PHP_EOL
-               . 'This bot For Alerts only and its not for replay with any other message or help'
+               . 'This bot is For Alerts only and its not for reply with any other message or help'
                . PHP_EOL
                . 'هذا البوت تم تصميمه فقط لإشعارات المستخدمين ولا يقوم برد مختلف في اي وقت عن هذه الرسالة وغير مخصص للمساعدة'
                . PHP_EOL
@@ -110,7 +124,7 @@ class TelegramBotWebHookAdminController
     {
         return '‼️️' . $_ENV['TELEGRAM_ADMIN_USERNAME'] . '‼️️'
                . PHP_EOL . PHP_EOL
-               . '  I\'m an Assistance for User Notifications and Login Only.'
+               . '  I\'m an Assistant for Users who Login and Receive Notifications Only.'
                . PHP_EOL . PHP_EOL
                . '  I\'m Developed by Maatify.'
                . PHP_EOL . PHP_EOL

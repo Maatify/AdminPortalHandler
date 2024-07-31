@@ -250,7 +250,7 @@ class AdminTelegramBotPortal extends ParentClassHandler
         return $this->RowThisTable('chat_id', "`$this->identify_table_id_col_name` = ? AND `status` = ? ", [$admin_id, 1]);
     }
 
-    private function rowByChatId(int $chatId): array
+    public function rowByChatId(int $chatId): array
     {
         return $this->RowThisTable('*', "`chat_id` = ?", [$chatId]);
 

@@ -15,6 +15,7 @@ namespace Maatify\Portal\Admin;
 
 use \App\Assist\AppFunctions;
 use App\Assist\Jwt\JWTAssistance;
+use App\DB\Tables\PortalCacheRedis;
 use Exception;
 use Maatify\GoogleRecaptcha\V3\GoogleRecaptchaV3Json;
 use Maatify\Json\Json;
@@ -193,6 +194,7 @@ class AdminPortal extends ParentClassHandler
 
             $user = $this->UserForEdit();
             $user['password'] = $otp;
+            PortalCacheRedis::obj()->UsersListDelete();
             Json::Success($user);
         }
     }
@@ -295,5 +297,13 @@ class AdminPortal extends ParentClassHandler
         );
     }
 
+    public function allIdAndNameList(): array
+    {
+        return $this->RowsThisTable(
+            "`$this->identify_table_id_col_name`, `name`",
+            "`$this->identify_table_id_col_name` > ? ORDER BY `$this->identify_table_id_col_name`",
+            [0]);
+
+    }
 
 }

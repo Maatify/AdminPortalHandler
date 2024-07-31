@@ -72,6 +72,36 @@ class Admin2FAPortal extends Admin2FA
         Json::Success(AdminLoginToken::obj()->HandleAdminResponse($admin));
     }
 
+    public function AuthPassedViaTelegram()
+    {
+        if($admin = $this->ValideToken()){
+
+            // ============================================================================
+            // ============================================================================
+            // ===================== replace with passed via telegram =====================
+            // ============================================================================
+            // ============================================================================
+
+            if($this->ValidateCode($code, $this->AuthDecode($admin['auth']), $admin['username'])){
+                JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
+                $this->logger_keys = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name]];
+                $this->row_id = $admin[$this->identify_table_id_col_name];
+                $log = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name], 'details' => 'Success Login with Telegram Authenticator'];
+                $this->AdminLogger($log, [], 'Login');
+                if(!empty($admin['telegram_status'])) {
+                    AlertAdminTelegramBot::obj()->alertMessageOfAgent(
+                        $admin[$this->identify_table_id_col_name],
+                        $admin['telegram_chat_id'],
+                        'You Have Success Login with Two-Factor-Authenticator'
+                    );
+                }
+                AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
+                Json::Success(AdminLoginToken::obj()->HandleAdminResponse($admin));
+            }
+        }
+        Json::ReLogin($this->class_name . __FUNCTION__ . '::' . __LINE__);
+    }
+
 
     public function AuthRegister(): void
     {

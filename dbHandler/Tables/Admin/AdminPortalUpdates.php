@@ -13,6 +13,7 @@
 
 namespace Maatify\Portal\Admin;
 
+use App\DB\Tables\PortalCacheRedis;
 use Maatify\Json\Json;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;
@@ -56,7 +57,9 @@ class AdminPortalUpdates extends AdminPortal
                 ValidatorConstantsValidators::Optional
             ],
         ];
-        $this->UpdateByPostedId();
+        $this->UpdateByPostedIdSilent();
+        PortalCacheRedis::obj()->UsersListDelete();
+        Json::Success(line: $this->class_name . __LINE__);
     }
 
     public function SwitchAsAdmin(): void

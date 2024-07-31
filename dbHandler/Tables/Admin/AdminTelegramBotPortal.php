@@ -264,4 +264,22 @@ class AdminTelegramBotPortal extends ParentClassHandler
     {
         return $this->RowThisTable('*', "`$this->identify_table_id_col_name` = ?", [$admin_id]);
     }
+
+    public function AllPaginationThisTableFilter(string $order_with_asc_desc = ''): void
+    {
+        [$tables, $cols] = $this->HandleThisTableJoins();
+        $list = $this->ArrayPaginationThisTableFilter($tables, $cols, order_with_asc_desc: $order_with_asc_desc);
+        if (! empty($list['data'])) {
+            $list['data'] = array_map(function ($row) {
+                if(empty($row['photo_url'])){
+                    $row['photo_url'] = AppFunctions::ImageNotAvailable();
+                }
+                return $row;
+            }, $list['data']);
+        }
+        Json::Success(
+            $list,
+            line: $this->class_name . __LINE__
+        );
+    }
 }

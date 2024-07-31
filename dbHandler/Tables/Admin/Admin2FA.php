@@ -94,7 +94,7 @@ class Admin2FA extends ParentClassHandler
 
     protected function ValideToken(): array
     {
-        $auth_pages = ['AuthRegister', 'Auth'];
+        $auth_pages = ['AuthRegister', 'Auth', 'AuthPassedViaTelegram'];
         if (! empty($_GET['action']) && in_array($_GET['action'], $auth_pages)) {
             if (! empty($_SESSION['token']) && $tokens = JWTAssistance::obj()->JwtValidation($this->class_name . __FUNCTION__ . '::' . __LINE__)) {
                 if (isset($tokens->token, $tokens->next)) {

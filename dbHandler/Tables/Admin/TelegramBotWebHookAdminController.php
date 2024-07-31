@@ -119,7 +119,7 @@ class TelegramBotWebHookAdminController
             $status_message = '';
         }
 
-        return 'Welcome to: ' . $_ENV['TELEGRAM_ADMIN_USERNAME']
+        return '‼️️' . $_ENV['TELEGRAM_ADMIN_USERNAME'] . '‼️️'
                . PHP_EOL . PHP_EOL
                . (! $this->admin_first_name ? ('  I Don\'t know who you are ⁉️') : 'Hello! ' . $this->admin_first_name)
                . PHP_EOL . PHP_EOL
@@ -127,12 +127,18 @@ class TelegramBotWebHookAdminController
                . PHP_EOL
                . PHP_EOL
                . $status_message
-               . $this->infoMessage();
+               . $this->infoMessage(false);
     }
 
-    public function infoMessage(): string
+    public function infoMessage(bool $bot_name = true): string
     {
-        return '‼️️' . $_ENV['TELEGRAM_ADMIN_USERNAME'] . '‼️️'
+        if ($bot_name) {
+            $title = '‼️️' . $_ENV['TELEGRAM_ADMIN_USERNAME'] . '‼️️';
+        } else {
+            $title = '';
+        }
+
+        return $title
                . PHP_EOL . PHP_EOL
                . '  I\'m an Assistant for Users who Login and Receive Notifications Only.'
                . PHP_EOL . PHP_EOL

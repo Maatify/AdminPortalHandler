@@ -70,58 +70,53 @@ class TelegramBotWebHookAdminController
                     break;
 
                 case '/info':
-                    $message = '‼️️' . $_ENV['TELEGRAM_ADMIN_USERNAME'] . '‼️️'
-                               . PHP_EOL . PHP_EOL
-                               . '  I\'m an Assistance for User Notifications and Login Only.'
-                               . PHP_EOL . PHP_EOL
-                               . '  I\'m Developed by Maatify.'
-                               . PHP_EOL . PHP_EOL
-                               . '  I\'ve been active since 2024-07-31.'
-                               . PHP_EOL . PHP_EOL
-                               . '  My Developer\'s website is maatify.dev.';
+                    $message = $this->infoMessage();
 
                     break;
 
                 default;
-                    $message =
-                        'Welcome to: ' . $_ENV['TELEGRAM_ADMIN_USERNAME']
-                        . PHP_EOL . PHP_EOL .
-                        'your chat id : ' . $chatId
-                        . PHP_EOL
-                        . PHP_EOL
-                        . 'This bot For Alerts only and its not for replay with any other message or help'
-                        . PHP_EOL
-                        . 'هذا البوت تم تصميمه فقط لإشعارات المستخدمين ولا يقوم برد مختلف في اي وقت عن هذه الرسالة وغير مخصص للمساعدة'
-                        . PHP_EOL
-                        . 'to start receiving message from bot sent /start';
-
+                    $message = $this->defaultMessage($chatId);
             }
         } else {
             $message = match ($text) {
-                '/info' => '‼️️' . $_ENV['TELEGRAM_ADMIN_USERNAME'] . '‼️️'
-                           . PHP_EOL . PHP_EOL
-                           . '  I\'m an Assistance for User Notifications and Login Only.'
-                           . PHP_EOL . PHP_EOL
-                           . '  I\'m Developed by Maatify.'
-                           . PHP_EOL . PHP_EOL
-                           . '  I\'ve been active since ' . AppFunctions::PortalGeneratedDate() . '.'
-                           . PHP_EOL . PHP_EOL
-                           . '  My Developer\'s website is maatify.dev.',
-                default => 'Welcome to: ' . $_ENV['TELEGRAM_ADMIN_USERNAME']
-                           . PHP_EOL . PHP_EOL
-                           . 'I Don\'t know who you are ⁉️'
-                           . PHP_EOL . PHP_EOL
-                           . 'your chat id : ' . $chatId
-                           . PHP_EOL
-                           . PHP_EOL
-                           . 'This bot For Alerts only and its not for replay with any other message or help'
-                           . PHP_EOL
-                           . 'هذا البوت تم تصميمه فقط لإشعارات المستخدمين ولا يقوم برد مختلف في اي وقت عن هذه الرسالة وغير مخصص للمساعدة'
-                           . PHP_EOL
-                           . 'to start receiving message from bot sent /start',
+                '/info' => $this->infoMessage(),
+                default => $this->defaultMessage($chatId),
             };
         }
+
         return [$admin_id, $message];
+    }
+
+    public function defaultMessage(int $chatId): string
+    {
+        return 'Welcome to: ' . $_ENV['TELEGRAM_ADMIN_USERNAME']
+               . PHP_EOL . PHP_EOL
+               . 'I Don\'t know who you are ⁉️'
+               . PHP_EOL . PHP_EOL
+               . 'your chat id : ' . $chatId
+               . PHP_EOL
+               . PHP_EOL
+               . 'This bot For Alerts only and its not for replay with any other message or help'
+               . PHP_EOL
+               . 'هذا البوت تم تصميمه فقط لإشعارات المستخدمين ولا يقوم برد مختلف في اي وقت عن هذه الرسالة وغير مخصص للمساعدة'
+               . PHP_EOL
+               . 'To start receiving message from bot sent /start'
+               . PHP_EOL
+               . PHP_EOL
+               . $this->infoMessage();
+    }
+
+    public function infoMessage(): string
+    {
+        return '‼️️' . $_ENV['TELEGRAM_ADMIN_USERNAME'] . '‼️️'
+               . PHP_EOL . PHP_EOL
+               . '  I\'m an Assistance for User Notifications and Login Only.'
+               . PHP_EOL . PHP_EOL
+               . '  I\'m Developed by Maatify.'
+               . PHP_EOL . PHP_EOL
+               . '  I\'ve been active since ' . AppFunctions::PortalGeneratedDate() . '.'
+               . PHP_EOL . PHP_EOL
+               . '  My Developer\'s website is maatify.dev.';
     }
 
     public function reply(int $chatId, string $text, int $source_message_id): void
@@ -208,10 +203,12 @@ class TelegramBotWebHookAdminController
     {
         try {
             $telegramBotManager = new TelegramBotManager($this->api_key);
+
             return $telegramBotManager->Sender()->sendMessage($chat_id, $message, $message_id, [], $parsMode);
         } catch (Exception $exception) {
             Logger::RecordLog($exception, 'sendNewMessage');
         }
+
         return [];
     }
 
@@ -228,8 +225,8 @@ class TelegramBotWebHookAdminController
         } catch (Exception $exception) {
             Logger::RecordLog($exception, 'allowedAuth');
         }
-        return [];
 
+        return [];
     }
 
     public function editMessage(int $chat_id, string $message, int $message_id): array
@@ -240,7 +237,7 @@ class TelegramBotWebHookAdminController
         } catch (Exception $exception) {
             Logger::RecordLog($exception, 'editMessage');
         }
-        return [];
 
+        return [];
     }
 }

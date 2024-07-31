@@ -1,12 +1,14 @@
 <?php
 /**
  * @PHP       Version >= 8.0
+ * @Liberary  AdminPortalHandler
+ * @Project   AdminPortalHandler
  * @copyright ©2024 Maatify.dev
  * @author    Mohamed Abdulalim (megyptm) <mohamed@maatify.dev>
  * @since     2024-07-27 5:11 PM
  * @link      https://www.maatify.dev Maatify.com
  * @link      https://github.com/Maatify/AdminPortalHandler  view project on GitHub
- * @Maatify   DB :: AdminPortalHandler
+ * @Maatify   AdminPortalHandler :: TelegramBotWebHookAdminController
  */
 
 namespace Maatify\Portal\Admin;
@@ -112,16 +114,14 @@ class TelegramBotWebHookAdminController
 
             $status_message .= PHP_EOL
                                . PHP_EOL
-                               . 'To receive All Pending Notifications, Please send /send'
-                               . PHP_EOL
-                               . PHP_EOL;
+                               . 'To receive All Pending Notifications, Please send /send';
         } else {
             $status_message = '';
         }
 
         return '‼️️' . $_ENV['TELEGRAM_ADMIN_USERNAME'] . '‼️️'
                . PHP_EOL . PHP_EOL
-               . (! $this->admin_first_name ? ('  I Don\'t know who you are ⁉️') : 'Hello! ' . $this->admin_first_name)
+               . (! $this->admin_first_name ? ('  I Don\'t know who you are ⁉️.') : 'Hello! ' . $this->admin_first_name . '.')
                . PHP_EOL . PHP_EOL
                . 'your chat id : ' . $chatId
                . PHP_EOL

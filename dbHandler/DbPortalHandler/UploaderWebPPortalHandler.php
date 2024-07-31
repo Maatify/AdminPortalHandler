@@ -1,10 +1,14 @@
 <?php
 /**
- * Created by Maatify.dev
- * User: Maatify.dev
- * Date: 2023-10-25
- * Time: 2:58 PM
- * https://www.Maatify.dev
+ * @PHP       Version >= 8.0
+ * @Liberary  AdminPortalHandler
+ * @Project   AdminPortalHandler
+ * @copyright ©2024 Maatify.dev
+ * @author    Mohamed Abdulalim (megyptm) <mohamed@maatify.dev>
+ * @since     2023-10-25 2:58 PM
+ * @link      https://www.maatify.dev Maatify.com
+ * @link      https://github.com/Maatify/AdminPortalHandler  view project on GitHub
+ * @Maatify   AdminPortalHandler :: UploaderWebPPortalHandler
  */
 
 namespace Maatify\Portal\DbHandler;

@@ -1,10 +1,14 @@
 <?php
 /**
- * Created by Maatify.dev
- * User: Maatify.dev
- * Date: 2024-07-23
- * Time: 11:52 AM
- * https://www.Maatify.dev
+ * @PHP       Version >= 8.0
+ * @Liberary  AdminPortalHandler
+ * @Project   AdminPortalHandler
+ * @copyright ©2024 Maatify.dev
+ * @author    Mohamed Abdulalim (megyptm) <mohamed@maatify.dev>
+ * @since     2024-07-23 11:52 AM
+ * @link      https://www.maatify.dev Maatify.com
+ * @link      https://github.com/Maatify/AdminPortalHandler  view project on GitHub
+ * @Maatify   AdminPortalHandler :: AdminTelegramBot
  */
 
 namespace Maatify\Portal\Admin;

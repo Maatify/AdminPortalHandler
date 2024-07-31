@@ -1,15 +1,18 @@
 <?php
 /**
- * Created by Maatify.dev
- * User: Maatify.dev
- * Date: 2024-07-31
- * Time: 3:52 AM
- * https://www.Maatify.dev
+ * @PHP       Version >= 8.0
+ * @Liberary  AdminPortalHandler
+ * @Project   AdminPortalHandler
+ * @copyright ©2024 Maatify.dev
+ * @author    Mohamed Abdulalim (megyptm) <mohamed@maatify.dev>
+ * @since     2024-07-31 3:52 AM
+ * @link      https://www.maatify.dev Maatify.com
+ * @link      https://github.com/Maatify/AdminPortalHandler  view project on GitHub
+ * @Maatify   AdminPortalHandler :: AdminPassViaTelegramPortal
  */
 
 namespace Maatify\Portal\Admin;
 
-use Maatify\Logger\Logger;
 use Maatify\Portal\DbHandler\ParentClassHandler;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;

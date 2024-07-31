@@ -1,16 +1,19 @@
 <?php
 /**
- * Created by Maatify.dev
- * User: Maatify.dev
- * Date: 2024-07-25
- * Time: 6:50 PM
- * https://www.Maatify.dev
+ * @PHP       Version >= 8.0
+ * @Liberary  AdminPortalHandler
+ * @Project   AdminPortalHandler
+ * @copyright ©2024 Maatify.dev
+ * @author    Mohamed Abdulalim (megyptm) <mohamed@maatify.dev>
+ * @since     2024-07-25 6:50 PM
+ * @link      https://www.maatify.dev Maatify.com
+ * @link      https://github.com/Maatify/AdminPortalHandler  view project on GitHub
+ * @Maatify   AdminPortalHandler :: AdminNotificationTypePortal
  */
 
 namespace Maatify\Portal\Admin;
 
 use Maatify\Portal\DbHandler\AddRemoveTwoColsHandler;
-use Maatify\Portal\Setting\Notification\NotificationTypes;
 use Maatify\Portal\Setting\Notification\NotificationTypesPortal;
 
 class AdminNotificationTypePortal extends AddRemoveTwoColsHandler

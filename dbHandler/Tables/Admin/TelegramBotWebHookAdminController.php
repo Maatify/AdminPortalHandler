@@ -103,20 +103,30 @@ class TelegramBotWebHookAdminController
 
     public function defaultMessage(int $chatId, string $first_name = ''): string
     {
+        if (! empty($this->admin_first_name)) {
+            if ($this->admin_status) {
+                $status_message = 'To Stop receiving Notifications, Please send /stop';
+            } else {
+                $status_message = 'To start receiving Notifications , Please send /start';
+            }
+
+            $status_message .= PHP_EOL
+                               . PHP_EOL
+                               . 'To receive All Pending Notifications, Please send /send'
+                               . PHP_EOL
+                               . PHP_EOL;
+        } else {
+            $status_message = '';
+        }
+
         return 'Welcome to: ' . $_ENV['TELEGRAM_ADMIN_USERNAME']
                . PHP_EOL . PHP_EOL
-               . (! $first_name ? ('  I Don\'t know who you are ⁉️') : 'Hello! ' . $first_name)
+               . (! $this->admin_first_name ? ('  I Don\'t know who you are ⁉️') : 'Hello! ' . $this->admin_first_name)
                . PHP_EOL . PHP_EOL
                . 'your chat id : ' . $chatId
                . PHP_EOL
                . PHP_EOL
-               . 'This bot is For Alerts only and its not for reply with any other message or help'
-               . PHP_EOL
-               . 'هذا البوت تم تصميمه فقط لإشعارات المستخدمين ولا يقوم برد مختلف في اي وقت عن هذه الرسالة وغير مخصص للمساعدة'
-               . PHP_EOL
-               . 'To start receiving message from bot sent /start'
-               . PHP_EOL
-               . PHP_EOL
+               . $status_message
                . $this->infoMessage();
     }
 

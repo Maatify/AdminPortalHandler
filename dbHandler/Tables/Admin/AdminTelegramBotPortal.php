@@ -239,7 +239,7 @@ class AdminTelegramBotPortal extends ParentClassHandler
                     $sender = TelegramBotManager::obj($api_key)
                         ->Sender();
                     foreach ($chats as $chat) {
-                        $sender->SendMessage($chat['chat_id'], $message);
+                        $sender->sendMessage($chat['chat_id'], $message);
                     }
                 }
                 catch (\Exception $exception) {

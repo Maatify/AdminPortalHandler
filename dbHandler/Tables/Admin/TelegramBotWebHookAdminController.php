@@ -159,7 +159,7 @@ class TelegramBotWebHookAdminController
     {
         try {
             $telegramBotManager = new TelegramBotManager($this->api_key);
-            $telegramBotManager->Sender()->SendMessage($chat_id, $text, $source_message_id);
+            $telegramBotManager->sender->sendMessage($chat_id, $text, $source_message_id);
         } catch (Exception $exception) {
             Logger::RecordLog($exception, 'telegram_bot_webhook_reply');
         }
@@ -169,7 +169,7 @@ class TelegramBotWebHookAdminController
     {
         try {
             $telegramBotManager = new TelegramBotManager($this->api_key);
-            $telegramBotManager->Sender()->SendMessageWithKeyboardMarkup($chat_id, $text, $source_message_id, $keyboard);
+            $telegramBotManager->sender->sendMessageWithKeyboardMarkup($chat_id, $text, $source_message_id, $keyboard);
         } catch (Exception $exception) {
             Logger::RecordLog($exception, 'telegram_bot_webhook_reply');
         }
@@ -179,8 +179,8 @@ class TelegramBotWebHookAdminController
     {
         try {
             $telegramBotManager = new TelegramBotManager($this->api_key);
-            //            $telegramBotManager->Sender()->editMessageReplyMarkup($chat_id, reply_to_message_id: $message_id);
-            $telegramBotManager->Sender()->editMessageText($chat_id, 'new authorization requested after this message', reply_to_message_id: $message_id);
+            //            $telegramBotManager->sender->editMessageReplyMarkup($chat_id, reply_to_message_id: $message_id);
+            $telegramBotManager->sender->editMessageText($chat_id, 'new authorization requested after this message', reply_to_message_id: $message_id);
         } catch (Exception $exception) {
             Logger::RecordLog($exception, 'clearAuthKeyboard');
         }
@@ -218,7 +218,7 @@ class TelegramBotWebHookAdminController
             ];
             $telegramBotManager = new TelegramBotManager($this->api_key);
 
-            return $telegramBotManager->Sender()->SendMessage($chat_id,
+            return $telegramBotManager->sender->sendMessage($chat_id,
                 $text,
                 keyboard: $keyboard
             );
@@ -234,7 +234,7 @@ class TelegramBotWebHookAdminController
         try {
             $telegramBotManager = new TelegramBotManager($this->api_key);
 
-            return $telegramBotManager->Sender()->sendMessage($chat_id, $message, $message_id, [], $parsMode);
+            return $telegramBotManager->sender->sendMessage($chat_id, $message, $message_id, [], $parsMode);
         } catch (Exception $exception) {
             Logger::RecordLog($exception, 'sendNewMessage');
         }
@@ -251,7 +251,7 @@ class TelegramBotWebHookAdminController
         ];
         try {
             $telegramBotManager = new TelegramBotManager($this->api_key);
-            $telegramBotManager->Sender()->editMessageText($chat_id, $message, $message_id, $keyboard, 'HTML');
+            $telegramBotManager->sender->editMessageText($chat_id, $message, $message_id, $keyboard, 'HTML');
         } catch (Exception $exception) {
             Logger::RecordLog($exception, 'allowedAuth');
         }
@@ -263,7 +263,7 @@ class TelegramBotWebHookAdminController
     {
         try {
             $telegramBotManager = new TelegramBotManager($this->api_key);
-            $telegramBotManager->Sender()->editMessageText($chat_id, $message, $message_id, [], 'HTML');
+            $telegramBotManager->sender->editMessageText($chat_id, $message, $message_id, [], 'HTML');
         } catch (Exception $exception) {
             Logger::RecordLog($exception, 'editMessage');
         }

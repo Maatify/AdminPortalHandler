@@ -1,7 +1,7 @@
 {
   "name": "maatify/admin-portal-handler",
   "description": "maatify.com",
-  "version": "1.1.063",
+  "version": "1.1.064",
   "type": "library",
   "keywords": [
     "PHP",
@@ -62,7 +62,8 @@
     "maatify/cron-sms": "^1.0",
     "maatify/cron-email": "^1.0",
     "maatify/queue-manager": "^1.0",
-    "maatify/cron-telegram-bot": "^1.0"
+    "maatify/cron-telegram-bot": "^1.0",
+    "maatify/emoji-replacer": "^1.0"
   },
   "config": {
     "platform": {

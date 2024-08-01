@@ -62,28 +62,18 @@ class Admin2FAPortal extends Admin2FA
         $log = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name], 'details' => 'Success Login with Two-Factor-Authenticator'];
         $this->AdminLogger($log, [], 'Login');
         if(!empty($admin['telegram_status'])) {
-            AlertAdminTelegramBot::obj()->alertMessageOfAgent(
-                $admin[$this->identify_table_id_col_name],
-                $admin['telegram_chat_id'],
-                'You Have Success Login with Two-Factor-Authenticator'
-            );
+            AdminTelegramPassPortal::obj()->sendSessionStartFrom2fs($admin[$this->identify_table_id_col_name], $admin['telegram_first_name'], $admin['telegram_chat_id']);
         }
         AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
         Json::Success(AdminLoginToken::obj()->HandleAdminResponse($admin));
     }
 
-    public function AuthPassedViaTelegram()
+    public function AuthPassedViaTelegram(): void
     {
         if($admin = $this->ValideToken()){
-
-            // ============================================================================
-            // ============================================================================
-            // ===================== replace with passed via telegram =====================
-            // ============================================================================
-            // ============================================================================
-
-            if($this->ValidateCode($code, $this->AuthDecode($admin['auth']), $admin['username'])){
-                JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
+            $token = JWTAssistance::obj()->JwtValidationForSessionLogin($this->class_name . __LINE__);
+            if(AdminTelegramPassPortal::obj()->validateAdminPassViaTelegramToken($admin[$this->identify_table_id_col_name], $token->token))
+            {
                 $this->logger_keys = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name]];
                 $this->row_id = $admin[$this->identify_table_id_col_name];
                 $log = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name], 'details' => 'Success Login with Telegram Authenticator'];
@@ -92,14 +82,15 @@ class Admin2FAPortal extends Admin2FA
                     AlertAdminTelegramBot::obj()->alertMessageOfAgent(
                         $admin[$this->identify_table_id_col_name],
                         $admin['telegram_chat_id'],
-                        'You Have Success Login with Two-Factor-Authenticator'
+                        'You Have Success Login with Telegram-Authenticator'
                     );
                 }
+                JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
                 AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
                 Json::Success(AdminLoginToken::obj()->HandleAdminResponse($admin));
             }
         }
-        Json::ReLogin($this->class_name . __FUNCTION__ . '::' . __LINE__);
+        Json::Incorrect('telegram_auth');
     }
 
 

@@ -15,9 +15,9 @@ namespace Maatify\Portal\Admin;
 
 use Maatify\Portal\DbHandler\ParentClassHandler;
 
-class AdminPassViaTelegram extends ParentClassHandler
+class AdminTelegramPass extends ParentClassHandler
 {
-    const TABLE_NAME                 = 'a_pass_telegram';
+    const TABLE_NAME                 = 'a_telegram_pass';
     const TABLE_ALIAS                = '';
     const IDENTIFY_TABLE_ID_COL_NAME = 'message_id';
     const LOGGER_TYPE                = Admin::LOGGER_TYPE;

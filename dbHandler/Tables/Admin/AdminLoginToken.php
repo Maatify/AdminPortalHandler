@@ -47,7 +47,7 @@ class AdminLoginToken extends AdminToken
             if (! empty($token->token)) {
                 if ($admin = $this->ByToken($token->token, $this->class_name . __LINE__)) {
                     $this->Edit(['token'=>''], "`$this->identify_table_id_col_name` = ? ", [$admin[$this->identify_table_id_col_name]]);
-                    AdminPassViaTelegramPortal::obj()->clearAdminPendingLogin($admin[$this->identify_table_id_col_name], $admin['chat_id']);
+                    AdminTelegramPassPortal::obj()->clearAdminPendingLogin($admin[$this->identify_table_id_col_name], $admin['chat_id']);
                     $this->row_id = $admin[$this->identify_table_id_col_name];
                     $this->logger_type = Admin::LOGGER_TYPE;
                     $this->logger_sub_type = 'Logout';
@@ -59,6 +59,19 @@ class AdminLoginToken extends AdminToken
             }
         }
         session_destroy();
+    }
+
+    public function terminateSessionUsingTelegram(int $admin_id, int $chat_id): void
+    {
+        $this->Edit(['token'=>''], "`$this->identify_table_id_col_name` = ? ", [$admin_id]);
+        AdminTelegramPassPortal::obj()->clearAdminPendingLogin($admin_id, $chat_id);
+        $this->row_id = $admin_id;
+        $this->logger_type = Admin::LOGGER_TYPE;
+        $this->logger_sub_type = 'Logout';
+        $log = [$this->identify_table_id_col_name=$admin_id];
+        $this->logger_keys = $log;
+        $log['details'] = 'Success Terminate Session Using Telegram';
+        $this->AdminLogger($log, [], 'TelegramTerminateSession');
     }
 
     public function UserLogout(): void
@@ -105,7 +118,7 @@ class AdminLoginToken extends AdminToken
 
     public function ValidateSilentAdminToken(): void
     {
-        $auth_pages = ['AuthRegister', 'Auth', 'ChangePassword', 'EmailConfirm', 'CheckSession'];
+        $auth_pages = ['AuthRegister', 'Auth', '', 'ChangePassword', 'EmailConfirm', 'CheckSession'];
         if(!empty($_GET['action'])) {
             if (! empty($_SESSION['token']) && $tokens = JWTAssistance::obj()->JwtValidationForSessionLogin($this->class_name . __LINE__)) {
                 if (isset($tokens->token)) {
@@ -177,8 +190,7 @@ class AdminLoginToken extends AdminToken
         return md5(AppFunctions::IP());
     }
 
-
-    private static function TokenSecretKeyEncode($code): string
+    public static function TokenSecretKeyEncode($code): string
     {
         $code = base64_encode($code);
         return (new AdminTokenEncryption())->Hash($code);

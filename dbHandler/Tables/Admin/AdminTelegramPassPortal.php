@@ -13,18 +13,19 @@
 
 namespace Maatify\Portal\Admin;
 
+use Maatify\Logger\Logger;
 use Maatify\Portal\DbHandler\ParentClassHandler;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;
 
-class AdminPassViaTelegramPortal extends ParentClassHandler
+class AdminTelegramPassPortal extends ParentClassHandler
 {
-    public const IDENTIFY_TABLE_ID_COL_NAME = AdminPassViaTelegram::IDENTIFY_TABLE_ID_COL_NAME;
-    public const TABLE_NAME                 = AdminPassViaTelegram::TABLE_NAME;
-    public const TABLE_ALIAS                = AdminPassViaTelegram::TABLE_ALIAS;
-    public const LOGGER_TYPE                = AdminPassViaTelegram::LOGGER_TYPE;
-    public const LOGGER_SUB_TYPE            = AdminPassViaTelegram::LOGGER_SUB_TYPE;
-    public const COLS                       = AdminPassViaTelegram::COLS;
+    public const IDENTIFY_TABLE_ID_COL_NAME = AdminTelegramPass::IDENTIFY_TABLE_ID_COL_NAME;
+    public const TABLE_NAME                 = AdminTelegramPass::TABLE_NAME;
+    public const TABLE_ALIAS                = AdminTelegramPass::TABLE_ALIAS;
+    public const LOGGER_TYPE                = AdminTelegramPass::LOGGER_TYPE;
+    public const LOGGER_SUB_TYPE            = AdminTelegramPass::LOGGER_SUB_TYPE;
+    public const COLS                       = AdminTelegramPass::COLS;
     public const IMAGE_FOLDER               = self::TABLE_NAME;
 
     protected string $identify_table_id_col_name = self::IDENTIFY_TABLE_ID_COL_NAME;
@@ -74,13 +75,13 @@ class AdminPassViaTelegramPortal extends ParentClassHandler
         }
     }
 
-    public function clearAdminPendingLogin(int $admin_id, int $chat_id): void
+    public function clearAdminPendingLogin(int $admin_id, int $chat_id, bool $is_auth_by_2fa = false): void
     {
-        if ($this->is_active_telegram && !empty($chat_id)) {
+        if ($this->is_active_telegram && ! empty($chat_id)) {
             $list = $this->pendingListAdminChat($admin_id, $chat_id);
             if (! empty($list)) {
                 foreach ($list as $item) {
-                    $this->clearAuthMessage($admin_id, $chat_id, $item[self::IDENTIFY_TABLE_ID_COL_NAME]);
+                    $this->clearAuthMessage($admin_id, $chat_id, $item[self::IDENTIFY_TABLE_ID_COL_NAME], $is_auth_by_2fa);
                 }
             }
         }
@@ -89,13 +90,13 @@ class AdminPassViaTelegramPortal extends ParentClassHandler
     private function pendingListAdminChat(int $admin_id, int $chat_id): array
     {
         return $this->RowsThisTable("`$this->identify_table_id_col_name`",
-            "`" . Admin::IDENTIFY_TABLE_ID_COL_NAME . "` = ? AND `chat_id` = ? ",
-            [$admin_id, $chat_id]);
+            "`" . Admin::IDENTIFY_TABLE_ID_COL_NAME . "` = ? AND `chat_id` = ? AND `is_pending` = ?",
+            [$admin_id, $chat_id, 1]);
     }
 
-    private function clearAuthMessage(int $admin_id, int $chat_id, int $message_id): void
+    private function clearAuthMessage(int $admin_id, int $chat_id, int $message_id, bool $is_auth_by_2fa = false): void
     {
-        TelegramBotWebHookAdminController::obj()->clearAuthKeyboard($chat_id, $message_id);
+        TelegramBotWebHookAdminController::obj()->clearAuthKeyboard($chat_id, $message_id, $is_auth_by_2fa);
         $this->Edit([
             'is_pending' => 0,
         ],
@@ -104,28 +105,26 @@ class AdminPassViaTelegramPortal extends ParentClassHandler
     }
 
 
-
     public function sendNewAuthorization(int $admin_id, string $token): void
     {
         $admin = AdminTelegramBotPortal::obj()->infoByAdmin($admin_id);
-        if (!empty($admin)) {
-            if(!empty($admin['admin_id']) && !empty($admin['chat_id'])) {
+        if (! empty($admin)) {
+            if (! empty($admin['admin_id']) && ! empty($admin['chat_id'])) {
                 $this->clearAdminPendingLogin($admin_id, $admin['chat_id']);
                 $message = TelegramBotWebHookAdminController::obj()->sendAuthorization($admin['first_name'], $admin['chat_id']);
-                if(!empty($message['ok'])){
-                    if(!empty($message['result']['message_id'])){
+                if (! empty($message['ok'])) {
+                    if (! empty($message['result']['message_id'])) {
                         $this->Add([
-                            self::IDENTIFY_TABLE_ID_COL_NAME => $message['result']['message_id'],
+                            self::IDENTIFY_TABLE_ID_COL_NAME  => $message['result']['message_id'],
                             Admin::IDENTIFY_TABLE_ID_COL_NAME => $admin_id,
-                            'chat_id' => $admin['chat_id'],
-                            'is_pending' => 1,
-                            'token' => $token,
+                            'chat_id'                         => $admin['chat_id'],
+                            'is_pending'                      => 1,
+                            'token'                           => $token,
                         ]);
                     }
                 }
             }
         }
-
     }
 
     /*
@@ -148,4 +147,57 @@ class AdminPassViaTelegramPortal extends ParentClassHandler
         Json::Success();
     }
     */
+    public function validateAdminPassViaTelegramToken(int $admin_id, string $token): bool
+    {
+        if (! empty($token)) {
+            $admin_col_name = Admin::IDENTIFY_TABLE_ID_COL_NAME;
+            if ($this->RowIsExistThisTable("`$admin_col_name` = ? AND `token` = ? AND `is_pending` = ? AND `is_passed` = ?",
+                [$admin_id,
+                 $token,
+                 0,
+                 1])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function sendSessionStartFrom2fs(int $admin_id, string $first_name, int $telegram_chat_id, bool $is_auth_by_2fa = false): void
+    {
+        AdminTelegramPassPortal::obj()->clearAdminPendingLogin($admin_id, $telegram_chat_id, true);
+        if (! empty($first_name) && ! empty($telegram_chat_id)) {
+            AdminTelegramMessageSender::obj()->sendAdminSessionStartByNewSession($first_name, $telegram_chat_id);
+        }
+    }
+
+    public function allowByTelegram(int $chat_id, int $message_id): void
+    {
+        $this->Edit([
+            'is_pending' => 0,
+            'is_passed' => 1,
+        ], "`chat_id` = ? AND `message_id` = ? AND `is_pending` = ?", [$chat_id, $message_id, 1]);
+    }
+
+    public function disallowByTelegram(int $chat_id, int $message_id): void
+    {
+        $this->Edit([
+            'is_pending' => 0,
+            'is_passed' => 0,
+        ], "`chat_id` = ? AND `message_id` = ? AND `is_pending` = ?", [$chat_id, $message_id, 1]);
+    }
+
+    public function terminateSession(int $chat_id, int $message_id): void
+    {
+        $admin_id = (int)$this->ColThisTable('admin_id',
+            " `chat_id` = ? AND `message_id` = ? ORDER BY $this->identify_table_id_col_name DESC LIMIT 1", [$chat_id, $message_id]);
+        $this->Edit(
+            [
+                'is_pending' => 0,
+            ],
+            "`chat_id` = ? AND `admin_id` = ? AND `message_id` = ? AND `is_pending` = ?",
+            [$chat_id, $admin_id, $message_id, 1]
+        );
+        AdminLoginToken::obj()->terminateSessionUsingTelegram($admin_id, $chat_id);
+    }
 }

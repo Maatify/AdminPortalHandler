@@ -17,6 +17,7 @@ use App\Assist\AppFunctions;
 use App\Assist\Encryptions\EnvEncryption;
 use Exception;
 use Maatify\CronTelegramBotAdmin\CronTelegramBotAdminSender;
+use Maatify\Emoji\EmojiConverter;
 use Maatify\Functions\GeneralAgentFunctions;
 use Maatify\Logger\Logger;
 use Maatify\TelegramBot\TelegramBotManager;
@@ -115,6 +116,10 @@ class TelegramBotWebHookAdminController
             $status_message .= PHP_EOL
                                . PHP_EOL
                                . 'To receive All Pending Notifications, Please send /send';
+
+            $status_message .= PHP_EOL
+                               . PHP_EOL
+                               . 'To get my information, Please send /info';
         } else {
             $status_message = '';
         }
@@ -128,6 +133,27 @@ class TelegramBotWebHookAdminController
                . PHP_EOL
                . $status_message
                . $this->infoMessage(false);
+    }
+
+    public function sendAdminSessionStart(string $first_name, int $chat_id): void
+    {
+        $text = '‼️️ Dear <b>' . $first_name . '</b>,'
+                . PHP_EOL . PHP_EOL
+                . 'Your session was started successfully';
+        $keyboard = [
+            [
+                ['text' => 'Terminate the Session', 'callback_data' => 'terminate_session'],
+            ],
+        ];
+        try {
+            $telegramBotManager = new TelegramBotManager($this->api_key);
+            $message = $telegramBotManager->sender->sendMessage($chat_id, $text, 0, $keyboard, 'HTML');
+            if(!empty($message['result']['message_id'])) {
+                AdminTelegramMessage::obj()->recordNewMessage($message['result']['message_id'], $chat_id, $text, true, true);
+            }
+        } catch (Exception $exception) {
+            Logger::RecordLog($exception, 'sendAdminSessionStart');
+        }
     }
 
     public function infoMessage(bool $bot_name = true): string
@@ -149,38 +175,65 @@ class TelegramBotWebHookAdminController
                . '  My Developer\'s website is maatify.dev.';
     }
 
-    public function reply(int $chatId, string $text, int $source_message_id): void
+    public function reply(int $chatId, string $text, int $source_message_id): array
     {
         [$admin_id, $message] = $this->handleMessageFromCommand($chatId, $text);
-        $this->sendUsingTelegram($chatId, $message, $source_message_id);
+        return $this->sendUsingTelegram($chatId, $message, $source_message_id);
     }
 
-    private function sendUsingTelegram(int $chat_id, string $text, int $source_message_id): void
+    private function sendUsingTelegram(int $chat_id, string $text, int $source_message_id, array $keyboard = [], $parseMode = null): array
     {
         try {
             $telegramBotManager = new TelegramBotManager($this->api_key);
-            $telegramBotManager->sender->sendMessage($chat_id, $text, $source_message_id);
+            return $telegramBotManager->sender->sendMessage($chat_id, $text, $source_message_id, $keyboard, $parseMode);
         } catch (Exception $exception) {
             Logger::RecordLog($exception, 'telegram_bot_webhook_reply');
+            return [];
         }
     }
 
-    private function sendUsingTelegramWithKeyboard(int $chat_id, string $text, int $source_message_id, array $keyboard = []): void
+
+
+    private function sendUsingTelegramWithKeyboard(int $chat_id, string $text, int $source_message_id, array $keyboard = []): array
     {
         try {
             $telegramBotManager = new TelegramBotManager($this->api_key);
-            $telegramBotManager->sender->sendMessageWithKeyboardMarkup($chat_id, $text, $source_message_id, $keyboard);
+            return $telegramBotManager->sender->sendMessageWithKeyboardMarkup($chat_id, $text, $source_message_id, $keyboard);
         } catch (Exception $exception) {
             Logger::RecordLog($exception, 'telegram_bot_webhook_reply');
+            return [];
         }
     }
 
-    public function clearAuthKeyboard(int $chat_id, int $message_id): void
+    public function clearAuthKeyboard(int $chat_id, int $message_id, bool $is_auth_by_2fa = false): void
     {
         try {
             $telegramBotManager = new TelegramBotManager($this->api_key);
-            //            $telegramBotManager->sender->editMessageReplyMarkup($chat_id, reply_to_message_id: $message_id);
-            $telegramBotManager->sender->editMessageText($chat_id, 'new authorization requested after this message', reply_to_message_id: $message_id);
+            $text = AdminTelegramMessage::obj()->getMessageHaveKeyboard($chat_id, $message_id);
+
+//            $text = $telegramBotManager->sender->forwardAndDeleteAndGetText($chat_id, $chat_id, $message_id);
+            if(!empty($text)) {
+                if ($is_auth_by_2fa) {
+                    $message = str_replace('⚠️', '☑️', $text);
+                    $message .= PHP_EOL . PHP_EOL . '☑️ Login Success by Two-Factor-Authenticator at: ' . AppFunctions::CurrentDateTime();
+                    $clear_message = '☑️ Login Success by Two-Factor-Authenticator';
+                } else {
+                    $message = str_replace('⚠️', '🔄', $text);
+                    //            $message = str_replace('⚠️', '☑️', $text);
+                    $message .= PHP_EOL . PHP_EOL . 'Replaced by new login request at: ' . AppFunctions::CurrentDateTime();
+                    $clear_message = 'Replaced by new login request';
+
+                }
+            }else{
+                $clear_message = $message = 'New authorization requested after this message';
+            }
+            $sent = $telegramBotManager->sender->editMessageText($chat_id, $message, reply_to_message_id: $message_id, parseMode: 'HTML');
+
+            if(!empty($sent['result']['message_id'])) {
+                AdminTelegramMessage::obj()->markMessageDeleted($chat_id, $message_id);
+                AdminTelegramMessageSender::obj()->clearPreviousAuth($chat_id, $clear_message);
+                AdminTelegramMessageSender::obj()->recordNewMessage($chat_id, $sent['result']['message_id'], $text, false, true);
+            }
         } catch (Exception $exception) {
             Logger::RecordLog($exception, 'clearAuthKeyboard');
         }
@@ -199,12 +252,16 @@ class TelegramBotWebHookAdminController
                               . "ip: " . AppFunctions::IP()
                               . PHP_EOL
                               . "time: " . AppFunctions::CurrentDateTime()
-                              . PHP_EOL . PHP_EOL;
+                              . PHP_EOL;
             } else {
                 $user_agent = PHP_EOL;
             }
 
-            $text = $first_name . ", we received a request to log in on  with your account."
+            $text = "⚠️  "
+                    //                    . PHP_EOL
+                    //                    . PHP_EOL
+                    . "<b>$first_name</b>, "
+                    . "We received a request to log in on " . AppFunctions::PortalName() . " with your account."
                     . PHP_EOL . PHP_EOL
                     . "To authorize this request, use the 'Confirm' button below. "
                     . $user_agent
@@ -217,11 +274,17 @@ class TelegramBotWebHookAdminController
                 ],
             ];
             $telegramBotManager = new TelegramBotManager($this->api_key);
+            AdminTelegramMessageSender::obj()->clearPreviousAuth($chat_id, 'Replaced by new login request');
 
-            return $telegramBotManager->sender->sendMessage($chat_id,
+            $sent = $telegramBotManager->sender->sendMessage($chat_id,
                 $text,
-                keyboard: $keyboard
+                keyboard : $keyboard,
+                parseMode: 'HTML'
             );
+            if(!empty($sent['result']['message_id'])) {
+                AdminTelegramMessage::obj()->recordNewMessage($chat_id, $sent['result']['message_id'], $text, true, true);
+            }
+            return $sent;
         } catch (Exception $exception) {
             Logger::RecordLog($exception, 'sendAuthorization');
         }
@@ -244,19 +307,17 @@ class TelegramBotWebHookAdminController
 
     public function allowedAuth(int $chat_id, string $message, int $message_id): array
     {
-        $keyboard = [
-            [
-                ['text' => 'Terminate the Session', 'callback_data' => 'terminate_session'],
-            ],
-        ];
-        try {
-            $telegramBotManager = new TelegramBotManager($this->api_key);
-            $telegramBotManager->sender->editMessageText($chat_id, $message, $message_id, $keyboard, 'HTML');
-        } catch (Exception $exception) {
-            Logger::RecordLog($exception, 'allowedAuth');
-        }
+        return AdminTelegramMessageSender::obj()->allowFromTelegram($chat_id, $message_id, $message);
+    }
 
-        return [];
+    public function disallowedAuth(int $chat_id, string $message, int $message_id): array
+    {
+        return AdminTelegramMessageSender::obj()->disallowedAuth($chat_id, $message_id, $message);
+
+    }
+    public function terminateSession(?int $chat_id, string $message, ?int $message_id): array
+    {
+        return AdminTelegramMessageSender::obj()->terminateSession($chat_id, $message_id, $message);
     }
 
     public function editMessage(int $chat_id, string $message, int $message_id): array

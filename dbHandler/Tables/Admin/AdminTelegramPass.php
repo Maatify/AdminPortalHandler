@@ -8,7 +8,7 @@
  * @since     2024-07-30 2:31 PM
  * @link      https://www.maatify.dev Maatify.com
  * @link      https://github.com/Maatify/AdminPortalHandler  view project on GitHub
- * @Maatify   AdminPortalHandler :: AdminPassViaTelegram
+ * @Maatify   AdminPortalHandler :: AdminTelegramPass
  */
 
 namespace Maatify\Portal\Admin;

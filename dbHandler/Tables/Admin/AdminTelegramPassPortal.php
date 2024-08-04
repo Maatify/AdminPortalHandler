@@ -13,10 +13,16 @@
 
 namespace Maatify\Portal\Admin;
 
+use App\Assist\AppFunctions;
+use App\Assist\Encryptions\EnvEncryption;
+use Exception;
+use Maatify\Emoji\EmojiConverter;
+use Maatify\Functions\GeneralAgentFunctions;
 use Maatify\Logger\Logger;
 use Maatify\Portal\DbHandler\ParentClassHandler;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;
+use Maatify\TelegramBot\TelegramBotManager;
 
 class AdminTelegramPassPortal extends ParentClassHandler
 {
@@ -57,6 +63,8 @@ class AdminTelegramPassPortal extends ParentClassHandler
      * @var true
      */
     private bool $is_active_telegram = false;
+    private string $api_key;
+    private TelegramBotManager $telegramBotManager;
 
     public static function obj(): self
     {
@@ -71,82 +79,132 @@ class AdminTelegramPassPortal extends ParentClassHandler
     {
         parent::__construct();
         if (! empty($_ENV['TELEGRAM_ADMIN_USERNAME'])) {
-            $this->is_active_telegram = true;
-        }
-    }
-
-    public function clearAdminPendingLogin(int $admin_id, int $chat_id, bool $is_auth_by_2fa = false): void
-    {
-        if ($this->is_active_telegram && ! empty($chat_id)) {
-            $list = $this->pendingListAdminChat($admin_id, $chat_id);
-            if (! empty($list)) {
-                foreach ($list as $item) {
-                    $this->clearAuthMessage($admin_id, $chat_id, $item[self::IDENTIFY_TABLE_ID_COL_NAME], $is_auth_by_2fa);
-                }
+            try {
+                $this->is_active_telegram = true;
+                $api_key = (new EnvEncryption())->DeHashed($_ENV['TELEGRAM_API_KEY_ADMIN']);
+                $this->telegramBotManager = new TelegramBotManager($api_key);
+            } catch (Exception $exception) {
+                Logger::RecordLog($exception, 'AdminTelegramPassPortal');
+                $this->is_active_telegram = false;
             }
         }
     }
 
-    private function pendingListAdminChat(int $admin_id, int $chat_id): array
+    public function clearPendingChatAuthKeyboardByLogout(int $chat_id): void
     {
-        return $this->RowsThisTable("`$this->identify_table_id_col_name`",
-            "`" . Admin::IDENTIFY_TABLE_ID_COL_NAME . "` = ? AND `chat_id` = ? AND `is_pending` = ?",
-            [$admin_id, $chat_id, 1]);
+        if($this->is_active_telegram) {
+            $this->clearPendingChatAuthKeyboardForAllTypes($chat_id, false, '👋 Logout');
+        }
     }
 
-    private function clearAuthMessage(int $admin_id, int $chat_id, int $message_id, bool $is_auth_by_2fa = false): void
+    public function clearPendingChatAuthKeyboard(int $chat_id, bool $is_auth_by_2fa = false): void
     {
-        TelegramBotWebHookAdminController::obj()->clearAuthKeyboard($chat_id, $message_id, $is_auth_by_2fa);
-        $this->Edit([
-            'is_pending' => 0,
-        ],
-            "`" . Admin::IDENTIFY_TABLE_ID_COL_NAME . "` = ? AND `$this->identify_table_id_col_name` = ? AND `chat_id` = ? ",
-            [$admin_id, $message_id, $chat_id]);
+        if($this->is_active_telegram) {
+            if ($is_auth_by_2fa) {
+                $message_to_add = '☑️ Login Success by Two-Factor-Authenticator';
+            } else {
+                $message_to_add = '🔄 Replaced by new login request';
+            }
+            $this->clearPendingChatAuthKeyboardForAllTypes($chat_id, $is_auth_by_2fa, $message_to_add);
+        }
     }
 
-
-    public function sendNewAuthorization(int $admin_id, string $token): void
+    private function clearPendingChatAuthKeyboardForAllTypes(int $chat_id, bool $is_auth_by_2fa = false, $message_to_add = ''): void
     {
-        $admin = AdminTelegramBotPortal::obj()->infoByAdmin($admin_id);
-        if (! empty($admin)) {
-            if (! empty($admin['admin_id']) && ! empty($admin['chat_id'])) {
-                $this->clearAdminPendingLogin($admin_id, $admin['chat_id']);
-                $message = TelegramBotWebHookAdminController::obj()->sendAuthorization($admin['first_name'], $admin['chat_id']);
-                if (! empty($message['ok'])) {
-                    if (! empty($message['result']['message_id'])) {
-                        $this->Add([
-                            self::IDENTIFY_TABLE_ID_COL_NAME  => $message['result']['message_id'],
-                            Admin::IDENTIFY_TABLE_ID_COL_NAME => $admin_id,
-                            'chat_id'                         => $admin['chat_id'],
-                            'is_pending'                      => 1,
-                            'token'                           => $token,
-                        ]);
+        if($this->is_active_telegram) {
+            $list = $this->pendingChatList($chat_id);
+            if (! empty($list)) {
+                foreach ($list as $item) {
+                    if (! empty($item['message'])) {
+                        $message = $item['message'];
+                        $message = str_replace('‼️️', '🔄', $message);
+                        if ($is_auth_by_2fa) {
+                            $message = str_replace('⚠️', '☑️', $message);
+                        } else {
+                            $message = str_replace('⚠️', '🔄', $message);
+                        }
+                        $message .= PHP_EOL . PHP_EOL . $message_to_add . ' at: ' . AppFunctions::CurrentDateTime();
+                        $sent = $this->telegramBotManager
+                            ->sender
+                            ->editMessageText($chat_id, $message, reply_to_message_id: $item['message_id'], parseMode: 'HTML');
+                        if (! empty($sent['result']['message_id'])) {
+                            $this->Edit([
+                                'is_pending' => 0,
+                                'message'    => EmojiConverter::emojiToCodepoint($message),
+                                'token'      => '',
+                            ],
+                                "`message_id` = ? AND `chat_id` = ? AND `admin_id` = ? ",
+                                [$item['message_id'], $chat_id, $item['admin_id']]);
+                        }
                     }
                 }
             }
         }
     }
 
-    /*
-    public function fixNotDefinedAdmin(): void
+    public function sendNewAuthorization(int $admin_id, string $token): void
     {
-        $a_table_name = Admin::TABLE_NAME;
-        $all = $this->Rows(
-            "`$a_table_name` 
-            LEFT JOIN `$this->tableName` ON `$this->tableName`.`$this->identify_table_id_col_name` = `$a_table_name`.`$this->identify_table_id_col_name` ",
-            "`$a_table_name`.`$this->identify_table_id_col_name`",
-            "`$this->tableName`.`$this->identify_table_id_col_name` IS NULL"
-        );
-        if(!empty($all)){
-            foreach($all as $row){
-                $this->Add([
-                    self::IDENTIFY_TABLE_ID_COL_NAME => $row[self::IDENTIFY_TABLE_ID_COL_NAME],
-                ]);
+        if($this->is_active_telegram) {
+            $admin = AdminTelegramBotPortal::obj()->infoByAdmin($admin_id);
+            if (! empty($admin)) {
+                if (! empty($admin['admin_id']) && ! empty($admin['chat_id'])) {
+                    $this->clearPendingChatAuthKeyboard($admin['chat_id']);
+                    $platform = GeneralAgentFunctions::obj()->platform();
+                    if (! empty($platform)) {
+                        $user_agent = PHP_EOL . PHP_EOL
+                                      . "platform: " . GeneralAgentFunctions::obj()->platform()
+                                      . PHP_EOL
+                                      . "browser: " . GeneralAgentFunctions::obj()->browser() . ' ver. (' . GeneralAgentFunctions::obj()->browserVersion() . ')'
+                                      . PHP_EOL
+                                      . "ip: " . AppFunctions::IP()
+                                      . PHP_EOL
+                                      . "time: " . AppFunctions::CurrentDateTime()
+                                      . PHP_EOL;
+                    } else {
+                        $user_agent = PHP_EOL;
+                    }
+
+                    $text = "⚠️  "
+                            . "<b>" . $admin['first_name'] . "</b>, "
+                            . "We received a request to log in on " . AppFunctions::PortalName() . " with your account."
+                            . PHP_EOL . PHP_EOL
+                            . "To authorize this request, use the 'Confirm' button below. "
+                            . $user_agent
+                            . PHP_EOL
+                            . "If you didn't request this, use the 'Decline' button or ignore this message.";
+                    $keyboard = [
+                        [
+                            ['text' => 'Decline', 'callback_data' => 'disallow_auth'],
+                            ['text' => 'Confirm', 'callback_data' => 'allow_auth'],
+                        ],
+                    ];
+                    $sent = $this->telegramBotManager->sender->sendMessage($admin['chat_id'],
+                        $text,
+                        keyboard : $keyboard,
+                        parseMode: 'HTML'
+                    );
+                    if (! empty($sent['result']['message_id'])) {
+                        $this->recordNewMessage($admin_id, $admin['chat_id'], $sent['result']['message_id'], $sent['result']['text'], $token);
+                    }
+                }
             }
         }
-        Json::Success();
     }
-    */
+
+    public function recordNewMessage(int $admin_id, int $chat_id, int $message_id, string $message_text, string $token = ''): void
+    {
+        $this->Add([
+            self::IDENTIFY_TABLE_ID_COL_NAME  => $message_id,
+            Admin::IDENTIFY_TABLE_ID_COL_NAME => $admin_id,
+            'chat_id'                         => $chat_id,
+            'is_pending'                      => 1,
+            'is_passed'                       => 0,
+            'token'                           => $token,
+            'message'                         => EmojiConverter::emojiToCodepoint($message_text),
+            'time'                            => AppFunctions::CurrentDateTime(),
+        ]);
+    }
+
     public function validateAdminPassViaTelegramToken(int $admin_id, string $token): bool
     {
         if (! empty($token)) {
@@ -163,41 +221,105 @@ class AdminTelegramPassPortal extends ParentClassHandler
         return false;
     }
 
-    public function sendSessionStartFrom2fs(int $admin_id, string $first_name, int $telegram_chat_id, bool $is_auth_by_2fa = false): void
+    public function sendAdminSessionStartByNewSession(int $admin_id, string $first_name, int $chat_id): void
     {
-        AdminTelegramPassPortal::obj()->clearAdminPendingLogin($admin_id, $telegram_chat_id, true);
-        if (! empty($first_name) && ! empty($telegram_chat_id)) {
-            AdminTelegramMessageSender::obj()->sendAdminSessionStartByNewSession($first_name, $telegram_chat_id);
+        if($this->is_active_telegram) {
+            $text = '‼️️ Dear <b>' . $first_name . '</b>,'
+                    . PHP_EOL . PHP_EOL
+                    . 'Your session was started successfully';
+            $keyboard = [
+                [
+                    ['text' => 'Terminate the Session', 'callback_data' => 'terminate_session'],
+                ],
+            ];
+            $this->clearPendingChatAuthKeyboard($chat_id, true);
+            $sent = $this->telegramBotManager->sender->sendMessage($chat_id, $text, 0, $keyboard, 'HTML');
+            if (! empty($sent['result']['message_id'])) {
+                $this->recordNewMessage($admin_id, $chat_id, $sent['result']['message_id'], $text);
+            }
         }
     }
 
-    public function allowByTelegram(int $chat_id, int $message_id): void
+    public function allowByTelegram(int $chat_id, string $message, int $message_id): void
     {
-        $this->Edit([
-            'is_pending' => 0,
-            'is_passed' => 1,
-        ], "`chat_id` = ? AND `message_id` = ? AND `is_pending` = ?", [$chat_id, $message_id, 1]);
+        if($this->is_active_telegram) {
+            $keyboard = [
+                [
+                    ['text' => 'Terminate the Session', 'callback_data' => 'terminate_session'],
+                ],
+            ];
+            $sent = $this->telegramBotManager->sender->editMessageText($chat_id, $message, $message_id, $keyboard, 'HTML');
+            if (! empty($sent['result']['message_id'])) {
+                $this->Edit([
+                    'is_pending' => 0,
+                    'is_passed'  => 1,
+                ], "`chat_id` = ? AND `message_id` = ? AND `is_pending` = ?", [$chat_id, $message_id, 1]);
+            }
+            $this->clearPendingChatAuthKeyboardForAllTypes($chat_id, false, 'Replaced by allowed');
+        }
     }
 
-    public function disallowByTelegram(int $chat_id, int $message_id): void
+    public function disallowByTelegram(int $chat_id, string $message, int $message_id): void
     {
-        $this->Edit([
-            'is_pending' => 0,
-            'is_passed' => 0,
-        ], "`chat_id` = ? AND `message_id` = ? AND `is_pending` = ?", [$chat_id, $message_id, 1]);
+        if($this->is_active_telegram) {
+            $this->clearPendingChatAuthKeyboardForAllTypes($chat_id, false, '❌ Replaced by declined');
+            $sent = $this->telegramBotManager->sender->editMessageText($chat_id, $message, $message_id, [], 'HTML');
+            if (! empty($sent['result']['message_id'])) {
+                $this->Edit([
+                    'is_pending' => 0,
+                    'is_passed'  => 0,
+                ], "`chat_id` = ? AND `message_id` = ? AND `is_pending` = ?", [$chat_id, $message_id, 1]);;
+            }
+        }
     }
 
-    public function terminateSession(int $chat_id, int $message_id): void
+    public function terminateSession(int $chat_id, string $message, int $message_id): void
     {
-        $admin_id = (int)$this->ColThisTable('admin_id',
-            " `chat_id` = ? AND `message_id` = ? ORDER BY $this->identify_table_id_col_name DESC LIMIT 1", [$chat_id, $message_id]);
-        $this->Edit(
-            [
-                'is_pending' => 0,
-            ],
-            "`chat_id` = ? AND `admin_id` = ? AND `message_id` = ? AND `is_pending` = ?",
-            [$chat_id, $admin_id, $message_id, 1]
-        );
-        AdminLoginToken::obj()->terminateSessionUsingTelegram($admin_id, $chat_id);
+        if($this->is_active_telegram) {
+            $this->clearPendingChatAuthKeyboardForAllTypes($chat_id, false, 'Session Terminated By TelegramBot');
+            $sent = $this->telegramBotManager->sender->editMessageText($chat_id, $message, $message_id, [], 'HTML');
+            $admin_id = (int)$this->ColThisTable('admin_id',
+                " `chat_id` = ? AND `message_id` = ? ORDER BY $this->identify_table_id_col_name DESC LIMIT 1",
+                [$chat_id, $message_id]);
+            $this->Edit(
+                [
+                    'is_pending' => 0,
+                ],
+                "`chat_id` = ? AND `admin_id` = ? AND `message_id` = ? AND `is_pending` = ?",
+                [$chat_id, $admin_id, $message_id, 1]
+            );
+            AdminLoginToken::obj()->terminateSessionUsingTelegram($admin_id, $chat_id);
+        }
+    }
+
+    private function pendingChatList(int $chat_id): array
+    {
+        $list = $this->RowsThisTable('*', "`chat_id` = ? AND `is_pending` = ?", [$chat_id, 1]);
+        if (! empty($list)) {
+            $list = $this->messageArrayMapTextCodeToEmoji($list);
+        }
+
+        return $list;
+    }
+
+    private function messageArrayMapTextCodeToEmoji(array $messages): array
+    {
+        if (! empty($messages)) {
+            $messages = array_map(function ($message) {
+                return $this->messageTextCodeToEmoji($message);
+            }, $messages);
+        }
+
+        return $messages;
+    }
+
+    private function messageTextCodeToEmoji(array $message): array
+    {
+        if (! empty($message['message'])) {
+            $message['message'] = htmlspecialchars_decode($message['message']);
+            $message['message'] = EmojiConverter::codepointToEmoji(($message['message']));
+        }
+
+        return $message;
     }
 }

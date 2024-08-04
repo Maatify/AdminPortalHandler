@@ -47,7 +47,7 @@ class AdminLoginToken extends AdminToken
             if (! empty($token->token)) {
                 if ($admin = $this->ByToken($token->token, $this->class_name . __LINE__)) {
                     $this->Edit(['token'=>''], "`$this->identify_table_id_col_name` = ? ", [$admin[$this->identify_table_id_col_name]]);
-                    AdminTelegramPassPortal::obj()->clearAdminPendingLogin($admin[$this->identify_table_id_col_name], $admin['chat_id']);
+                    AdminTelegramPassPortal::obj()->clearPendingChatAuthKeyboardByLogout($admin['telegram_chat_id']);
                     $this->row_id = $admin[$this->identify_table_id_col_name];
                     $this->logger_type = Admin::LOGGER_TYPE;
                     $this->logger_sub_type = 'Logout';
@@ -64,7 +64,7 @@ class AdminLoginToken extends AdminToken
     public function terminateSessionUsingTelegram(int $admin_id, int $chat_id): void
     {
         $this->Edit(['token'=>''], "`$this->identify_table_id_col_name` = ? ", [$admin_id]);
-        AdminTelegramPassPortal::obj()->clearAdminPendingLogin($admin_id, $chat_id);
+        AdminTelegramPassPortal::obj()->clearPendingChatAuthKeyboard($chat_id);
         $this->row_id = $admin_id;
         $this->logger_type = Admin::LOGGER_TYPE;
         $this->logger_sub_type = 'Logout';

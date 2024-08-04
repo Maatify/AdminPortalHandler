@@ -62,7 +62,7 @@ class Admin2FAPortal extends Admin2FA
         $log = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name], 'details' => 'Success Login with Two-Factor-Authenticator'];
         $this->AdminLogger($log, [], 'Login');
         if(!empty($admin['telegram_status'])) {
-            AdminTelegramPassPortal::obj()->sendSessionStartFrom2fs($admin[$this->identify_table_id_col_name], $admin['telegram_first_name'], $admin['telegram_chat_id']);
+            AdminTelegramPassPortal::obj()->sendAdminSessionStartByNewSession($admin[$this->identify_table_id_col_name], $admin['telegram_first_name'], $admin['telegram_chat_id']);
         }
         AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
         Json::Success(AdminLoginToken::obj()->HandleAdminResponse($admin));

@@ -11,7 +11,7 @@
  * @Maatify   AdminPortalHandler :: AdminTelegramPassPortal
  */
 
-namespace Maatify\Portal\Admin;
+namespace Maatify\Portal\Admin\TelegramBot;
 
 use App\Assist\AppFunctions;
 use App\Assist\Encryptions\EnvEncryption;
@@ -19,6 +19,8 @@ use Exception;
 use Maatify\Emoji\EmojiConverter;
 use Maatify\Functions\GeneralAgentFunctions;
 use Maatify\Logger\Logger;
+use Maatify\Portal\Admin\Admin;
+use Maatify\Portal\Admin\AdminLoginToken;
 use Maatify\Portal\DbHandler\ParentClassHandler;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;

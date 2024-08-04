@@ -11,7 +11,7 @@
  * @Maatify   AdminPortalHandler :: AlertAdminTelegramBot
  */
 
-namespace Maatify\Portal\Admin;
+namespace Maatify\Portal\Admin\TelegramBot;
 
 use App\Assist\AppFunctions;
 use Maatify\CronTelegramBotAdmin\CronTelegramBotAdminRecord;

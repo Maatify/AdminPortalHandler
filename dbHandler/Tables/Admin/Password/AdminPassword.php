@@ -11,13 +11,15 @@
  * @Maatify   AdminPortalHandler :: AdminPassword
  */
 
-namespace Maatify\Portal\Admin;
+namespace Maatify\Portal\Admin\Password;
 
-use \App\Assist\DefaultPassword;
-use \App\Assist\Encryptions\AdminPasswordEncryption;
+use App\Assist\DefaultPassword;
+use App\Assist\Encryptions\AdminPasswordEncryption;
 use Maatify\CronEmail\CronEmailRecord;
 use Maatify\CronSms\CronSmsAdminRecord;
 use Maatify\Json\Json;
+use Maatify\Portal\Admin\Admin;
+use Maatify\Portal\Admin\Privilege\AdminPrivilegeHandler;
 use Maatify\Portal\DbHandler\ParentClassHandler;
 
 class AdminPassword extends ParentClassHandler

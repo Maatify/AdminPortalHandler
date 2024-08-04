@@ -5,35 +5,31 @@
  * @Project   AdminPortalHandler
  * @copyright ©2024 Maatify.dev
  * @author    Mohamed Abdulalim (megyptm) <mohamed@maatify.dev>
- * @since     2024-07-23 11:52 AM
+ * @since     2024-07-30 2:31 PM
  * @link      https://www.maatify.dev Maatify.com
  * @link      https://github.com/Maatify/AdminPortalHandler  view project on GitHub
- * @Maatify   AdminPortalHandler :: AdminTelegramBot
+ * @Maatify   AdminPortalHandler :: AdminTelegramPass
  */
 
-namespace Maatify\Portal\Admin;
+namespace Maatify\Portal\Admin\TelegramBot;
 
-use App\DB\DBS\DbConnector;
+use Maatify\Portal\Admin\Admin;
+use Maatify\Portal\DbHandler\ParentClassHandler;
 
-class AdminTelegramBot extends DbConnector
+class AdminTelegramPass extends ParentClassHandler
 {
-    const TABLE_NAME                 = 'a_telegram';
-    const TABLE_ALIAS                = 'telegram';
-    const IDENTIFY_TABLE_ID_COL_NAME = Admin::IDENTIFY_TABLE_ID_COL_NAME;
+    const TABLE_NAME                 = 'a_telegram_pass';
+    const TABLE_ALIAS                = '';
+    const IDENTIFY_TABLE_ID_COL_NAME = 'message_id';
     const LOGGER_TYPE                = Admin::LOGGER_TYPE;
-    const LOGGER_SUB_TYPE            = 'telegram';
-    const COLS                       =
-        [
-            self::IDENTIFY_TABLE_ID_COL_NAME => 1,
-            'chat_id'                        => 1,
-            'username'                       => 0,
-            'first_name'                     => 0,
-            'last_name'                      => 0,
-            'photo_url'                      => 0,
-            'status'                         => 1,
-            'auth_date'                      => 0,
-            'time'                           => 0,
-        ];
+    const LOGGER_SUB_TYPE            = 'AuthViaTelegram';
+    const COLS                       = [
+        self::IDENTIFY_TABLE_ID_COL_NAME  => 1,
+        Admin::IDENTIFY_TABLE_ID_COL_NAME => 1,
+        'chat_id'                         => 1,
+        'is_pending'                      => 1,
+        'is_passed'                       => 1,
+    ];
 
     protected string $tableName = self::TABLE_NAME;
     protected string $tableAlias = self::TABLE_ALIAS;
@@ -41,7 +37,6 @@ class AdminTelegramBot extends DbConnector
     protected string $logger_type = self::LOGGER_TYPE;
     protected string $logger_sub_type = self::LOGGER_SUB_TYPE;
     protected array $cols = self::COLS;
-
     private static self $instance;
 
     public static function obj(): self
@@ -52,6 +47,4 @@ class AdminTelegramBot extends DbConnector
 
         return self::$instance;
     }
-
-
 }

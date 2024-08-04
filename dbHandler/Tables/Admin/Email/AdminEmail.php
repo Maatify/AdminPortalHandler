@@ -11,11 +11,12 @@
  * @Maatify   AdminPortalHandler :: AdminEmail
  */
 
-namespace Maatify\Portal\Admin;
+namespace Maatify\Portal\Admin\Email;
 
-use \App\Assist\Encryptions\ConfirmEmailEncryption;
+use App\Assist\Encryptions\ConfirmEmailEncryption;
 use Maatify\CronEmail\CronEmailRecord;
 use Maatify\Functions\GeneralFunctions;
+use Maatify\Portal\Admin\Admin;
 use Maatify\Portal\DbHandler\ParentClassHandler;
 
 class AdminEmail extends ParentClassHandler

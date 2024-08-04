@@ -8,10 +8,10 @@
  * @since     2024-04-18 8:55 AM
  * @link      https://www.maatify.dev Maatify.com
  * @link      https://github.com/Maatify/AdminPortalHandler  view project on GitHub
- * @Maatify   AdminPortalHandler :: Admin2FA
+ * @Maatify   AdminPortalHandler :: AdminTwoFactorAuthenticator
  */
 
-namespace Maatify\Portal\Admin;
+namespace Maatify\Portal\Admin\TwoFactorAuthenticator;
 
 use App\Assist\Encryptions\AdminAuthEncryption;
 use App\Assist\Jwt\JWTAssistance;
@@ -19,9 +19,12 @@ use Exception;
 use Maatify\GoogleAuth\GoogleAuth;
 use Maatify\Json\Json;
 use Maatify\Logger\Logger;
+use Maatify\Portal\Admin\Admin;
+use Maatify\Portal\Admin\AdminFailedLogin;
+use Maatify\Portal\Admin\AdminLoginToken;
 use Maatify\Portal\DbHandler\ParentClassHandler;
 
-class Admin2FA extends ParentClassHandler
+class AdminTwoFactorAuthenticator extends ParentClassHandler
 {
     const TABLE_NAME = 'a_2fa';
     protected string $tableName = self::TABLE_NAME;

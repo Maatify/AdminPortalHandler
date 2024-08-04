@@ -11,7 +11,7 @@
  * @Maatify   AdminPortalHandler :: AdminPrivilegeHandler
  */
 
-namespace Maatify\Portal\Admin;
+namespace Maatify\Portal\Admin\Privilege;
 
 class AdminPrivilegeHandler extends AdminPrivilege
 {

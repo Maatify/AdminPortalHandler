@@ -8,15 +8,20 @@
  * @since     2024-04-18 8:55 AM
  * @link      https://www.maatify.dev Maatify.com
  * @link      https://github.com/Maatify/AdminPortalHandler  view project on GitHub
- * @Maatify   AdminPortalHandler :: Admin2FAPortal
+ * @Maatify   AdminPortalHandler :: AdminTwoFactorAuthenticatorPortal
  */
 
-namespace Maatify\Portal\Admin;
+namespace Maatify\Portal\Admin\TwoFactorAuthenticator;
 
 use App\Assist\Jwt\JWTAssistance;
 use Maatify\Json\Json;
+use Maatify\Portal\Admin\AdminLoginToken;
+use Maatify\Portal\Admin\AdminPortal;
+use Maatify\Portal\Admin\Password\AdminPassword;
+use Maatify\Portal\Admin\TelegramBot\AdminTelegramPassPortal;
+use Maatify\Portal\Admin\TelegramBot\AlertAdminTelegramBot;
 
-class Admin2FAPortal extends Admin2FA
+Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
 {
     private static self $instance;
     private string $code;

@@ -13,11 +13,16 @@
 
 namespace Maatify\Portal\Admin;
 
-use \App\Assist\AppFunctions;
-use \App\Assist\Encryptions\AdminTokenEncryption;
+use App\Assist\AppFunctions;
+use App\Assist\Encryptions\AdminTokenEncryption;
 use App\Assist\Jwt\JWTAssistance;
 use Maatify\Functions\GeneralFunctions;
 use Maatify\Json\Json;
+use Maatify\Portal\Admin\Email\AdminEmail;
+use Maatify\Portal\Admin\Phone\AdminPhone;
+use Maatify\Portal\Admin\TelegramBot\AdminTelegramBot;
+use Maatify\Portal\Admin\TelegramBot\AdminTelegramPassPortal;
+use Maatify\Portal\Admin\TwoFactorAuthenticator\AdminTwoFactorAuthenticator;
 use Maatify\Portal\Language\LanguagePortal;
 
 class AdminLoginToken extends AdminToken
@@ -136,7 +141,7 @@ class AdminLoginToken extends AdminToken
     {
         $tb_admin = Admin::TABLE_NAME;
         $tb_admin_email = AdminEmail::TABLE_NAME;
-        $tb_admin_auth = Admin2FA::TABLE_NAME;
+        $tb_admin_auth = AdminTwoFactorAuthenticator::TABLE_NAME;
         [$a_phone_table_name, $a_phone_cols] = AdminPhone::obj()->InnerJoinThisTableWithUniqueCols($tb_admin, ['phone'=> 0]);
         [$a_telegram_table_name, $a_telegram_cols] = AdminTelegramBot::obj()->LeftJoinThisTableWithTableAlias($tb_admin);
         $admin = $this->Row("`$this->tableName` 

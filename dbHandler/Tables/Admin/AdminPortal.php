@@ -13,13 +13,22 @@
 
 namespace Maatify\Portal\Admin;
 
-use \App\Assist\AppFunctions;
+use App\Assist\AppFunctions;
 use App\Assist\Jwt\JWTAssistance;
 use App\DB\Tables\PortalCacheRedis;
 use Exception;
 use Maatify\GoogleRecaptcha\V3\GoogleRecaptchaV3Json;
 use Maatify\Json\Json;
 use Maatify\Logger\Logger;
+use Maatify\Portal\Admin\Email\AdminEmail;
+use Maatify\Portal\Admin\Password\AdminPassword;
+use Maatify\Portal\Admin\Phone\AdminPhone;
+use Maatify\Portal\Admin\Phone\AdminPhonePortal;
+use Maatify\Portal\Admin\Privilege\AdminPrivilegeHandler;
+use Maatify\Portal\Admin\TelegramBot\AdminTelegramBot;
+use Maatify\Portal\Admin\TelegramBot\AdminTelegramPassPortal;
+use Maatify\Portal\Admin\TelegramBot\AlertAdminTelegramBot;
+use Maatify\Portal\Admin\TwoFactorAuthenticator\AdminTwoFactorAuthenticator;
 use Maatify\Portal\DbHandler\ParentClassHandler;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;
@@ -70,7 +79,7 @@ class AdminPortal extends ParentClassHandler
                         if ($_ENV['AUTH_2FA_STATUS']) {
                             if ($_ENV['AUTH_2FA_REQUIRED'] || AdminPrivilegeHandler::obj()->IsMaster($admin[$this->identify_table_id_col_name]) || $admin['is_admin'] || $admin['isAuthRequired']) {
                                 try {
-                                    Admin2FA::obj()->ResponseAuthMov($admin);
+                                    AdminTwoFactorAuthenticator::obj()->ResponseAuthMov($admin);
                                 } catch (Exception $e) {
                                     Logger::RecordLog($e, 'auth_move');
                                     Json::TryAgain($this->class_name . __LINE__);
@@ -128,7 +137,7 @@ class AdminPortal extends ParentClassHandler
     private function Login($username): array
     {
         $tb_email = AdminEmail::TABLE_NAME;
-        $tb_admin_auth = Admin2FA::TABLE_NAME;
+        $tb_admin_auth = AdminTwoFactorAuthenticator::TABLE_NAME;
         [$telegram_t, $telegram_c] = AdminTelegramBot::obj()->LeftJoinThisTableWithTableAlias($this->tableName);
         return self::Row("`$this->tableName` 
         INNER JOIN `$tb_email` ON `$tb_email`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
@@ -173,7 +182,7 @@ class AdminPortal extends ParentClassHandler
         $this->row_id = $this->SilentRecord();
         if (! empty($this->row_id)) {
             $to_add = [$this->identify_table_id_col_name => $this->row_id];
-            Admin2FA::obj()->Add($to_add);
+            AdminTwoFactorAuthenticator::obj()->Add($to_add);
             AdminEmail::obj()->Add($to_add);
             AdminPassword::obj()->Add($to_add);
             AdminEmail::obj()->SetUser($this->row_id, $email, $name);
@@ -242,7 +251,7 @@ class AdminPortal extends ParentClassHandler
     private function UsersTbsCols(): array
     {
         $tb_admin_emails = AdminEmail::TABLE_NAME;
-        $tb_admin_auth = Admin2FA::TABLE_NAME;
+        $tb_admin_auth = AdminTwoFactorAuthenticator::TABLE_NAME;
         [$p_t, $p_c] = AdminPhone::obj()->InnerJoinThisTableWithUniqueCols($this->tableName, ['phone' => 0]);
         [$t_t, $t_c] = AdminTelegramBot::obj()->LeftJoinThisTableWithTableAlias($this->tableName);
 

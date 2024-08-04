@@ -11,11 +11,13 @@
  * @Maatify   AdminPortalHandler :: AdminPrivilege
  */
 
-namespace Maatify\Portal\Admin;
+namespace Maatify\Portal\Admin\Privilege;
 
-use \App\Assist\AppFunctions;
+use App\Assist\AppFunctions;
 use Maatify\Functions\GeneralFunctions;
 use Maatify\Json\Json;
+use Maatify\Portal\Admin\Admin;
+use Maatify\Portal\Admin\AdminLoginToken;
 use Maatify\Portal\DbHandler\AddRemoveTwoColsHandler;
 use Maatify\Portal\Privileges\PrivilegeMethods;
 use Maatify\Portal\Privileges\PrivilegeRoles;

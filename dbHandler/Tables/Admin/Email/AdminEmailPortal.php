@@ -11,12 +11,16 @@
  * @Maatify   AdminPortalHandler :: AdminEmailPortal
  */
 
-namespace Maatify\Portal\Admin;
+namespace Maatify\Portal\Admin\Email;
 
-use \App\Assist\Encryptions\ConfirmEmailEncryption;
+use App\Assist\Encryptions\ConfirmEmailEncryption;
 use App\Assist\Jwt\JWTAssistance;
 use Maatify\CronEmail\CronEmailRecord;
 use Maatify\Json\Json;
+use Maatify\Portal\Admin\AdminFailedLogin;
+use Maatify\Portal\Admin\AdminLoginToken;
+use Maatify\Portal\Admin\Password\AdminPassword;
+use Maatify\Portal\Admin\TelegramBot\AlertAdminTelegramBot;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;
 

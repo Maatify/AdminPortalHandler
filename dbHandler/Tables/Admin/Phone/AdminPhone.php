@@ -11,9 +11,10 @@
  * @Maatify   AdminPortalHandler :: AdminPhone
  */
 
-namespace Maatify\Portal\Admin;
+namespace Maatify\Portal\Admin\Phone;
 
 use App\DB\DBS\DbConnector;
+use Maatify\Portal\Admin\Admin;
 
 class AdminPhone extends DbConnector
 {

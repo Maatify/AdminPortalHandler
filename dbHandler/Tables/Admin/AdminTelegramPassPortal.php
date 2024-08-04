@@ -209,10 +209,9 @@ class AdminTelegramPassPortal extends ParentClassHandler
     {
         if (! empty($token)) {
             $admin_col_name = Admin::IDENTIFY_TABLE_ID_COL_NAME;
-            if ($this->RowIsExistThisTable("`$admin_col_name` = ? AND `token` = ? AND `is_pending` = ? AND `is_passed` = ?",
+            if ($this->RowIsExistThisTable("`$admin_col_name` = ? AND `token` = ? AND `is_passed` = ?",
                 [$admin_id,
                  $token,
-                 0,
                  1])) {
                 return true;
             }
@@ -251,7 +250,7 @@ class AdminTelegramPassPortal extends ParentClassHandler
             $sent = $this->telegramBotManager->sender->editMessageText($chat_id, $message, $message_id, $keyboard, 'HTML');
             if (! empty($sent['result']['message_id'])) {
                 $this->Edit([
-                    'is_pending' => 0,
+                    'is_pending' => 1,
                     'is_passed'  => 1,
                 ], "`chat_id` = ? AND `message_id` = ? AND `is_pending` = ?", [$chat_id, $message_id, 1]);
             }

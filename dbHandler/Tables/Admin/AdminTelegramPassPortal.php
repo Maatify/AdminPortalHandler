@@ -241,6 +241,7 @@ class AdminTelegramPassPortal extends ParentClassHandler
 
     public function allowByTelegram(int $chat_id, string $message, int $message_id): void
     {
+        $token = $this->ColThisTable('token', "`chat_id` = ? AND `message_id` = ? ", [$chat_id, $message_id]);
         $this->clearPendingChatAuthKeyboardForAllTypes($chat_id, false, 'Replaced by allowed');
         if($this->is_active_telegram) {
             $keyboard = [
@@ -253,6 +254,7 @@ class AdminTelegramPassPortal extends ParentClassHandler
                 $this->Edit([
                     'is_pending' => 1,
                     'is_passed'  => 1,
+                    'token' => $token
                 ], "`chat_id` = ? AND `message_id` = ? ", [$chat_id, $message_id]);
             }
         }

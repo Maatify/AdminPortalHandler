@@ -125,7 +125,7 @@ class AdminTelegramPassPortal extends ParentClassHandler
                         } else {
                             $message = str_replace('⚠️', '🔄', $message);
                         }
-                        $message .= PHP_EOL . PHP_EOL . $message_to_add . ' at: ' . AppFunctions::CurrentDateTime();
+                        $message .= PHP_EOL . PHP_EOL . $message_to_add . ' <tg-spoiler>at: ' . AppFunctions::CurrentDateTime() . '</tg-spoiler>';
                         $sent = $this->telegramBotManager
                             ->sender
                             ->editMessageText($chat_id, $message, reply_to_message_id: $item['message_id'], parseMode: 'HTML');
@@ -256,6 +256,7 @@ class AdminTelegramPassPortal extends ParentClassHandler
                 $this->Edit([
                     'is_pending' => 1,
                     'is_passed'  => 1,
+                    'message'    => EmojiConverter::emojiToCodepoint($message),
                     'token' => $token
                 ], "`chat_id` = ? AND `message_id` = ? ", [$chat_id, $message_id]);
             }

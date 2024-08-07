@@ -1,7 +1,7 @@
 {
   "name": "maatify/admin-portal-handler",
   "description": "maatify.com",
-  "version": "1.1.0073",
+  "version": "1.1.0074",
   "type": "library",
   "keywords": [
     "PHP",
@@ -64,7 +64,7 @@
     "maatify/queue-manager": "^1.0",
     "maatify/cron-telegram-bot": "^1.0",
     "maatify/emoji-replacer": "^1.0",
-    "maatify/cloudflare-turnstile": "^1.0"
+    "maatify/captcha-all-in-one": "^1.0"
   },
   "config": {
     "platform": {

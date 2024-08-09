@@ -17,6 +17,7 @@ use App\Assist\AppFunctions;
 use App\Assist\Jwt\JWTAssistance;
 use App\DB\Tables\PortalCacheRedis;
 use Exception;
+use Maatify\CaptchaV1\CaptchaManager;
 use Maatify\GoogleRecaptcha\V3\GoogleRecaptchaV3Json;
 use Maatify\Json\Json;
 use Maatify\Logger\Logger;
@@ -60,7 +61,15 @@ class AdminPortal extends ParentClassHandler
     public function AdminLogin(): void
     {
         $this->logger_sub_type = 'Login';
-        (new GoogleRecaptchaV3Json());
+        if(!empty($_ENV['CAPTCHA_ACTIVE'])) {
+            try {
+                $captcha = CaptchaManager::getInstance();
+                $captcha->jsonErrors();
+            } catch (Exception $e) {
+                Json::Invalid('captcha', $e->getMessage());
+            }
+        }
+
         $username = $this->postValidator->Require('username', 'username', $this->class_name . __LINE__);
         $password = $this->postValidator->Require('password', 'password', $this->class_name . __LINE__);
         if ($admin = $this->Login($username)) {

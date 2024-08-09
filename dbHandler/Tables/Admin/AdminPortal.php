@@ -90,7 +90,6 @@ class AdminPortal extends ParentClassHandler
                                 try {
                                     AdminTwoFactorAuthenticator::obj()->ResponseAuthMov($admin);
                                 } catch (Exception $e) {
-                                    Logger::RecordLog($e, 'auth_move');
                                     Json::TryAgain($this->class_name . __LINE__);
                                 }
                             } else {

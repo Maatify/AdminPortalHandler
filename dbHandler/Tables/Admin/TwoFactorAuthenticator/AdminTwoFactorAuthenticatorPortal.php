@@ -66,7 +66,7 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
         $this->row_id = $admin[$this->identify_table_id_col_name];
         $log = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name], 'details' => 'Success Login with Two-Factor-Authenticator'];
         $this->AdminLogger($log, [], 'Login');
-        if(!empty($admin['telegram_status'])) {
+        if(!empty($admin['telegram_status']) && !empty($admin['telegram_chat_id']) && !empty($admin['telegram_status_auth'])) {
             AdminTelegramPassPortal::obj()->sendAdminSessionStartByNewSession($admin[$this->identify_table_id_col_name], $admin['telegram_first_name'], $admin['telegram_chat_id']);
         }
         AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);

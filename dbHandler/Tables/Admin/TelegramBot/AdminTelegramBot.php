@@ -32,8 +32,10 @@ class AdminTelegramBot extends DbConnector
             'last_name'                      => 0,
             'photo_url'                      => 0,
             'status'                         => 1,
+            'status_auth'                    => 1,
             'auth_date'                      => 0,
             'time'                           => 0,
+            'is_locked'                      => 1,
         ];
 
     protected string $tableName = self::TABLE_NAME;

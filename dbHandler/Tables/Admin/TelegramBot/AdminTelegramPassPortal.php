@@ -22,6 +22,7 @@ use Maatify\Logger\Logger;
 use Maatify\Portal\Admin\Admin;
 use Maatify\Portal\Admin\AdminLoginToken;
 use Maatify\Portal\DbHandler\ParentClassHandler;
+use Maatify\Portal\Setting\Settings;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;
 use Maatify\TelegramBot\TelegramBotManager;
@@ -65,6 +66,10 @@ class AdminTelegramPassPortal extends ParentClassHandler
      * @var true
      */
     private bool $is_active_telegram = false;
+    /**
+     * @var true
+     */
+    private bool $is_sys_active_telegram_auth = false;
     private string $api_key;
     private TelegramBotManager $telegramBotManager;
 
@@ -83,6 +88,7 @@ class AdminTelegramPassPortal extends ParentClassHandler
         if (! empty($_ENV['TELEGRAM_ADMIN_USERNAME'])) {
             try {
                 $this->is_active_telegram = true;
+                $this->is_sys_active_telegram_auth = Settings::obj()->TelegramAdminAuthorization();
                 $api_key = (new EnvEncryption())->DeHashed($_ENV['TELEGRAM_API_KEY_ADMIN']);
                 $this->telegramBotManager = new TelegramBotManager($api_key);
             } catch (Exception $exception) {
@@ -180,6 +186,7 @@ class AdminTelegramPassPortal extends ParentClassHandler
                             ['text' => 'Confirm', 'callback_data' => 'allow_auth'],
                         ],
                     ];
+                    if(!empty($admin['status_auth']) && $this->is_sys_active_telegram_auth)
                     $sent = $this->telegramBotManager->sender->sendMessage($admin['chat_id'],
                         $text,
                         keyboard : $keyboard,
@@ -234,9 +241,11 @@ class AdminTelegramPassPortal extends ParentClassHandler
                 ],
             ];
             $this->clearPendingChatAuthKeyboard($chat_id, true);
-            $sent = $this->telegramBotManager->sender->sendMessage($chat_id, $text, 0, $keyboard, 'HTML');
-            if (! empty($sent['result']['message_id'])) {
-                $this->recordNewMessage($admin_id, $chat_id, $sent['result']['message_id'], $text);
+            if($this->is_sys_active_telegram_auth) {
+                $sent = $this->telegramBotManager->sender->sendMessage($chat_id, $text, 0, $keyboard, 'HTML');
+                if (! empty($sent['result']['message_id'])) {
+                    $this->recordNewMessage($admin_id, $chat_id, $sent['result']['message_id'], $text);
+                }
             }
         }
     }
@@ -246,11 +255,15 @@ class AdminTelegramPassPortal extends ParentClassHandler
         $token = $this->ColThisTable('token', "`chat_id` = ? AND `message_id` = ? ", [$chat_id, $message_id]);
         $this->clearPendingChatAuthKeyboardForAllTypes($chat_id, false, 'Replaced by allowed');
         if($this->is_active_telegram) {
-            $keyboard = [
-                [
-                    ['text' => 'Terminate the Session', 'callback_data' => 'terminate_session'],
-                ],
-            ];
+            if($this->is_sys_active_telegram_auth) {
+                $keyboard = [
+                    [
+                        ['text' => 'Terminate the Session', 'callback_data' => 'terminate_session'],
+                    ],
+                ];
+            }else{
+                $keyboard = [];
+            }
             $sent = $this->telegramBotManager->sender->editMessageText($chat_id, $message, $message_id, $keyboard, 'HTML');
             if (! empty($sent['result']['message_id'])) {
                 $this->Edit([

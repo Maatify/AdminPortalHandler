@@ -112,4 +112,22 @@ class Settings extends DbPortalHandler
         return $this->ColThisTable('default_value', ' `setting_id` = ? ', [$setting_id]);
     }
 
+    private string $telegram_admin_authorization = '';
+    public function TelegramAdminAuthorization(): string
+    {
+        if(empty($this->telegram_admin_authorization)){
+            $this->telegram_admin_authorization = $this->ReturnColValue('telegram_admin_authorization');
+        }
+        return $this->telegram_admin_authorization;
+    }
+
+    private string $telegram_customer_authorization = '';
+    public function TelegramCustomerAuthorization(): string
+    {
+        if(empty($this->telegram_customer_authorization)){
+            $this->telegram_customer_authorization = $this->ReturnColValue('telegram_customer_authorization');
+        }
+        return $this->telegram_customer_authorization;
+    }
+
 }

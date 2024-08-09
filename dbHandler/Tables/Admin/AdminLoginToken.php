@@ -37,6 +37,8 @@ class AdminLoginToken extends AdminToken
     private int $telegram_status;
     private int $telegram_chat_id;
     private int $admin_isMaster;
+    private int $telegram_status_auth;
+    private int $telegram_is_locked;
 
     public static function obj(): self
     {
@@ -174,6 +176,8 @@ class AdminLoginToken extends AdminToken
             $this->admin_email = $admin['email'];
             $this->admin_phone = $admin['phone'];
             $this->telegram_status = $admin['telegram_status'];
+            $this->telegram_status_auth = $admin['telegram_status_auth'];
+            $this->telegram_is_locked = $admin['telegram_is_locked'];
             $this->telegram_chat_id = $admin['telegram_chat_id'];
         }
         return $admin;
@@ -269,5 +273,15 @@ class AdminLoginToken extends AdminToken
     public function GetTelegramStatus(): int
     {
         return $this->telegram_status;
+    }
+
+    public function GetTelegramAuthStatus(): int
+    {
+        return $this->telegram_status_auth;
+    }
+
+    public function GetTelegramIsLocked(): int
+    {
+        return $this->telegram_is_locked;
     }
 }

@@ -64,6 +64,7 @@ class AdminTelegramBotPortal extends ParentClassHandler
         ['last_name', ValidatorConstantsTypes::Name, ValidatorConstantsValidators::Optional],
         [ValidatorConstantsTypes::Status, ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
         ['status_auth', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
+        ['is_locked', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
     ];
 
     protected array $cols_to_filter = [
@@ -72,6 +73,7 @@ class AdminTelegramBotPortal extends ParentClassHandler
         [ValidatorConstantsTypes::Username, ValidatorConstantsTypes::Username, ValidatorConstantsValidators::Optional],
         [ValidatorConstantsTypes::Status, ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
         ['status_auth', ValidatorConstantsTypes::Status, ValidatorConstantsValidators::Optional],
+        ['is_locked', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
     ];
 
     // to use in add if child classes no have language_id
@@ -115,6 +117,13 @@ class AdminTelegramBotPortal extends ParentClassHandler
         $this->validateMyTelegramLockedForEdit();
         $_POST[self::IDENTIFY_TABLE_ID_COL_NAME] = AdminLoginToken::obj()->GetAdminID();
         parent::SwitchByKey('status_auth');
+    }
+
+    public function SwitchIsLocked(): void
+    {
+        $this->validateMyTelegramLockedForEdit();
+        $_POST[self::IDENTIFY_TABLE_ID_COL_NAME] = AdminLoginToken::obj()->GetAdminID();
+        parent::SwitchByKey('is_locked');
     }
 
     private function validateMyTelegramLockedForEdit(): void

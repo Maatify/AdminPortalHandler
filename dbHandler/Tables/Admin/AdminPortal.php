@@ -291,11 +291,11 @@ class AdminPortal extends ParentClassHandler
             }
         }
         if(isset($_POST['status']) && is_numeric($_POST['status']) && in_array($_POST['status'], [0,1])){
-            $where_to_add .= 'AND `status` = ? ';
+            $where_to_add .= " AND `$this->tableName`.`status` = ? ";
             $where_val[] = $_POST['status'];
         }
         if(isset($_POST['is_admin']) && is_numeric($_POST['is_admin']) && in_array($_POST['is_admin'], [0,1])){
-            $where_to_add .= 'AND `is_admin` = ? ';
+            $where_to_add .= " AND `$this->tableName`.`is_admin` = ? ";
             $where_val[] = $_POST['is_admin'];
         }
         Json::Success(

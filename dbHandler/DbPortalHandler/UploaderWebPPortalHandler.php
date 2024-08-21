@@ -21,7 +21,7 @@ use ReflectionClass;
 
 class UploaderWebPPortalHandler extends UploadImageToWebP
 {
-    protected string $site_image_folder = __DIR__ . "/../../../public_html/images/";
+    protected string $site_image_folder = __DIR__ . "/../../../../public_html/images/";
 
     protected int|string $uploaded_for_id;
     protected int|string $uploaded_target_folder = '';

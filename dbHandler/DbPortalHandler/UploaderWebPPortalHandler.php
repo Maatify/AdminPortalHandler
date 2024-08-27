@@ -13,6 +13,7 @@
 
 namespace Maatify\Portal\DbHandler;
 
+use App\Assist\AppFunctions;
 use Maatify\Json\Json;
 use Maatify\Logger\Logger;
 use Maatify\PostValidatorV2\PostValidatorV2;
@@ -21,7 +22,7 @@ use ReflectionClass;
 
 class UploaderWebPPortalHandler extends UploadImageToWebP
 {
-    protected string $site_image_folder = __DIR__ . "/../../../../public_html/images/";
+    protected string $site_image_folder;
 
     protected int|string $uploaded_for_id;
     protected int|string $uploaded_target_folder = '';
@@ -43,6 +44,7 @@ class UploaderWebPPortalHandler extends UploadImageToWebP
 
     public function __construct(string $uploaded_target_folder)
     {
+        $this->site_image_folder = AppFunctions::site_image_folder();
         $this->uploaded_target_folder = $uploaded_target_folder;
         $this->upload_folder = $this->site_image_folder . $this->uploaded_target_folder;
         $this->class_name = (new ReflectionClass($this))->getShortName() . '::';

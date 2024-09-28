@@ -55,12 +55,6 @@ class LanguagePortal extends DbLanguage
         return $this->id_name_code;
     }
 
-
-    protected function RowByID(): array
-    {
-        return $this->RowThisTable('*', '`language_id` = ? ', [$this->language_id]);
-    }
-
     protected function CheckColExist(string $col, string $val): bool
     {
         return $this->RowIsExistThisTable("`$col` = ? ", [$val]);

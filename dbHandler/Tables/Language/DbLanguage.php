@@ -71,4 +71,17 @@ class DbLanguage extends DbPortalHandler
         }
         return $id;
     }
+
+    public function RowByID(): array
+    {
+        return $this->RowThisTable('*', "`$this->identify_table_id_col_name` = ? ", [$this->language_id]);
+    }
+
+    public function ShortNameByID(int $language_id): string
+    {
+        if($short_name = $this->ColThisTable('short_name', "`$this->identify_table_id_col_name` = ? ", [strtolower($language_id)])){
+            return $short_name;
+        }
+        return '';
+    }
 }

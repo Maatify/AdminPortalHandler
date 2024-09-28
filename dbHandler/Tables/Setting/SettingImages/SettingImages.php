@@ -50,4 +50,10 @@ class SettingImages extends DbConnector
         return self::$instance;
     }
 
+    public function getSettingById(int $setting_id): array
+    {
+        return $this->RowThisTable('`max_width`, `max_height`, `max_size`',
+            "`$this->identify_table_id_col_name` = ? ", [$setting_id]);
+    }
+
 }

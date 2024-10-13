@@ -43,6 +43,7 @@ class AdminPortal extends ParentClassHandler
     protected string $identify_table_id_col_name = self::IDENTIFY_TABLE_ID_COL_NAME;
     protected string $tableAlias = 'user';
     private static self $instance;
+    private bool $telegram_bot_active;
 
     public static function obj(): self
     {
@@ -51,6 +52,12 @@ class AdminPortal extends ParentClassHandler
         }
 
         return self::$instance;
+    }
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->telegram_bot_active = !empty($_ENV['IS_TELEGRAM_ADMIN_ACTIVATE']);
     }
 
     protected array $cols_to_filter = [
@@ -94,7 +101,7 @@ class AdminPortal extends ParentClassHandler
                                 }
                             } else {
                                 $log['details'] = 'Success Login';
-                                if(!empty($admin['telegram_status'])) {
+                                if($this->telegram_bot_active && !empty($admin['telegram_status'])) {
                                     AlertAdminTelegramBot::obj()->alertLogin(
                                         $admin[$this->identify_table_id_col_name],
                                         $admin['telegram_chat_id'],
@@ -106,7 +113,7 @@ class AdminPortal extends ParentClassHandler
                                 AdminFailedLogin::obj()->Success($admin['username']);
                             }
                         } else {
-                            if(!empty($admin['telegram_status'])) {
+                            if($this->telegram_bot_active && !empty($admin['telegram_status'])) {
                                 AlertAdminTelegramBot::obj()->alertLogin(
                                     $admin[$this->identify_table_id_col_name],
                                     $admin['telegram_chat_id'],
@@ -127,7 +134,7 @@ class AdminPortal extends ParentClassHandler
                     Json::SuspendedAccount();
                 }
             } else {
-                if(!empty($admin['telegram_status'])) {
+                if($this->telegram_bot_active && !empty($admin['telegram_status'])) {
                     AlertAdminTelegramBot::obj()->alertFailedLogin(
                         $admin[$this->identify_table_id_col_name],
                         $admin['telegram_chat_id'],

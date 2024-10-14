@@ -148,8 +148,6 @@ class LanguagePortal extends DbLanguage
         Json::Success(line: $this->class_name . __LINE__);
     }
 
-
-
     public function UploadImage(): void
     {
         $this->row_id = $this->ValidatePostedTableId();
@@ -171,5 +169,10 @@ class LanguagePortal extends DbLanguage
             $this->Logger($log, $changes, 'UploadImage');
             Json::Success(line: $this->class_name . __LINE__);
         }
+    }
+
+    public function listArray(): array
+    {
+        return $this->RowsThisTable('`language_id`, `name`');
     }
 }

@@ -18,9 +18,7 @@ use App\Assist\Jwt\JWTAssistance;
 use App\DB\Tables\PortalCacheRedis;
 use Exception;
 use Maatify\CaptchaV1\CaptchaManager;
-use Maatify\GoogleRecaptcha\V3\GoogleRecaptchaV3Json;
 use Maatify\Json\Json;
-use Maatify\Logger\Logger;
 use Maatify\Portal\Admin\Email\AdminEmail;
 use Maatify\Portal\Admin\Password\AdminPassword;
 use Maatify\Portal\Admin\Phone\AdminPhone;
@@ -57,7 +55,7 @@ class AdminPortal extends ParentClassHandler
     public function __construct()
     {
         parent::__construct();
-        $this->telegram_bot_active = !empty($_ENV['IS_TELEGRAM_ADMIN_ACTIVATE']);
+        $this->telegram_bot_active = (bool)($_ENV['IS_TELEGRAM_ADMIN_ACTIVATE'] ?? false);
     }
 
     protected array $cols_to_filter = [

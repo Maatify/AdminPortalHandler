@@ -15,7 +15,6 @@ namespace Maatify\Portal\Language;
 
 use App\Assist\AppFunctions;
 use Maatify\Json\Json;
-use Maatify\Logger\Logger;
 use Maatify\Portal\DbHandler\UploaderWebPPortalHandler;
 
 class LanguagePortal extends DbLanguage

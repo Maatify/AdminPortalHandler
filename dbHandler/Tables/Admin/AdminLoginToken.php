@@ -157,7 +157,7 @@ class AdminLoginToken extends AdminToken
             "`$tb_admin`.*, `$tb_admin_email`.`email`, `$tb_admin_email`.`confirmed`, 
             `$tb_admin_auth`.`auth`, `$tb_admin_auth`.`isAuthRequired`, " . $a_phone_cols . ', ' . $a_telegram_cols,
             "`$this->tableName`.`token` = ? AND `$this->tableName`.`token` <> ''",
-            [self::TokenSecretKeyEncode($hashed_token)]);
+            [self::TokenSecretKeyDecode($hashed_token)]);
         if($admin){
             if(empty($admin['status'])){
                 Json::SuspendedAccount($line);
@@ -213,7 +213,7 @@ class AdminLoginToken extends AdminToken
 
     private function SetToken(int $admin_id, string $token): void
     {
-        $this->Edit(['token' => $this->TokenSecretKeyEncode($token)],
+        $this->Edit(['token' => $token],
             "`$this->identify_table_id_col_name` = ? ",
             [$admin_id]);
     }

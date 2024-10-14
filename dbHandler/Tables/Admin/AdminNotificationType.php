@@ -14,7 +14,6 @@
 namespace Maatify\Portal\Admin;
 
 use App\DB\DBS\DbConnector;
-use Maatify\Portal\Setting\Notification\NotificationTypes;
 use Maatify\Portal\Setting\Notification\NotificationTypesPortal;
 
 class AdminNotificationType extends DbConnector

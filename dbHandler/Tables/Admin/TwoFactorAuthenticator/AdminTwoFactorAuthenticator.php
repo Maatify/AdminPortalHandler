@@ -95,6 +95,12 @@ class AdminTwoFactorAuthenticator extends ParentClassHandler
         return $this->ValidateCode($code, $this->AuthDecode($admin['auth']), $admin['username']);
     }
 
+    public function ValidateCurrentAdminCode(): bool
+    {
+        $admin_id = AdminLoginToken::obj()->GetAdminID();
+        return $this->ValidateAdminCode($admin_id);
+    }
+
     protected function ValideToken(): array
     {
         $auth_pages = ['AuthRegister', 'Auth', 'AuthPassedViaTelegram'];

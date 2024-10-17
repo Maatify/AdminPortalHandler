@@ -24,6 +24,8 @@ class AdminTwoFactorAuthenticatorSession extends AdminTwoFactorAuthenticator
         return self::$instance;
     }
 
+    private ?bool $is_valid = null;
+
     public function generate(): void
     {
         JWTAdminTwoFactorAuthenticatorSession::obj()->Jwt2FaTokenHash();
@@ -31,6 +33,9 @@ class AdminTwoFactorAuthenticatorSession extends AdminTwoFactorAuthenticator
 
     public function validate(): bool
     {
-        return JWTAdminTwoFactorAuthenticatorSession::obj()->Jwt2FaValidation();
+        if($this->is_valid === null) {
+            $this->is_valid = JWTAdminTwoFactorAuthenticatorSession::obj()->Jwt2FaValidation();
+        }
+        return $this->is_valid;
     }
 }

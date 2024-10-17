@@ -13,6 +13,7 @@
 
 namespace Maatify\Portal\Admin\TwoFactorAuthenticator;
 
+use App\Assist\AdminTwoFactorAuthenticatorAssistance;
 use App\Assist\Encryptions\AdminAuthEncryption;
 use App\Assist\Jwt\JWTAssistance;
 use Exception;
@@ -67,10 +68,15 @@ class AdminTwoFactorAuthenticator extends ParentClassHandler
                     'Please Set Your Google Authenticator',
                     [
                         'g_auth_code'   => $g_2fa_code,
-                        'g_auth_base64' => base64_encode(file_get_contents(GoogleAuth::obj()
-                            ->GetImg(trim($admin['username']),
-                                trim($g_2fa_code),
-                                trim($_ENV['SITE_PORTAL_NAME'])))),
+                        'g_auth_base64' => AdminTwoFactorAuthenticatorAssistance::obj()->TwoFactorAuthenticatorBase64(
+                            $admin['username'],
+                            $g_2fa_code,
+                            $_ENV['SITE_PORTAL_NAME']
+                        ),
+//                        'g_auth_base64' => base64_encode(file_get_contents(GoogleAuth::obj()
+//                            ->GetImg(trim($admin['username']),
+//                                trim($g_2fa_code),
+//                                trim($_ENV['SITE_PORTAL_NAME'])))),
                     ],
                     $this->class_name . __FUNCTION__ . '::' . __LINE__);
             } catch (Exception $exception) {
@@ -98,6 +104,7 @@ class AdminTwoFactorAuthenticator extends ParentClassHandler
     public function ValidateCurrentAdminCode(): bool
     {
         $admin_id = AdminLoginToken::obj()->GetAdminID();
+
         return $this->ValidateAdminCode($admin_id);
     }
 
@@ -112,6 +119,7 @@ class AdminTwoFactorAuthenticator extends ParentClassHandler
                             if (! empty($tokens->secret)) {
                                 $admin['secret'] = $tokens->secret;
                             }
+
                             return $admin;
                         }
                     }

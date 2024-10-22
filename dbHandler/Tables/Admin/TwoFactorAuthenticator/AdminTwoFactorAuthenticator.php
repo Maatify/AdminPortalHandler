@@ -71,12 +71,8 @@ class AdminTwoFactorAuthenticator extends ParentClassHandler
                         'g_auth_base64' => AdminTwoFactorAuthenticatorAssistance::obj()->TwoFactorAuthenticatorBase64(
                             $admin['username'],
                             $g_2fa_code,
-                            $_ENV['SITE_PORTAL_NAME']
+                            $_ENV['SITE_PORTAL_NAME'] ?? ''
                         ),
-//                        'g_auth_base64' => base64_encode(file_get_contents(GoogleAuth::obj()
-//                            ->GetImg(trim($admin['username']),
-//                                trim($g_2fa_code),
-//                                trim($_ENV['SITE_PORTAL_NAME'])))),
                     ],
                     $this->class_name . __FUNCTION__ . '::' . __LINE__);
             } catch (Exception $exception) {

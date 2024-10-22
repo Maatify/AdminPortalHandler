@@ -101,6 +101,23 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
         }
     }
 
+    public function setMyAuthSecret(): void
+    {
+        $secret = $this->postValidator->Require('secret', 'digital_upper_letters');
+        $this->NewAuthRecord(AdminLoginToken::obj()->GetAdminID(),
+            $secret);
+        Json::Success();
+    }
+
+    public function checkMyAuthCode(): void
+    {
+        if(AdminTwoFactorAuthenticatorPortal::obj()->ValidateCurrentAdminCode()){
+            Json::Success(line: $this->class_name . __LINE__);
+        }
+
+        Json::Incorrect('code', 'code not valide ', $this->class_name . __LINE__);
+    }
+
 
     public function AuthRegister(): void
     {

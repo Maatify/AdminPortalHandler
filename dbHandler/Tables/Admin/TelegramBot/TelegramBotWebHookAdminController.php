@@ -42,7 +42,7 @@ class TelegramBotWebHookAdminController
 
     public function __construct()
     {
-        $this->api_key = (new EnvEncryption())->DeHashed($_ENV['TELEGRAM_API_KEY_ADMIN']);
+        $this->api_key = (new EnvEncryption())->DeHashed($_ENV['TELEGRAM_API_KEY']);
     }
 
     public function handleMessageFromCommand(int $chatId, string $text): array
@@ -123,7 +123,7 @@ class TelegramBotWebHookAdminController
             $status_message = '';
         }
 
-        return '‼️️' . $_ENV['TELEGRAM_ADMIN_USERNAME'] . '‼️️'
+        return '‼️️' . $_ENV['TELEGRAM_USERNAME'] . '‼️️'
                . PHP_EOL . PHP_EOL
                . (! $this->admin_first_name ? ('  I don’t know who you are. ⁉️.') : 'Hello! ' . $this->admin_first_name . '.')
                . PHP_EOL . PHP_EOL
@@ -137,7 +137,7 @@ class TelegramBotWebHookAdminController
     public function infoMessage(bool $bot_name = true): string
     {
         if ($bot_name) {
-            $title = '‼️️' . $_ENV['TELEGRAM_ADMIN_USERNAME'] . '‼️️';
+            $title = '‼️️' . $_ENV['TELEGRAM_USERNAME'] . '‼️️';
         } else {
             $title = '';
         }

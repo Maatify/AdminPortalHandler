@@ -258,9 +258,9 @@ class AdminTelegramBotPortal extends ParentClassHandler
 
     public function sendAdminTelegramMessage(int $admin_id, string $message): void
     {
-        if(!empty($_ENV['IS_TELEGRAM_ADMIN_ACTIVATE']) && !empty($_ENV['TELEGRAM_API_KEY_ADMIN']))
+        if(!empty($_ENV['IS_TELEGRAM_ACTIVATE']) && !empty($_ENV['TELEGRAM_API_KEY']))
         {
-            $api_key = (new EnvEncryption())->DeHashed($_ENV['TELEGRAM_API_KEY_ADMIN']);
+            $api_key = (new EnvEncryption())->DeHashed($_ENV['TELEGRAM_API_KEY']);
             $chats = $this->adminActiveChat($admin_id);
             if (! empty($chats)) {
                 try {

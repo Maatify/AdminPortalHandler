@@ -85,11 +85,11 @@ class AdminTelegramPassPortal extends ParentClassHandler
     public function __construct()
     {
         parent::__construct();
-        if (! empty($_ENV['TELEGRAM_ADMIN_USERNAME'])) {
+        if (! empty($_ENV['TELEGRAM_USERNAME'])) {
             try {
                 $this->is_active_telegram = true;
                 $this->is_sys_active_telegram_auth = Settings::obj()->TelegramAdminAuthorization();
-                $api_key = (new EnvEncryption())->DeHashed($_ENV['TELEGRAM_API_KEY_ADMIN']);
+                $api_key = (new EnvEncryption())->DeHashed($_ENV['TELEGRAM_API_KEY']);
                 $this->telegramBotManager = new TelegramBotManager($api_key);
             } catch (Exception $exception) {
                 Logger::RecordLog($exception, 'AdminTelegramPassPortal');

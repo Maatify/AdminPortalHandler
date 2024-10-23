@@ -38,7 +38,7 @@ class AlertAdminTelegramBot extends CronTelegramBotAdminRecord
 
     public function validateTelegramActive(int $admin_id,int $chat_id): bool
     {
-        if(!empty($_ENV['IS_TELEGRAM_ADMIN_ACTIVATE']) && !empty($admin_id) && !empty($chat_id)) {
+        if(!empty($_ENV['IS_TELEGRAM_ACTIVATE']) && !empty($admin_id) && !empty($chat_id)) {
             return true;
         }
         return false;

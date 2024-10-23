@@ -56,7 +56,7 @@ class AdminPortal extends ParentClassHandler
     public function __construct()
     {
         parent::__construct();
-        $this->telegram_bot_active = (bool)($_ENV['IS_TELEGRAM_ADMIN_ACTIVATE'] ?? false);
+        $this->telegram_bot_active = (bool)($_ENV['IS_TELEGRAM_ACTIVATE'] ?? false);
     }
 
     protected array $cols_to_filter = [

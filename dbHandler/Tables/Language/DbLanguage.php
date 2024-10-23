@@ -17,27 +17,32 @@ use \App\DB\DBS\DbPortalHandler;
 
 class DbLanguage extends DbPortalHandler
 {
-    const TABLE_NAME  = 'language';
+
+    public const TABLE_NAME                 = 'language';
+    public const TABLE_ALIAS                = self::TABLE_NAME;
+    public const IDENTIFY_TABLE_ID_COL_NAME = 'language_id';
+    public const LOGGER_TYPE                = self::TABLE_NAME;
+    public const LOGGER_SUB_TYPE            = '';
+    public const COLS                       = [
+        self::IDENTIFY_TABLE_ID_COL_NAME => 1,
+        'name'                           => 0,
+        'short_name'                     => 0,
+        'code'                           => 0,
+        'locale'                         => 0,
+        'image'                          => 0,
+        'directory'                      => 0,
+        'sort'                           => 1,
+        'status'                         => 1,
+    ];
+    const        IMAGE_FOLDER               = self::TABLE_NAME;
 
     protected string $tableName = self::TABLE_NAME;
-    protected string $image_folder = 'language';
-    const IDENTIFY_TABLE_ID_COL_NAME = 'language_id';
+    protected string $tableAlias = self::TABLE_ALIAS;
     protected string $identify_table_id_col_name = self::IDENTIFY_TABLE_ID_COL_NAME;
-    const LOGGER_TYPE = 'language';
     protected string $logger_type = self::LOGGER_TYPE;
-    protected string $logger_sub_type = '';
-
-    protected array $cols = [
-        self::IDENTIFY_TABLE_ID_COL_NAME => 1,
-        'name' => 0,
-        'short_name' => 0,
-        'code' => 0,
-        'locale' => 0,
-        'image' => 0,
-        'directory' => 0,
-        'sort' => 1,
-        'status' => 1,
-    ];
+    protected string $logger_sub_type = self::LOGGER_SUB_TYPE;
+    protected array $cols = self::COLS;
+    protected string $image_folder = self::IMAGE_FOLDER;
     private static self $instance;
 
     public static function obj(): self
@@ -66,9 +71,10 @@ class DbLanguage extends DbPortalHandler
 
     public function GetCurrentLanguageId(string $short_code): int
     {
-        if(!$id = (int)$this->ColThisTable('language_id', '`short_name` = ? ', [strtolower($short_code)])){
+        if (! $id = (int)$this->ColThisTable('language_id', '`short_name` = ? ', [strtolower($short_code)])) {
             $id = 1;
         }
+
         return $id;
     }
 
@@ -79,9 +85,10 @@ class DbLanguage extends DbPortalHandler
 
     public function ShortNameByID(int $language_id): string
     {
-        if($short_name = $this->ColThisTable('short_name', "`$this->identify_table_id_col_name` = ? ", [strtolower($language_id)])){
+        if ($short_name = $this->ColThisTable('short_name', "`$this->identify_table_id_col_name` = ? ", [strtolower($language_id)])) {
             return $short_name;
         }
+
         return '';
     }
 }

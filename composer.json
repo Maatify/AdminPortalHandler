@@ -1,7 +1,7 @@
 {
   "name": "maatify/admin-portal-handler",
   "description": "maatify.com",
-  "version": "1.1.0096",
+  "version": "1.1.0097",
   "type": "library",
   "keywords": [
     "PHP",
@@ -71,7 +71,9 @@
     "league/oauth2-facebook": "^2.2",
     "league/oauth2-github": "^3.1",
     "league/oauth2-google": "^4.0",
-    "wohali/oauth2-discord-new": "^1.2"
+    "wohali/oauth2-discord-new": "^1.2",
+    "smolblog/oauth2-twitter": "^1.1",
+    "bastiaandewaele/oauth2-tiktok": "^2.0"
   },
   "config": {
     "platform": {

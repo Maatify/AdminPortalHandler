@@ -191,4 +191,15 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
         }
         else return $authCode;
     }
+
+    public function stgClearMyAuth(): void
+    {
+        $admin_id = AdminLoginToken::obj()->GetAdminID();
+        if(empty($admin_id)){
+            Json::ReLogin($this->class_name . __LINE__);
+        }else{
+            $this->Edit(['auth' => ''], " `$this->identify_table_id_col_name` = ?", [$admin_id]);
+            Json::Success(line: $this->class_name . __LINE__);
+        }
+    }
 }

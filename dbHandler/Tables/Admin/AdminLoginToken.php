@@ -23,6 +23,7 @@ use Maatify\Portal\Admin\Phone\AdminPhone;
 use Maatify\Portal\Admin\TelegramBot\AdminTelegramBot;
 use Maatify\Portal\Admin\TelegramBot\AdminTelegramPassPortal;
 use Maatify\Portal\Admin\TwoFactorAuthenticator\AdminTwoFactorAuthenticator;
+use Maatify\Portal\Language\DbLanguage;
 use Maatify\Portal\Language\LanguagePortal;
 
 class AdminLoginToken extends AdminToken
@@ -147,15 +148,18 @@ class AdminLoginToken extends AdminToken
         $tb_admin_auth = AdminTwoFactorAuthenticator::TABLE_NAME;
         [$a_phone_table_name, $a_phone_cols] = AdminPhone::obj()->InnerJoinThisTableWithUniqueCols($tb_admin, ['phone'=> 0]);
         [$a_telegram_table_name, $a_telegram_cols] = AdminTelegramBot::obj()->LeftJoinThisTableWithTableAlias($tb_admin);
+        [$language_t, $language_c] = DbLanguage::obj()->InnerJoinThisTableWithUniqueColsWithTableAlias($tb_admin, ['short_name' => 0]);
+
         $admin = $this->Row("`$this->tableName` 
         INNER JOIN `$tb_admin` ON `$tb_admin`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
         INNER JOIN `$tb_admin_email` ON `$tb_admin_email`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
         INNER JOIN `$tb_admin_auth` ON `$tb_admin_auth`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
         $a_phone_table_name 
-        $a_telegram_table_name
+        $a_telegram_table_name 
+        $language_t 
         ",
             "`$tb_admin`.*, `$tb_admin_email`.`email`, `$tb_admin_email`.`confirmed`, 
-            `$tb_admin_auth`.`auth`, `$tb_admin_auth`.`isAuthRequired`, " . $a_phone_cols . ', ' . $a_telegram_cols,
+            `$tb_admin_auth`.`auth`, `$tb_admin_auth`.`isAuthRequired`, $a_phone_cols, $a_telegram_cols, $language_c",
             "`$this->tableName`.`token` = ? AND `$this->tableName`.`token` <> ''",
             [self::TokenSecretKeyDecode($hashed_token)]);
         if($admin){

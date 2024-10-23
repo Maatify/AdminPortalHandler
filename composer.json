@@ -1,7 +1,7 @@
 {
   "name": "maatify/admin-portal-handler",
   "description": "maatify.com",
-  "version": "1.1.0095",
+  "version": "1.1.0096",
   "type": "library",
   "keywords": [
     "PHP",
@@ -64,7 +64,14 @@
     "maatify/queue-manager": "^1.0",
     "maatify/cron-telegram-bot": "^1.0",
     "maatify/emoji-replacer": "^1.0",
-    "maatify/captcha-all-in-one": "^1.0"
+    "maatify/captcha-all-in-one": "^1.0",
+    "league/oauth2-client": "^2.7",
+    "league/oauth2-instagram": "^3.1",
+    "league/oauth2-linkedin": "^5.1",
+    "league/oauth2-facebook": "^2.2",
+    "league/oauth2-github": "^3.1",
+    "league/oauth2-google": "^4.0",
+    "wohali/oauth2-discord-new": "^1.2"
   },
   "config": {
     "platform": {

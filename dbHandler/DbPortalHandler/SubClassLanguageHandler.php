@@ -180,4 +180,15 @@ abstract class SubClassLanguageHandler extends DbPortalHandler
         Json::Success($result);
     }
 
+    public function duplicate(int $old_id, int $new_id): void
+    {
+        $records = $this->RowsThisTable('*', "`$this->identify_table_id_col_name` = ? ", [$old_id]);
+        foreach ($records as $record) {
+            if(isset($record[$this->identify_table_id_col_name])){
+                $record[$this->identify_table_id_col_name]= $new_id;
+                $this->Add($record);
+            }
+        }
+    }
+
 }

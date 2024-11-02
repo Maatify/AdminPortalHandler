@@ -66,10 +66,13 @@ class PrivilegeMethods extends ParentClassHandler
 
     public function Record(): void
     {
+        $page = $this->postValidator->Require('page', ValidatorConstantsTypes::Col_Name, $this->class_name . __LINE__);
+        $method = $this->postValidator->Require('method', ValidatorConstantsTypes::Col_Name, $this->class_name . __LINE__);
+
         if($this->RowIsExistThisTable('`page` = ? AND `method` = ? ',
         [
-            $this->postValidator->Require('page'),
-            $this->postValidator->Require('method')
+            $page,
+            $method
         ])){
             Json::Exist('method', 'method Already Exist', $this->class_name . __LINE__);
         }else{
@@ -80,8 +83,8 @@ class PrivilegeMethods extends ParentClassHandler
     public function UpdateByPostedId(): void
     {
         $this->ValidatePostedTableId();
-        $page = $this->postValidator->Optional('page');
-        $method = $this->postValidator->Optional('method');
+        $page = $this->postValidator->Optional('page', ValidatorConstantsTypes::Col_Name, $this->class_name . __LINE__);
+        $method = $this->postValidator->Optional('method', ValidatorConstantsTypes::Col_Name, $this->class_name . __LINE__);
         if(isset($_POST['page']) && $page != $this->current_row['page']){
             $new_page = $page;
         }else{

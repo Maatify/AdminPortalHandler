@@ -14,7 +14,7 @@
 namespace Maatify\Portal\Admin\Email;
 
 use App\Assist\Encryptions\ConfirmEmailEncryption;
-use Maatify\CronEmail\CronEmailRecord;
+use Maatify\CronEmail\CronEmailAdminRecord;
 use Maatify\Functions\GeneralFunctions;
 use Maatify\Portal\Admin\Admin;
 use Maatify\Portal\DbHandler\ParentClassHandler;
@@ -57,10 +57,10 @@ class AdminEmail extends ParentClassHandler
 
     public function SetUser(int $admin_id, string $email, string $name): void
     {
-        if($this->Edit(['email'=>$email, 'confirmed'=>0], "`$this->identify_table_id_col_name` = ?", [$admin_id])){
+        if($this->Edit(['email'=>$email, 'e_confirmed'=>0], "`$this->identify_table_id_col_name` = ?", [$admin_id])){
             $otp = $this->OTP();
             $this->Edit(['token' => $this->HashedOTP($otp)], "`$this->identify_table_id_col_name` = ?", [$admin_id]);
-            CronEmailRecord::obj()->RecordConfirmCode(0, $email, $otp, $name);
+            CronEmailAdminRecord::obj()->RecordConfirmCode(0, $email, $otp, $name);
         }
     }
 

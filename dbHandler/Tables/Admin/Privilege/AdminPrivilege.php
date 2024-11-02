@@ -18,6 +18,7 @@ use Maatify\Functions\GeneralFunctions;
 use Maatify\Json\Json;
 use Maatify\Portal\Admin\Admin;
 use Maatify\Portal\Admin\AdminLoginToken;
+use Maatify\Portal\Admin\AdminPortal;
 use Maatify\Portal\DbHandler\AddRemoveTwoColsHandler;
 use Maatify\Portal\Privileges\PrivilegeMethods;
 use Maatify\Portal\Privileges\PrivilegeRoles;
@@ -200,6 +201,20 @@ abstract class AdminPrivilege extends AddRemoveTwoColsHandler
             }
         }
         return true;
+    }
+
+    public function AllUsersHavePrivileges(): void
+    {
+        $a_t = Admin::TABLE_NAME;
+        $result = $this->Rows(
+            "`$this->tableName` 
+            INNER JOIN $a_t ON `$a_t`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name`",
+            "`$this->tableName`.`$this->identify_table_id_col_name`, `$a_t`.`name`, `$a_t`.`username`",
+            "`$this->tableName`.`$this->identify_table_id_col_name` > ? 
+            GROUP BY `$this->tableName`.`$this->identify_table_id_col_name`",
+            [0]
+        );
+        Json::Success($result);
     }
 
     /** deprecated */

@@ -167,7 +167,7 @@ class AdminLoginToken extends AdminToken
         $a_telegram_table_name 
         $language_t 
         ",
-            "`$tb_admin`.*, `$tb_admin_email`.`email`, `$tb_admin_email`.`confirmed`, 
+            "`$tb_admin`.*, `$tb_admin_email`.`email`, `$tb_admin_email`.`e_confirmed`, 
             `$tb_admin_auth`.`auth`, `$tb_admin_auth`.`isAuthRequired`, $a_phone_cols, $a_telegram_cols, $language_c",
             "`$this->tableName`.`token` = ? AND `$this->tableName`.`token` <> ''",
             [self::TokenSecretKeyDecode($hashed_token)]);
@@ -237,7 +237,7 @@ class AdminLoginToken extends AdminToken
         if(isset($admin['username'])) unset($admin['username']);
         if(isset($admin['status'])) unset($admin['status']);
         if(isset($admin['lang'])) unset($admin['lang']);
-        if(isset($admin['confirmed'])) $admin['confirmed'] = (bool) $admin['confirmed'];
+        if(isset($admin['e_confirmed'])) $admin['e_confirmed'] = (bool) $admin['e_confirmed'];
         if(isset($admin['isAuthRequired'])) unset($admin['isAuthRequired']);
         if(isset($admin['auth'])) unset($admin['auth']);
         $admin['languages'] = LanguagePortal::obj()->IdNameCode();

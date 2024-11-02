@@ -15,7 +15,7 @@ namespace Maatify\Portal\Admin\Email;
 
 use App\Assist\Encryptions\ConfirmEmailEncryption;
 use App\Assist\Jwt\JWTAssistance;
-use Maatify\CronEmail\CronEmailRecord;
+use Maatify\CronEmail\CronEmailAdminRecord;
 use Maatify\Json\Json;
 use Maatify\Portal\Admin\AdminFailedLogin;
 use Maatify\Portal\Admin\AdminLoginToken;
@@ -134,11 +134,11 @@ class AdminEmailPortal extends AdminEmail
         $admin_id = AdminLoginToken::obj()->GetAdminID();
         $username = AdminLoginToken::obj()->GetAdminUsername();
         if($row = $this->RowThisTable('*', "`$this->identify_table_id_col_name` = ? ", [$admin_id])){
-            if($row['confirmed']){
+            if($row['e_confirmed']){
                 Json::EmailAlreadyVerified($this->class_name . __LINE__);
             }else{
                 if(!empty($row['token']) && $code == $this->ConfirmCodeDecode($row['token'])){
-                    $this->Edit(['confirmed'=> 1, 'token' => ''],"`$this->identify_table_id_col_name` = ?", [$admin_id]);
+                    $this->Edit(['e_confirmed'=> 1, 'token' => ''],"`$this->identify_table_id_col_name` = ?", [$admin_id]);
                     AdminFailedLogin::obj()->Success($username);
                 }else{
                     AdminFailedLogin::obj()->Failed($username);
@@ -161,7 +161,7 @@ class AdminEmailPortal extends AdminEmail
         $username = AdminLoginToken::obj()->GetAdminUsername();
         $email = AdminLoginToken::obj()->GetAdminEmail();
         if($admin = $this->RowThisTable('*', "`$this->identify_table_id_col_name` = ?", [$admin_id])) {
-            if(empty($admin['confirmed'])) {
+            if(empty($admin['e_confirmed'])) {
                 $this->RenewTokenAndSendEmail($admin_id, $username, $name, $email);
             }else{
                 Json::EmailAlreadyVerified($this->class_name . __LINE__);
@@ -171,7 +171,7 @@ class AdminEmailPortal extends AdminEmail
 
     private function Set(int $admin_id, string $email, string $name, string $username): void
     {
-        if($this->Edit(['email'=>$email, 'confirmed'=>0], "`$this->identify_table_id_col_name` = ?", [$admin_id])){
+        if($this->Edit(['email'=>$email, 'e_confirmed'=>0], "`$this->identify_table_id_col_name` = ?", [$admin_id])){
             $this->RenewTokenAndSendEmail($admin_id, $username, $name, $email);
         }
     }
@@ -181,6 +181,6 @@ class AdminEmailPortal extends AdminEmail
         $otp = $this->OTP();
         $this->Edit(['token' => $this->HashedOTP($otp)], "`$this->identify_table_id_col_name` = ?", [$admin_id]);
         JWTAssistance::obj()->TokenConfirmMail($admin_id, $username);
-        CronEmailRecord::obj()->RecordConfirmCode(0, $email, $otp, $name);
+        CronEmailAdminRecord::obj()->RecordConfirmCode(0, $email, $otp, $name);
     }
 }

@@ -30,6 +30,7 @@ use Maatify\Portal\Admin\TelegramBot\AlertAdminTelegramBot;
 use Maatify\Portal\Admin\TwoFactorAuthenticator\AdminTwoFactorAuthenticator;
 use Maatify\Portal\DbHandler\ParentClassHandler;
 use Maatify\Portal\Language\DbLanguage;
+use Maatify\Portal\Language\LanguagePortal;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;
 
@@ -90,7 +91,7 @@ class AdminPortal extends ParentClassHandler
 
                     AdminPrivilegeHandler::obj()->storePrivileges($admin[$this->identify_table_id_col_name], $admin['is_admin']);
 
-                    if (! empty($admin['confirmed']) || empty($_ENV['EMAIL_CONFIRM_REQUIRED'])) {
+                    if (! empty($admin['e_confirmed']) || empty($_ENV['EMAIL_CONFIRM_REQUIRED'])) {
                         if (!empty($_ENV['AUTH_2FA_STATUS'])) {
                             if (!empty($_ENV['AUTH_2FA_REQUIRED']) || AdminPrivilegeHandler::obj()->IsMaster($admin[$this->identify_table_id_col_name]) || $admin['is_admin'] || $admin['isAuthRequired']) {
                                 try {
@@ -160,7 +161,7 @@ class AdminPortal extends ParentClassHandler
         $telegram_t 
         $language_t ",
             "`$this->tableName`.*, 
-            `$tb_email`.`email`, `$tb_email`.`confirmed`, 
+            `$tb_email`.`email`, `$tb_email`.`e_confirmed`, 
             `$tb_admin_auth`.`auth`, `$tb_admin_auth`.`isAuthRequired`, $telegram_c, $language_c",
             "LCASE(`$this->tableName`.`username`) = ? LIMIT 1 ",
             [strtolower($username)]);
@@ -196,6 +197,11 @@ class AdminPortal extends ParentClassHandler
             ['status', ValidatorConstantsTypes::Bool, ValidatorConstantsValidators::Optional],
             [$this->language_col_name, ValidatorConstantsTypes::Int, ValidatorConstantsValidators::Optional],
         ];
+        if(empty($_POST[$this->language_col_name])){
+            $_POST[$this->language_col_name] = 1;
+        }else{
+            LanguagePortal::obj()->ValidatePostedTableId();
+        }
         $this->row_id = $this->SilentRecord();
         if (! empty($this->row_id)) {
             $to_add = [$this->identify_table_id_col_name => $this->row_id];
@@ -265,7 +271,7 @@ class AdminPortal extends ParentClassHandler
             [AdminLoginToken::obj()->GetAdminID()]));
     }
 
-    private function UsersTbsCols(): array
+/*    private function UsersTbsCols(): array
     {
         $tb_admin_emails = AdminEmail::TABLE_NAME;
         $tb_admin_auth = AdminTwoFactorAuthenticator::TABLE_NAME;
@@ -273,17 +279,41 @@ class AdminPortal extends ParentClassHandler
         [$t_t, $t_c] = AdminTelegramBot::obj()->LeftJoinThisTableWithTableAlias($this->tableName);
         [$language_t, $language_c] = DbLanguage::obj()->InnerJoinThisTableWithUniqueColsWithTableAlias($this->tableName, ['short_name' => 0]);
 
-        return ["`$this->tableName` 
-            INNER JOIN `$tb_admin_emails` ON `$tb_admin_emails`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
-            INNER JOIN `$tb_admin_auth` ON `$tb_admin_auth`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name`  
-            $p_t 
-            $t_t 
+        return ["`$this->tableName`
+            INNER JOIN `$tb_admin_emails` ON `$tb_admin_emails`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name`
+            INNER JOIN `$tb_admin_auth` ON `$tb_admin_auth`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name`
+            $p_t
+            $t_t
             $language_t ",
-                "`$this->tableName`.*, `$tb_admin_emails`.`email`, `$tb_admin_emails`.`confirmed`,  
+                "`$this->tableName`.*, `$tb_admin_emails`.`email`, `$tb_admin_emails`.`e_confirmed`,
             IF(`$tb_admin_auth`.`auth` = '', 0, 1) as auth,
             `$tb_admin_auth`.`isAuthRequired`, $p_c, $t_c, $language_c"];
-    }
+    }*/
 
+    private function UsersTbsCols(): array
+    {
+        $tb_admin_emails = AdminEmail::TABLE_NAME;
+        //        $tb_admin_auth = AdminTwoFactorAuthenticator::TABLE_NAME;
+                [$p_t, $p_c] = AdminPhone::obj()->InnerJoinThisTableWithUniqueCols($this->tableName, ['phone' => 0]);
+        //        [$t_t, $t_c] = AdminTelegramBot::obj()->LeftJoinThisTableWithTableAlias($this->tableName);
+        //        [$language_t, $language_c] = DbLanguage::obj()->InnerJoinThisTableWithUniqueColsWithTableAlias($this->tableName, ['short_name' => 0]);
+
+        return ["`$this->tableName` 
+            INNER JOIN `$tb_admin_emails` ON `$tb_admin_emails`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name` 
+            $p_t "
+
+                //            . "INNER JOIN `$tb_admin_auth` ON `$tb_admin_auth`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name`
+                //            $p_t
+                //            $t_t
+                //            $language_t "
+                ,
+                "`$this->tableName`.*, `$tb_admin_emails`.`email`, `$tb_admin_emails`.`e_confirmed`, 
+                $p_c"
+                //                . ",
+                //            IF(`$tb_admin_auth`.`auth` = '', 0, 1) as auth,
+                //            `$tb_admin_auth`.`isAuthRequired`, $p_c, $t_c, $language_c"
+        ];
+    }
     public function AllUsers(): void
     {
         [$tables, $columns] = $this->UsersTbsCols();

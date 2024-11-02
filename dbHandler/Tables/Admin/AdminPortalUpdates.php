@@ -15,6 +15,12 @@ namespace Maatify\Portal\Admin;
 
 use App\DB\Tables\PortalCacheRedis;
 use Maatify\Json\Json;
+use Maatify\Portal\Admin\Email\AdminEmail;
+use Maatify\Portal\Admin\Phone\AdminPhone;
+use Maatify\Portal\Admin\TelegramBot\AdminTelegramBot;
+use Maatify\Portal\Admin\TwoFactorAuthenticator\AdminTwoFactorAuthenticator;
+use Maatify\Portal\Language\DbLanguage;
+use Maatify\Portal\Language\LanguagePortal;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;
 
@@ -31,7 +37,7 @@ class AdminPortalUpdates extends AdminPortal
         return self::$instance;
     }
 
-    public function UserInfo(): void
+/*    public function UserInfo(): void
     {
         $this->ValidatePostedTableId();
         $this->logger_sub_type = 'Info';
@@ -40,6 +46,40 @@ class AdminPortalUpdates extends AdminPortal
 
         $this->Logger($log, [], 'ViewUserInfo');
         Json::Success($this->current_row);
+    }*/
+
+    public function UserInfo(): void
+    {
+        $this->ValidatePostedTableId();
+
+        $tb_admin_emails = AdminEmail::TABLE_NAME;
+        $tb_admin_auth = AdminTwoFactorAuthenticator::TABLE_NAME;
+        [$p_t, $p_c] = AdminPhone::obj()->InnerJoinThisTableWithUniqueCols($this->tableName, ['phone' => 0]);
+        [$t_t, $t_c] = AdminTelegramBot::obj()->LeftJoinThisTableWithTableAlias($this->tableName);
+        [$language_t, $language_c] = DbLanguage::obj()->InnerJoinThisTableWithUniqueColsWithTableAlias($this->tableName, ['short_name' => 0]);
+
+        $admin = $this->Row(
+            "`$this->tableName`
+            INNER JOIN `$tb_admin_emails` ON `$tb_admin_emails`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name`
+            INNER JOIN `$tb_admin_auth` ON `$tb_admin_auth`.`$this->identify_table_id_col_name` = `$this->tableName`.`$this->identify_table_id_col_name`
+            $p_t
+            $t_t
+            $language_t ",
+            "`$this->tableName`.*, `$tb_admin_emails`.`email`, `$tb_admin_emails`.`e_confirmed`,
+            IF(`$tb_admin_auth`.`auth` = '', 0, 1) as auth,
+            `$tb_admin_auth`.`isAuthRequired`, $p_c, $t_c, $language_c",
+
+            "`$this->tableName`.`$this->identify_table_id_col_name` = ? ",
+            [$this->row_id]
+
+        );
+
+        $this->logger_sub_type = 'Info';
+        $this->logger_keys = [$this->identify_table_id_col_name => $this->row_id];
+        $log = $this->logger_keys;
+
+        $this->Logger($log, [], 'ViewUserInfo');
+        Json::Success($admin);
     }
 
     public function Update(): void
@@ -56,7 +96,16 @@ class AdminPortalUpdates extends AdminPortal
                 ValidatorConstantsTypes::Name,
                 ValidatorConstantsValidators::Optional
             ],
+            [
+                $this->language_col_name,
+                ValidatorConstantsTypes::Int,
+                ValidatorConstantsValidators::Optional
+            ],
         ];
+        $this->ValidatePostedTableId();
+        if(!empty($_POST[$this->language_col_name]) && $_POST[$this->language_col_name] != $this->current_row[$this->language_col_name]) {
+            LanguagePortal::obj()->ValidatePostedTableId();
+        }
         $this->UpdateByPostedIdSilent();
         PortalCacheRedis::obj()->UsersListDelete();
         Json::Success(line: $this->class_name . __LINE__);

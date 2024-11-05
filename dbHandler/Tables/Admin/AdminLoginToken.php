@@ -192,7 +192,7 @@ class AdminLoginToken extends AdminToken
             $this->telegram_status = $admin['telegram_status'];
             $this->telegram_status_auth = $admin['telegram_status_auth'];
             $this->telegram_is_locked = $admin['telegram_is_locked'];
-            $this->telegram_chat_id = $admin['telegram_chat_id'];
+            $this->telegram_chat_id = (int)$admin['telegram_chat_id'];
         }
         return $admin;
     }

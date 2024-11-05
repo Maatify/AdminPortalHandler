@@ -15,6 +15,7 @@
 namespace Maatify\Portal\Admin;
 
 use Maatify\Portal\DbHandler\ParentClassHandler;
+use Maatify\Portal\Language\DbLanguage;
 
 class Admin extends ParentClassHandler
 {
@@ -55,5 +56,11 @@ class Admin extends ParentClassHandler
         $this->row_id = $this->ValidatePostedTableId();
 
         return $this->row_id;
+    }
+
+    public function getLanguageOfAdminId(int $admin_id): string
+    {
+        [$language_t, $language_c] = DbLanguage::obj()->InnerJoinThisTableWithUniqueColsWithTableAlias($this->tableName, ['short_name' => 0]);
+        return $this->Col("`$this->tableName` $language_t", $language_c, "`$this->tableName`.`$this->identify_table_id_col_name` = ?", [$admin_id]);
     }
 }

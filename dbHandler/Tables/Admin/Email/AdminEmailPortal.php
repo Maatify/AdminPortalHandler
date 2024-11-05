@@ -181,6 +181,6 @@ class AdminEmailPortal extends AdminEmail
         $otp = $this->OTP();
         $this->Edit(['token' => $this->HashedOTP($otp)], "`$this->identify_table_id_col_name` = ?", [$admin_id]);
         JWTAssistance::obj()->TokenConfirmMail($admin_id, $username);
-        CronEmailAdminRecord::obj()->RecordConfirmCode(0, $email, $otp, $name);
+        CronEmailAdminRecord::obj()->RecordConfirmCode($admin_id, $email, $otp, $name);
     }
 }

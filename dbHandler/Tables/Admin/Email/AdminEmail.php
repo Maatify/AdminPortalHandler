@@ -60,7 +60,7 @@ class AdminEmail extends ParentClassHandler
         if($this->Edit(['email'=>$email, 'e_confirmed'=>0], "`$this->identify_table_id_col_name` = ?", [$admin_id])){
             $otp = $this->OTP();
             $this->Edit(['token' => $this->HashedOTP($otp)], "`$this->identify_table_id_col_name` = ?", [$admin_id]);
-            CronEmailAdminRecord::obj()->RecordConfirmCode(0, $email, $otp, $name);
+            CronEmailAdminRecord::obj()->RecordConfirmCode($admin_id, $email, $otp, $name);
         }
     }
 

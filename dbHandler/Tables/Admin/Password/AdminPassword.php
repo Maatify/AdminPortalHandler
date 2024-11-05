@@ -54,7 +54,7 @@ class AdminPassword extends ParentClassHandler
         $this->Edit(['password'=>$this->HashPassword($otp), 'is_temp'=>1], "`$this->identify_table_id_col_name` = ?", [$admin_id]);
         if(!empty($email)) {
             //            Mailer::obj()->TempPassword($name, $email, $otp);
-            CronEmailAdminRecord::obj()->RecordTempPassword(0, $email, $otp, $name);
+            CronEmailAdminRecord::obj()->RecordTempPassword($admin_id, $email, $otp, $name);
             if(!empty($_ENV['IS_SMS_ACTIVATE'])){
                 CronSmsAdminRecord::obj()->RecordPassword(0, $phone, $otp);
             }

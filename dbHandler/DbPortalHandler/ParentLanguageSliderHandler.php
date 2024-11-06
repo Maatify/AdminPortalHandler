@@ -49,11 +49,11 @@ abstract class ParentLanguageSliderHandler extends DbPortalHandler
             ->ImageUpload($this->row_id,
                 $this->identify_table_id_col_name . '-' . $this->language_short_name,
                 $this->current_row['image']);
-        if (! empty($file['image'])) {
+        if (! empty($file['file'])) {
             $old_file = ! empty($file['deleted']) ? AppFunctions::SiteImageURL() . $file['deleted'] : '';
-            $new_file = AppFunctions::SiteImageURL() . $this->image_folder . '/' . $file['image'];
+            $new_file = AppFunctions::SiteImageURL() . $this->image_folder . '/' . $file['file'];
             $this->Edit([
-                'image' => $this->image_folder . '/' . $file['image'],
+                'image' => $this->image_folder . '/' . $file['file'],
             ], "`$this->identify_table_id_col_name` = ? ", [$this->row_id]);
             $log = $this->logger_keys = [
                 'language'                                            => $this->language_short_name,

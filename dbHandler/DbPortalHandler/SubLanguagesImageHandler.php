@@ -43,9 +43,9 @@ abstract class SubLanguagesImageHandler extends SubClassLanguageHandler
         $file =
             UploaderWebPPortalHandler::obj($this->image_folder)
                 ->ImageUpload($this->row_id, $this->language_short_name . '-' . $parent_row['slug'], $this->current_row['image']);
-        if (! empty($file['image'])) {
+        if (! empty($file['file'])) {
             $old_file = ! empty($file['deleted']) ? AppFunctions::SiteImageURL() . $file['deleted'] : 'NA';
-            $new_file = AppFunctions::SiteImageURL() . $this->image_folder . '/' . $file['image'];
+            $new_file = AppFunctions::SiteImageURL() . $this->image_folder . '/' . $file['file'];
             $log = $this->logger_keys =
                 [
                     'language'                             => $this->language_short_name,
@@ -57,7 +57,7 @@ abstract class SubLanguagesImageHandler extends SubClassLanguageHandler
 
             $this->Edit(
                 [
-                    'image' => $this->image_folder . '/' . $file['image'],
+                    'image' => $this->image_folder . '/' . $file['file'],
                 ],
                 "`$this->identify_table_id_col_name` = ? AND `" . DbLanguage::IDENTIFY_TABLE_ID_COL_NAME . "` = ? ",
                 [$this->row_id, $this->language_id]
@@ -79,9 +79,9 @@ abstract class SubLanguagesImageHandler extends SubClassLanguageHandler
         $file =
             UploaderWebPPortalHandler::obj($this->image_folder)
                 ->ImageTypeUpload($this->language_short_name, $this->row_id, $parent_row['slug'], $this->current_row);
-        if (! empty($file['image'])) {
+        if (! empty($file['file'])) {
             $old_file = ! empty($file['deleted']) ? AppFunctions::SiteImageURL() . $file['deleted'] : 'NA';
-            $new_file = AppFunctions::SiteImageURL() . $this->image_folder . '/' . $file['image'];
+            $new_file = AppFunctions::SiteImageURL() . $this->image_folder . '/' . $file['file'];
             $type = UploaderWebPPortalHandler::obj($this->image_folder)->GetType() . '_image';
 
             $log = $this->logger_keys =
@@ -95,7 +95,7 @@ abstract class SubLanguagesImageHandler extends SubClassLanguageHandler
 
             $this->Edit(
                 [
-                    $type => $this->image_folder . '/' . $file['image'],
+                    $type => $this->image_folder . '/' . $file['file'],
                 ],
                 "`$this->identify_table_id_col_name` = ? AND `" . DbLanguage::IDENTIFY_TABLE_ID_COL_NAME . "` = ? ",
                 [$this->row_id, $this->language_id]

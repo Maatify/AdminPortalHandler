@@ -151,10 +151,10 @@ class LanguagePortal extends DbLanguage
     {
         $this->row_id = $this->ValidatePostedTableId();
         $file = UploaderWebPPortalHandler::obj($this->image_folder)->IconUpload($this->row_id, $this->current_row['short_name'], $this->current_row['image']);
-        if (! empty($file['image'])) {
+        if (! empty($file['file'])) {
             $log = $this->logger_keys = [self::IDENTIFY_TABLE_ID_COL_NAME => $this->row_id];
             $old_file = ! empty($file['deleted']) ? AppFunctions::SiteImageURL() . $file['deleted'] : '';
-            $new_file = AppFunctions::SiteImageURL() . $this->image_folder . '/' . $file['image'];
+            $new_file = AppFunctions::SiteImageURL() . $this->image_folder . '/' . $file['file'];
             $log['image'] = ['from' => $old_file, 'to' => $new_file];
             $changes[] = [
                 'image',
@@ -162,7 +162,7 @@ class LanguagePortal extends DbLanguage
                 $new_file,
             ];
             $this->Edit([
-                'image' => $this->image_folder . '/' . $file['image'],
+                'image' => $this->image_folder . '/' . $file['file'],
             ], '`language_id` = ? ', [$this->row_id]);
 //            Logger::RecordLog($changes);
             $this->Logger($log, $changes, 'UploadImage');

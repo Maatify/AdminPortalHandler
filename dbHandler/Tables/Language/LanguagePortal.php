@@ -162,7 +162,7 @@ class LanguagePortal extends DbLanguage
                 $new_file,
             ];
             $this->Edit([
-                'image' => $this->image_folder . '/' . $file['file'],
+                'image' => /*$this->image_folder . '/' .*/ $file['file'],
             ], '`language_id` = ? ', [$this->row_id]);
 //            Logger::RecordLog($changes);
             $this->Logger($log, $changes, 'UploadImage');

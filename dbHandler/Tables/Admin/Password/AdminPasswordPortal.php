@@ -50,7 +50,7 @@ class AdminPasswordPortal extends AdminPassword
                 if(!empty($user['telegram_status'])){
                     AlertAdminTelegramBot::obj()->alertMessageOfAgent(
                         $this->row_id,
-                        $user['telegram_chat_id'],
+                        (int)$user['telegram_chat_id'],
                         'Your Password was Changed Successfully'
                     );
                 }
@@ -71,7 +71,7 @@ class AdminPasswordPortal extends AdminPassword
         $user = AdminPortal::obj()->UserForEdit($this->row_id);
         $otp = AdminPassword::obj()->SetTemp($this->row_id, $user['name'], $user['email'], $user['phone']);
         if(!empty($user['telegram_status']) && !empty($user['telegram_chat_id'])){
-            AlertAdminTelegramBot::obj()->alertTempPassword($this->row_id, $user['telegram_chat_id'], $otp);
+            AlertAdminTelegramBot::obj()->alertTempPassword($this->row_id, (int)$user['telegram_chat_id'], $otp);
         }
         $this->logger_keys = [$this->identify_table_id_col_name => $this->row_id];
         $log = $this->logger_keys;

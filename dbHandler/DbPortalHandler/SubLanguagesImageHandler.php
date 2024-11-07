@@ -45,7 +45,7 @@ abstract class SubLanguagesImageHandler extends SubClassLanguageHandler
                 ->ImageUpload($this->row_id, $this->language_short_name . '-' . $parent_row['slug'], $this->current_row['image']);
         if (! empty($file['file'])) {
             $old_file = ! empty($file['deleted']) ? AppFunctions::SiteImageURL() . $file['deleted'] : 'NA';
-            $new_file = AppFunctions::SiteImageURL() . $this->image_folder . '/' . $file['file'];
+            $new_file = AppFunctions::SiteImageURL() . /*$this->image_folder . '/' . */$file['file'];
             $log = $this->logger_keys =
                 [
                     'language'                             => $this->language_short_name,

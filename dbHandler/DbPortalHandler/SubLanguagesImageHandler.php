@@ -57,7 +57,7 @@ abstract class SubLanguagesImageHandler extends SubClassLanguageHandler
 
             $this->Edit(
                 [
-                    'image' => $this->image_folder . '/' . $file['file'],
+                    'image' => /*$this->image_folder . '/' .*/ $file['file'],
                 ],
                 "`$this->identify_table_id_col_name` = ? AND `" . DbLanguage::IDENTIFY_TABLE_ID_COL_NAME . "` = ? ",
                 [$this->row_id, $this->language_id]
@@ -81,7 +81,7 @@ abstract class SubLanguagesImageHandler extends SubClassLanguageHandler
                 ->ImageTypeUpload($this->language_short_name, $this->row_id, $parent_row['slug'], $this->current_row);
         if (! empty($file['file'])) {
             $old_file = ! empty($file['deleted']) ? AppFunctions::SiteImageURL() . $file['deleted'] : 'NA';
-            $new_file = AppFunctions::SiteImageURL() . $this->image_folder . '/' . $file['file'];
+            $new_file = AppFunctions::SiteImageURL() . /*$this->image_folder . '/' .*/ $file['file'];
             $type = UploaderWebPPortalHandler::obj($this->image_folder)->GetType() . '_image';
 
             $log = $this->logger_keys =
@@ -95,7 +95,7 @@ abstract class SubLanguagesImageHandler extends SubClassLanguageHandler
 
             $this->Edit(
                 [
-                    $type => $this->image_folder . '/' . $file['file'],
+                    $type => /*$this->image_folder . '/' .*/ $file['file'],
                 ],
                 "`$this->identify_table_id_col_name` = ? AND `" . DbLanguage::IDENTIFY_TABLE_ID_COL_NAME . "` = ? ",
                 [$this->row_id, $this->language_id]

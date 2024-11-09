@@ -49,6 +49,14 @@ class AdminTwoFactorAuthenticator extends ParentClassHandler
         Json::Success([$this->AuthDecode($admin['auth'])]);
     }
 
+    public function getAuthCode(array $admin): string
+    {
+        if(!empty($admin['auth'])) {
+            return $this->AuthDecode($admin['auth']);
+        }
+        return $admin['auth'];
+    }
+
     public function ResponseAuthMov(array $admin): void
     {
         if (! empty($admin['auth'])) {

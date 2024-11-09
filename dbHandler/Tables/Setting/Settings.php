@@ -130,4 +130,27 @@ class Settings extends DbPortalHandler
         return $this->telegram_customer_authorization;
     }
 
+    public function getKeysAsArray(array $keys_to_select):array
+    {
+        // Define the keys you are interested in
+//        $keys_to_select = ['maintenance_mode', 'game_categories_min', 'game_categories_max'];
+
+        // Create placeholders for the prepared statement
+        $placeholders = implode(',', array_fill(0, count($keys_to_select), '?'));
+
+        $result = $this->RowsThisTable('`default_key`, `default_value`', " `default_key` IN ($placeholders)", [$keys_to_select]);
+
+        // Initialize the result array
+        $final_result = [];
+
+        if($result) {
+
+            // Fetch the results and build the associative array
+            foreach ($result as $key => $value) {
+                $final_result[$key] = $keys_to_select[$value];
+            }
+        }
+        return $final_result;
+    }
+
 }

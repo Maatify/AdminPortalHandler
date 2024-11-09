@@ -104,7 +104,13 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
     public function setMyAuthSecret(): void
     {
         $secret = $this->postValidator->Require('secret', 'digital_upper_letters');
-        $this->NewAuthRecord(AdminLoginToken::obj()->GetAdminID(),
+        $this->SetAuth(AdminLoginToken::obj()->GetAdminID(),
+            $secret);
+    }
+
+    public function SetAuth(int $admin_id, string $secret): void
+    {
+        $this->NewAuthRecord($admin_id,
             $secret);
         Json::Success();
     }

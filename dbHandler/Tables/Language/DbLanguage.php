@@ -91,4 +91,11 @@ class DbLanguage extends DbPortalHandler
 
         return '';
     }
+
+    public function activeListToSelect(): array
+    {
+        return $this->RowsThisTable(
+            "`$this->identify_table_id_col_name`, `name`, `short_name`, `image`", "`status` = ? ORDER BY `sort` DESC", [1]
+        );
+    }
 }

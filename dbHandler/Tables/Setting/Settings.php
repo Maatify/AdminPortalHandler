@@ -146,9 +146,7 @@ class Settings extends DbPortalHandler
         if($result) {
             foreach ($result as $row) {
                 // Fetch the results and build the associative array
-                foreach ($row as $key => $value) {
-                    $final_result[$key] = $keys_to_select[$value];
-                }
+                $final_result[$row['default_key']] = $row['default_value'];
             }
         }
 

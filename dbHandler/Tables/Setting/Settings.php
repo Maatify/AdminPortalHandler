@@ -138,7 +138,7 @@ class Settings extends DbPortalHandler
         // Create placeholders for the prepared statement
         $placeholders = implode(',', array_fill(0, count($keys_to_select), '?'));
 
-        $result = $this->RowsThisTable('`default_key`, `default_value`', " `default_key` IN ($placeholders)", [$keys_to_select]);
+        $result = $this->RowsThisTable('`default_key`, `default_value`', " `default_key` IN ($placeholders)", $keys_to_select);
 
         // Initialize the result array
         $final_result = [];

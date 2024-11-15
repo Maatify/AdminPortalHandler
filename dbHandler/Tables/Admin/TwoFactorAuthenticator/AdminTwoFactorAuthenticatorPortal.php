@@ -43,7 +43,7 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
             if(!empty($_ENV['IS_TELEGRAM_ACTIVATE']) && !empty($admin['telegram_status'])) {
                 AlertAdminTelegramBot::obj()->alertMessageOfAgent(
                     $admin[$this->identify_table_id_col_name],
-                    $admin['telegram_chat_id'],
+                    (int) $admin['telegram_chat_id'],
                     'Your Two-Factor-Authenticator Code was removed from your account, please login to register new code'
                 );
             }
@@ -86,7 +86,7 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
                     if (! empty($admin['telegram_status'])) {
                         AlertAdminTelegramBot::obj()->alertMessageOfAgent(
                             $admin[$this->identify_table_id_col_name],
-                            $admin['telegram_chat_id'],
+                            (int) $admin['telegram_chat_id'],
                             'You Have Success Login with Telegram-Authenticator'
                         );
                     }
@@ -137,7 +137,7 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
         if(!empty($_ENV['IS_TELEGRAM_ACTIVATE']) && !empty($admin['telegram_status'])) {
             AlertAdminTelegramBot::obj()->alertMessageOfAgent(
                 $admin[$this->identify_table_id_col_name],
-                $admin['telegram_chat_id'],
+                (int) $admin['telegram_chat_id'],
                 'You Have Success Register of Two-Factor-Authenticator'
             );
         }

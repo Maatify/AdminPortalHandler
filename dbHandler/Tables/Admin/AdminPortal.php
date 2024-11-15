@@ -83,6 +83,7 @@ class AdminPortal extends ParentClassHandler
             if (AdminPassword::obj()->Check($admin[$this->identify_table_id_col_name], $password)) {
                 $log = [$this->identify_table_id_col_name];
                 $this->logger_keys = $log;
+                $admin['is_master'] = AdminPrivilegeHandler::obj()->IsMaster($admin[$this->identify_table_id_col_name]);
                 unset($admin['password']);
                 if (! empty($admin['status'])) {
                     AdminLoginToken::obj()->GenerateToken($admin[$this->identify_table_id_col_name], $admin['username']);
@@ -104,7 +105,7 @@ class AdminPortal extends ParentClassHandler
                                 if($this->telegram_bot_active && !empty($admin['telegram_status'])) {
                                     AlertAdminTelegramBot::obj()->alertLogin(
                                         $admin[$this->identify_table_id_col_name],
-                                        $admin['telegram_chat_id'],
+                                        (int) $admin['telegram_chat_id'],
                                     );
                                 }
                                 $this->AdminLogger($log, [], 'Login');
@@ -116,7 +117,7 @@ class AdminPortal extends ParentClassHandler
                             if($this->telegram_bot_active && !empty($admin['telegram_status'])) {
                                 AlertAdminTelegramBot::obj()->alertLogin(
                                     $admin[$this->identify_table_id_col_name],
-                                    $admin['telegram_chat_id'],
+                                    (int) $admin['telegram_chat_id'],
                                 );
                             }
                             $log['details'] = 'Success Login';
@@ -137,7 +138,7 @@ class AdminPortal extends ParentClassHandler
                 if($this->telegram_bot_active && !empty($admin['telegram_status'])) {
                     AlertAdminTelegramBot::obj()->alertFailedLogin(
                         $admin[$this->identify_table_id_col_name],
-                        $admin['telegram_chat_id'],
+                        (int) $admin['telegram_chat_id'],
                     );
                 }
                 AdminFailedLogin::obj()->Failed($admin['username']);

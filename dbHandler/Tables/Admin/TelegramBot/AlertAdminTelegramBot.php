@@ -49,7 +49,7 @@ class AlertAdminTelegramBot extends CronTelegramBotAdminRecord
         if($this->validateTelegramActive($admin_id, $chat_id)) {
             $this->telegram_bot->RecordMessage(
                 $admin_id,
-                $chat_id,
+                (string) $chat_id,
                 'You have Successfully Login ' . $this->AddAlertDetails()
             );
         }
@@ -60,7 +60,7 @@ class AlertAdminTelegramBot extends CronTelegramBotAdminRecord
         if($this->validateTelegramActive($admin_id, $chat_id)) {
             $this->telegram_bot->RecordMessage(
                 $admin_id,
-                $chat_id,
+                (string) $chat_id,
                 'You have Failed Login ' . $this->AddAlertDetails()
             );
         }
@@ -71,7 +71,7 @@ class AlertAdminTelegramBot extends CronTelegramBotAdminRecord
         if($this->validateTelegramActive($admin_id, $chat_id)) {
             $this->telegram_bot->RecordMessage(
                 $admin_id,
-                $chat_id,
+                (string) $chat_id,
                 $message . ' ' . $this->AddAlertDetails()
             );
         }
@@ -82,7 +82,7 @@ class AlertAdminTelegramBot extends CronTelegramBotAdminRecord
         if($this->validateTelegramActive($admin_id, $chat_id)) {
             $this->telegram_bot->RecordMessage(
                 $admin_id,
-                $chat_id,
+                (string) $chat_id,
                 $message
             );
         }

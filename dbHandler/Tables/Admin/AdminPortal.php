@@ -265,11 +265,17 @@ class AdminPortal extends ParentClassHandler
     {
         [$tables, $cols] = $this->UsersTbsCols();
 
-        Json::Success($this->Row(
+        $admin = $this->Row(
             $tables,
             $cols,
             "`$this->tableName`.`$this->identify_table_id_col_name` = ? ",
-            [AdminLoginToken::obj()->GetAdminID()]));
+            [AdminLoginToken::obj()->GetAdminID()]);
+
+        if($admin){
+            $admin['is_master'] = AdminPrivilegeHandler::obj()->IsMaster($admin[$this->identify_table_id_col_name]);
+        }
+
+        Json::Success($admin);
     }
 
 /*    private function UsersTbsCols(): array

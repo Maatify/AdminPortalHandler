@@ -20,6 +20,7 @@ use Maatify\Functions\GeneralFunctions;
 use Maatify\Json\Json;
 use Maatify\Portal\Admin\Email\AdminEmail;
 use Maatify\Portal\Admin\Phone\AdminPhone;
+use Maatify\Portal\Admin\Privilege\AdminPrivilegeHandler;
 use Maatify\Portal\Admin\TelegramBot\AdminTelegramBot;
 use Maatify\Portal\Admin\TelegramBot\AdminTelegramPassPortal;
 use Maatify\Portal\Admin\TwoFactorAuthenticator\AdminTwoFactorAuthenticator;
@@ -184,6 +185,8 @@ class AdminLoginToken extends AdminToken
                 $this->admin_isMaster = 0;
                 $this->admin_isAdmin = (int)$admin['is_admin'];
             }
+
+            $admin['is_master'] = $this->admin_isMaster;
 
             $this->admin_name = $admin['name'];
             $this->admin_username = $admin['username'];

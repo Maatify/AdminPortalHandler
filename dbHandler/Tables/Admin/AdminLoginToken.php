@@ -107,12 +107,6 @@ class AdminLoginToken extends AdminToken
                     if ($admin = $this->ByToken($token->token, $this->class_name . __LINE__)) {
                         JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
 
-                        $this->row_id = $admin[$this->identify_table_id_col_name];
-                        $this->admin_isAdmin = (int)$admin['is_admin'];
-                        $this->admin_name = $admin['name'];
-                        $this->admin_username = $admin['username'];
-                        $this->admin_email = $admin['email'];
-
                         return $admin;
                     }
                 }
@@ -120,6 +114,22 @@ class AdminLoginToken extends AdminToken
             AdminFailedLogin::obj()->Failed('');
             Json::ReLogin($this->class_name .  __FUNCTION__ . '::' .__LINE__);
         }
+        return [];
+    }
+
+    public function ValidateAdminTokenBool(): array
+    {
+        if (! empty($_SESSION['token']) && $token = JWTAssistance::obj()->JwtValidation($this->class_name . __LINE__)) {
+            if (! empty($token->token)) {
+                if ($admin = $this->ByToken($token->token, $this->class_name . __LINE__)) {
+                    JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
+
+                    return $admin;
+                }
+            }
+        }
+        AdminFailedLogin::obj()->Failed('');
+
         return [];
     }
 

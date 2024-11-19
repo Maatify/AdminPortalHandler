@@ -85,7 +85,7 @@ class AdminTelegramPassPortal extends ParentClassHandler
     public function __construct()
     {
         parent::__construct();
-        if (! empty($_ENV['TELEGRAM_USERNAME'])) {
+        if (! empty($_ENV['TELEGRAM_USERNAME']) && ! empty($_ENV['TELEGRAM_API_KEY'])) {
             try {
                 $this->is_active_telegram = true;
                 $this->is_sys_active_telegram_auth = Settings::obj()->TelegramAdminAuthorization();

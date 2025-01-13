@@ -48,4 +48,21 @@ enum MaritalEnum : int
         }
         return $pairs;
     }
+
+    /**
+     * Get an array of cases with 'id' as the case value and 'value' as the case name.
+     *
+     * @return array<array<string, int|string>>
+     */
+    public static function getIdValuePairs(): array
+    {
+        $pairs = [];
+        foreach (self::cases() as $case) {
+            $pairs[] = [
+                'id' => $case->value,
+                'value' => $case->name,
+            ];
+        }
+        return $pairs;
+    }
 }

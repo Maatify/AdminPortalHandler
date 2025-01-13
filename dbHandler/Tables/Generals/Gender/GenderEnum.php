@@ -31,4 +31,18 @@ enum GenderEnum: int
     {
         return self::tryFrom($type_id);
     }
+
+    /**
+     * Get an array of cases with their ID as key and name as value.
+     *
+     * @return array<int, string>
+     */
+    public static function getIdNamePairs(): array
+    {
+        $pairs = [];
+        foreach (self::cases() as $case) {
+            $pairs[$case->value] = $case->name;
+        }
+        return $pairs;
+    }
 }

@@ -1,7 +1,7 @@
 {
   "name": "maatify/admin-portal-handler",
   "description": "maatify.com",
-  "version": "2.0.0002",
+  "version": "2.0.0003",
   "type": "library",
   "keywords": [
     "PHP",
@@ -64,7 +64,7 @@
     "maatify/queue-manager": "^1.0",
     "maatify/cron-telegram-bot": "^1.0",
     "maatify/captcha-all-in-one": "^1.0",
-    "maatify/login-with-third-party": "^1.0"
+    "maatify/login-with-third-party": "^2.0"
   },
   "config": {
     "platform": {

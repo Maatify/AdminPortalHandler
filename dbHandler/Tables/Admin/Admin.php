@@ -14,8 +14,8 @@
 
 namespace Maatify\Portal\Admin;
 
-use Maatify\Portal\DbHandler\ParentClassHandler;
-use Maatify\Portal\Language\DbLanguage;
+use Maatify\LanguagePortalHandler\DBHandler\ParentClassHandler;
+use Maatify\LanguagePortalHandler\Language\DbLanguage;
 
 class Admin extends ParentClassHandler
 {

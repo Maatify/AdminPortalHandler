@@ -13,7 +13,7 @@
 
 namespace Maatify\Portal\Admin;
 
-use Maatify\Portal\DbHandler\AddRemoveTwoColsHandler;
+use Maatify\LanguagePortalHandler\DBHandler\AddRemoveTwoColsHandler;
 use Maatify\Portal\Setting\Notification\NotificationTypesPortal;
 
 class AdminNotificationTypePortal extends AddRemoveTwoColsHandler

@@ -13,8 +13,8 @@
 
 namespace Maatify\Portal\Admin\TelegramBot;
 
+use Maatify\LanguagePortalHandler\DBHandler\ParentClassHandler;
 use Maatify\Portal\Admin\Admin;
-use Maatify\Portal\DbHandler\ParentClassHandler;
 
 class AdminTelegramPass extends ParentClassHandler
 {

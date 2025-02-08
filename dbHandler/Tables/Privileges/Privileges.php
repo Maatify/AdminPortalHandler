@@ -13,7 +13,8 @@
 
 namespace Maatify\Portal\Privileges;
 
-use Maatify\Portal\DbHandler\AddRemoveTwoColsHandler;
+
+use Maatify\LanguagePortalHandler\DBHandler\AddRemoveTwoColsHandler;
 
 class Privileges extends AddRemoveTwoColsHandler
 {

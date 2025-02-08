@@ -18,9 +18,9 @@ use App\Assist\Encryptions\AdminPasswordEncryption;
 use Maatify\CronEmail\CronEmailAdminRecord;
 use Maatify\CronSms\CronSmsAdminRecord;
 use Maatify\Json\Json;
+use Maatify\LanguagePortalHandler\DBHandler\ParentClassHandler;
 use Maatify\Portal\Admin\Admin;
 use Maatify\Portal\Admin\Privilege\AdminPrivilegeHandler;
-use Maatify\Portal\DbHandler\ParentClassHandler;
 
 class AdminPassword extends ParentClassHandler
 {

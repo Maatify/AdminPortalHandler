@@ -16,8 +16,8 @@ namespace Maatify\Portal\Admin\Email;
 use App\Assist\Encryptions\ConfirmEmailEncryption;
 use Maatify\CronEmail\CronEmailAdminRecord;
 use Maatify\Functions\GeneralFunctions;
+use Maatify\LanguagePortalHandler\DBHandler\ParentClassHandler;
 use Maatify\Portal\Admin\Admin;
-use Maatify\Portal\DbHandler\ParentClassHandler;
 
 class AdminEmail extends ParentClassHandler
 {

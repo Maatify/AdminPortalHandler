@@ -19,11 +19,11 @@ use App\Assist\Jwt\JWTAssistance;
 use Exception;
 use Maatify\GoogleAuth\GoogleAuth;
 use Maatify\Json\Json;
+use Maatify\LanguagePortalHandler\DBHandler\ParentClassHandler;
 use Maatify\Logger\Logger;
 use Maatify\Portal\Admin\Admin;
 use Maatify\Portal\Admin\AdminFailedLogin;
 use Maatify\Portal\Admin\AdminLoginToken;
-use Maatify\Portal\DbHandler\ParentClassHandler;
 
 class AdminTwoFactorAuthenticator extends ParentClassHandler
 {

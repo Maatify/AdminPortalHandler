@@ -15,12 +15,12 @@ namespace Maatify\Portal\Admin;
 
 use App\DB\Tables\PortalCacheRedis;
 use Maatify\Json\Json;
+use Maatify\LanguagePortalHandler\Language\DbLanguage;
+use Maatify\LanguagePortalHandler\Language\LanguagePortal;
 use Maatify\Portal\Admin\Email\AdminEmail;
 use Maatify\Portal\Admin\Phone\AdminPhone;
 use Maatify\Portal\Admin\TelegramBot\AdminTelegramBot;
 use Maatify\Portal\Admin\TwoFactorAuthenticator\AdminTwoFactorAuthenticator;
-use Maatify\Portal\Language\DbLanguage;
-use Maatify\Portal\Language\LanguagePortal;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 use Maatify\PostValidatorV2\ValidatorConstantsValidators;
 

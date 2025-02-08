@@ -13,7 +13,8 @@
 
 namespace Maatify\Portal\Admin;
 
-use Maatify\Portal\DbHandler\ParentClassHandler;
+
+use Maatify\LanguagePortalHandler\DBHandler\ParentClassHandler;
 
 class AdminToken extends ParentClassHandler
 {

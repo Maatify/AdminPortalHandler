@@ -13,8 +13,8 @@
 
 namespace Maatify\Portal\Privileges;
 
-use Maatify\Portal\DbHandler\SubClassLanguageHandler;
-use Maatify\Portal\Language\DbLanguage;
+use Maatify\LanguagePortalHandler\DBHandler\SubClassLanguageHandler;
+use Maatify\LanguagePortalHandler\Tables\LanguageTable;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
 
 class PrivilegeRolesName extends SubClassLanguageHandler
@@ -32,9 +32,9 @@ class PrivilegeRolesName extends SubClassLanguageHandler
     protected array $cols_to_add = [[ValidatorConstantsTypes::Name, ValidatorConstantsTypes::Name, '']];
     protected string $parent_class = PrivilegeRoles::class;
     protected array $cols = [
-        self::IDENTIFY_TABLE_ID_COL_NAME => 1,
-        DbLanguage::IDENTIFY_TABLE_ID_COL_NAME => 1,
-        'name' => 0,
+        self::IDENTIFY_TABLE_ID_COL_NAME          => 1,
+        LanguageTable::IDENTIFY_TABLE_ID_COL_NAME => 1,
+        'name'                                    => 0,
     ];
     private static self $instance;
 

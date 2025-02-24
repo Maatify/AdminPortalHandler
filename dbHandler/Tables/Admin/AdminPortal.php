@@ -17,6 +17,7 @@ use App\Assist\AppFunctions;
 use App\Assist\Jwt\JWTAssistance;
 use App\DB\Tables\PortalCacheRedis;
 use Exception;
+use JetBrains\PhpStorm\NoReturn;
 use Maatify\CaptchaV1\CaptchaManager;
 use Maatify\Json\Json;
 use Maatify\LanguagePortalHandler\DBHandler\ParentClassHandler;
@@ -68,7 +69,7 @@ class AdminPortal extends ParentClassHandler
     public function AdminLogin(): void
     {
         $this->logger_sub_type = 'Login';
-        if(!empty($_ENV['CAPTCHA_ACTIVE'])) {
+        if(!empty($_ENV['CAPTCHA_ACTIVE']) && $_SERVER['HTTP_HOST'] !== '127.0.0.1') {
             try {
                 $captcha = CaptchaManager::getInstance();
                 $captcha->jsonErrors();
@@ -258,10 +259,9 @@ class AdminPortal extends ParentClassHandler
             }
         }
 
-        return [];
     }
 
-    public function MyInfo(): void
+    #[NoReturn] public function MyInfo(): void
     {
         [$tables, $cols] = $this->UsersTbsCols();
 
@@ -321,7 +321,7 @@ class AdminPortal extends ParentClassHandler
                 //            `$tb_admin_auth`.`isAuthRequired`, $p_c, $t_c, $language_c"
         ];
     }
-    public function AllUsers(): void
+    #[NoReturn] public function AllUsers(): void
     {
         [$tables, $columns] = $this->UsersTbsCols();
         $master_id = AdminPrivilegeHandler::obj()->MasterIds();

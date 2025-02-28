@@ -31,15 +31,15 @@ class AdminLoginToken extends AdminToken
     private static self $instance;
     private string $admin_name = '';
     private string $admin_username = '';
-    private string $admin_email;
+    private string $admin_email = '';
 
     private string $admin_phone;
-    private int $admin_isAdmin;
-    private int $telegram_status;
-    private int $telegram_chat_id;
-    private int $admin_isMaster;
-    private int $telegram_status_auth;
-    private int $telegram_is_locked;
+    private int $admin_isAdmin = 0;
+    private int $telegram_status = 0;
+    private int $telegram_chat_id = 0;
+    private int $admin_isMaster = 0;
+    private int $telegram_status_auth = 0;
+    private int $telegram_is_locked = 0;
 
     public static function obj(): self
     {

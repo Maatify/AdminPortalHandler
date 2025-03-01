@@ -110,7 +110,7 @@ class AdminPortal extends ParentClassHandler
                                         (int) $admin['telegram_chat_id'],
                                     );
                                 }
-                                $this->AdminLogger($log, [], 'Login');
+                                $this->AdminLogger(current_admin_id: $admin[$this->identify_table_id_col_name], changes: $log, action: 'Login');
                                 JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
                                 AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
                                 AdminFailedLogin::obj()->Success($admin['username']);
@@ -123,7 +123,7 @@ class AdminPortal extends ParentClassHandler
                                 );
                             }
                             $log['details'] = 'Success Login';
-                            $this->AdminLogger($log, [], 'Login');
+                            $this->AdminLogger(current_admin_id: $admin[$this->identify_table_id_col_name], changes: $log, action: 'Login');
                             JWTAssistance::obj()->JwtTokenHash($admin[$this->identify_table_id_col_name], $admin['username']);
                             AdminPassword::obj()->ValidateTempPass($admin[$this->identify_table_id_col_name]);
                             AdminFailedLogin::obj()->Success($admin['username']);

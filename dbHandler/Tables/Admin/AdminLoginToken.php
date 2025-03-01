@@ -16,6 +16,7 @@ namespace Maatify\Portal\Admin;
 use App\Assist\AppFunctions;
 use App\Assist\Encryptions\AdminTokenEncryption;
 use App\Assist\Jwt\JWTAssistance;
+use JetBrains\PhpStorm\NoReturn;
 use Maatify\Functions\GeneralFunctions;
 use Maatify\Json\Json;
 use Maatify\LanguagePortalHandler\Language\DbLanguage;
@@ -92,7 +93,7 @@ class AdminLoginToken extends AdminToken
         $this->AdminLogger($log, [], 'TelegramTerminateSession');
     }
 
-    public function UserLogout(): void
+    #[NoReturn] public function UserLogout(): void
     {
         $this->LogoutSilent();
         Json::Success(line: $this->class_name . __LINE__);
@@ -144,7 +145,7 @@ class AdminLoginToken extends AdminToken
         die("<script>window.location = '" . AppFunctions::PortalUrl() . "login" . "';</script>");
     }
 
-    public function ValidateSilentAdminToken(): void
+    #[NoReturn] public function ValidateSilentAdminToken(): void
     {
         $auth_pages = ['AuthRegister', 'Auth', '', 'ChangePassword', 'EmailConfirm', 'CheckSession'];
         if(!empty($_GET['action'])) {
@@ -254,6 +255,12 @@ class AdminLoginToken extends AdminToken
         if(isset($admin['auth'])) unset($admin['auth']);
         $admin['languages'] = LanguagePortal::obj()->IdNameCode();
         return $admin;
+    }
+
+    public function setAdminID(int $admin_id): static
+    {
+        $this->row_id = $admin_id;
+        return $this;
     }
 
     public function GetAdminID(): int

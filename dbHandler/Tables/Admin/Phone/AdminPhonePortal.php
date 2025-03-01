@@ -14,6 +14,7 @@
 namespace Maatify\Portal\Admin\Phone;
 
 use App\DB\DBS\DbPortalHandler;
+use JetBrains\PhpStorm\NoReturn;
 use Maatify\Json\Json;
 use Maatify\Portal\Admin\AdminLoginToken;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
@@ -57,7 +58,7 @@ class AdminPhonePortal extends DbPortalHandler
         return $this->RowIsExistThisTable('`phone` = ? ', [$phone]);
     }
 
-    public function ChangePhone(): void
+    #[NoReturn] public function ChangePhone(): void
     {
         $phone = $this->postValidator->Require(ValidatorConstantsTypes::Phone, ValidatorConstantsTypes::Phone, $this->class_name . __LINE__);
         $old_phone = AdminLoginToken::obj()->GetAdminPhone();
@@ -71,7 +72,7 @@ class AdminPhonePortal extends DbPortalHandler
             $this->logger_keys = [$this->identify_table_id_col_name => $this->row_id];
             $log = $this->logger_keys;
             $log['change'] = 'Change Phone';
-            $this->AdminLogger($log, [['phone', $old_phone, $phone]], $_GET['action']);
+            $this->AdminLogger(current_admin_id: $this->row_id, logger_description: $log, changes: ['phone' => ['from' => $old_phone, 'to' => $phone]], action: $_GET['action']);
             $this->Set(AdminLoginToken::obj()->GetAdminID(), $phone);
             Json::Success(line: $this->class_name . __LINE__);
         }

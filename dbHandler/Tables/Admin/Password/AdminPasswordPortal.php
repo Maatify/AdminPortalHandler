@@ -13,6 +13,7 @@
 
 namespace Maatify\Portal\Admin\Password;
 
+use JetBrains\PhpStorm\NoReturn;
 use Maatify\Json\Json;
 use Maatify\Portal\Admin\AdminFailedLogin;
 use Maatify\Portal\Admin\AdminLoginToken;
@@ -32,7 +33,7 @@ class AdminPasswordPortal extends AdminPassword
         return self::$instance;
     }
 
-    public function ChangePassword(): void
+    #[NoReturn] public function ChangePassword(): void
     {
         $password = $this->postValidator->Require('password', 'password');
         $password_old = $this->postValidator->Require('old_password', 'password');
@@ -41,11 +42,9 @@ class AdminPasswordPortal extends AdminPassword
         } else {
             if ($this->Check(AdminLoginToken::obj()->GetAdminID(), $password_old)) {
                 $this->row_id = AdminLoginToken::obj()->GetAdminID();
-                $this->logger_keys = [$this->identify_table_id_col_name => $this->row_id];
-                $log = $this->logger_keys;
-                $log['change'] = 'Change Password';
-                $this->AdminLogger($log, [['password', 'encrypted', 'encrypted']], $_GET['action']);
-                $this->Set(AdminLoginToken::obj()->GetAdminID(), $password);
+
+                $this->AdminLogger(current_admin_id: $this->row_id, changes: ['password' => 'encrypted'], action: $_GET['action']);
+                $this->Set($this->row_id, $password);
 
                 if(!empty($user['telegram_status'])){
                     AlertAdminTelegramBot::obj()->alertMessageOfAgent(
@@ -65,7 +64,7 @@ class AdminPasswordPortal extends AdminPassword
 
 
 
-    public function SetUserNewPassword(): void
+    #[NoReturn] public function SetUserNewPassword(): void
     {
         $this->row_id = $this->ValidatePostedTableId();
         $user = AdminPortal::obj()->UserForEdit($this->row_id);
@@ -77,7 +76,7 @@ class AdminPasswordPortal extends AdminPassword
         $log = $this->logger_keys;
         $log['change'] = 'Generate new default password';
         $changes[] = ['password', '{{encrypted}}', 'new default password: ' . $otp];
-        $this->Logger($log, $changes, $_GET['action']);
+        $this->AdminLogger(current_admin_id: $this->row_id, logger_description: $log, changes: $changes,action: $_GET['action']);
         $user['password'] = $otp;
         Json::Success($user, line: $this->class_name . __LINE__);
     }

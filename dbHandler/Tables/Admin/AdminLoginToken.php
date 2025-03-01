@@ -64,7 +64,7 @@ class AdminLoginToken extends AdminToken
                     $log = [$this->identify_table_id_col_name=>$admin[$this->identify_table_id_col_name]];
                     $this->logger_keys = $log;
                     $log['details'] = 'Success Logout';
-                    $this->AdminLogger($log, [], 'Logout');
+                    $this->AdminLogger(current_admin_id: $admin[$this->identify_table_id_col_name], changes: $log, action: 'Logout');
                 }
             }
         }
@@ -90,7 +90,7 @@ class AdminLoginToken extends AdminToken
         $log = [$this->identify_table_id_col_name=$admin_id];
         $this->logger_keys = $log;
         $log['details'] = 'Success Terminate Session Using Telegram';
-        $this->AdminLogger($log, [], 'TelegramTerminateSession');
+        $this->AdminLogger(current_admin_id: $admin_id, changes: $log, action: 'TelegramTerminateSession');
     }
 
     #[NoReturn] public function UserLogout(): void

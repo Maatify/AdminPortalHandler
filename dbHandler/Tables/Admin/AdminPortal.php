@@ -23,6 +23,7 @@ use Maatify\Json\Json;
 use Maatify\LanguagePortalHandler\DBHandler\ParentClassHandler;
 use Maatify\LanguagePortalHandler\Language\DbLanguage;
 use Maatify\LanguagePortalHandler\Language\LanguagePortal;
+use Maatify\Logger\Logger;
 use Maatify\Portal\Admin\Email\AdminEmail;
 use Maatify\Portal\Admin\Password\AdminPassword;
 use Maatify\Portal\Admin\Phone\AdminPhone;
@@ -100,6 +101,7 @@ class AdminPortal extends ParentClassHandler
                                 try {
                                     AdminTwoFactorAuthenticator::obj()->ResponseAuthMov($admin);
                                 } catch (Exception $e) {
+                                    Logger::RecordLog($e, 'admin_2fa_exception');
                                     Json::TryAgain($this->class_name . __LINE__);
                                 }
                             } else {

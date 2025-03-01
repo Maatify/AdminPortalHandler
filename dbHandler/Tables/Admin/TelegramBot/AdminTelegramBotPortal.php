@@ -15,6 +15,8 @@ namespace Maatify\Portal\Admin\TelegramBot;
 
 use App\Assist\AppFunctions;
 use App\Assist\Encryptions\EnvEncryption;
+use Exception;
+use JetBrains\PhpStorm\NoReturn;
 use Maatify\Functions\GeneralFunctions;
 use Maatify\Json\Json;
 use Maatify\LanguagePortalHandler\DBHandler\ParentClassHandler;
@@ -92,7 +94,7 @@ class AdminTelegramBotPortal extends ParentClassHandler
         return self::$instance;
     }
 
-    public function recordChatByPostedAdmin(): void
+    #[NoReturn] public function recordChatByPostedAdmin(): void
     {
         $admin_id = $this->postValidator->Require('user_id', ValidatorConstantsTypes::Int, $this->class_name . __LINE__);
         $chat_id = $this->postValidator->Require('chat_id', ValidatorConstantsTypes::Int, $this->class_name . __LINE__);
@@ -270,7 +272,7 @@ class AdminTelegramBotPortal extends ParentClassHandler
                         $sender->sendMessage($chat['chat_id'], $message);
                     }
                 }
-                catch (\Exception $exception) {
+                catch (Exception $exception) {
                     Logger::RecordLog($exception, 'admin_telegram_message');
                 }
             }
@@ -293,7 +295,7 @@ class AdminTelegramBotPortal extends ParentClassHandler
         return $this->RowThisTable('*', "`$this->identify_table_id_col_name` = ?", [$admin_id]);
     }
 
-    public function AllPaginationThisTableFilter(string $order_with_asc_desc = ''): void
+    #[NoReturn] public function AllPaginationThisTableFilter(string $order_with_asc_desc = ''): void
     {
         [$tables, $cols] = $this->HandleThisTableJoins();
         $list = $this->ArrayPaginationThisTableFilter($tables, $cols, order_with_asc_desc: $order_with_asc_desc);

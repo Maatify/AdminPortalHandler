@@ -17,7 +17,6 @@ use Maatify\LanguagePortalHandler\DBHandler\ParentClassHandler;
 
 class AdminInfo extends ParentClassHandler
 {
-
     const TABLE_NAME = 'a_info';
     protected string $tableName = self::TABLE_NAME;
     const IDENTIFY_TABLE_ID_COL_NAME = Admin::IDENTIFY_TABLE_ID_COL_NAME;

@@ -285,7 +285,7 @@ class AdminTelegramPassPortal extends ParentClassHandler
                 $this->Edit([
                     'is_pending' => 0,
                     'is_passed'  => 0,
-                ], "`chat_id` = ? AND `message_id` = ? AND `is_pending` = ?", [$chat_id, $message_id, 1]);;
+                ], "`chat_id` = ? AND `message_id` = ? AND `is_pending` = ?", [$chat_id, $message_id, 1]);
             }
         }
     }

@@ -96,7 +96,7 @@ class AdminPassword extends ParentClassHandler
 
     public function ValidateTempPass(int $admin_id): void
     {
-        if($col = $this->ColThisTable('is_temp', "`$this->identify_table_id_col_name` = ? AND `is_temp` = ?", [$admin_id, 1])){
+        if($this->ColThisTable('is_temp', "`$this->identify_table_id_col_name` = ? AND `is_temp` = ?", [$admin_id, 1])){
             Json::GoToMethod('ChangePassword', line: $this->class_name . __LINE__);
         }
     }

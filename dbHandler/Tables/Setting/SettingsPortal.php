@@ -13,6 +13,7 @@
 
 namespace Maatify\Portal\Setting;
 
+use JetBrains\PhpStorm\NoReturn;
 use Maatify\Json\Json;
 use Maatify\LanguagePortalHandler\DBHandler\ParentClassHandler;
 use Maatify\PostValidatorV2\ValidatorConstantsTypes;
@@ -67,7 +68,7 @@ class SettingsPortal extends ParentClassHandler
         return self::$instance;
     }
 
-    public function AllPaginationThisTableFilter(string $order_with_asc_desc = ''): void
+    #[NoReturn] public function AllPaginationThisTableFilter(string $order_with_asc_desc = ''): void
     {
         [$tables, $cols] = $this->HandleThisTableJoins();
         $result = $this->ArrayPaginationThisTableFilter($tables,

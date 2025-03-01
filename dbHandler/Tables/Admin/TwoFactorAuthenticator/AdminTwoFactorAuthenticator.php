@@ -17,6 +17,7 @@ use App\Assist\AdminTwoFactorAuthenticatorAssistance;
 use App\Assist\Encryptions\AdminAuthEncryption;
 use App\Assist\Jwt\JWTAssistance;
 use Exception;
+use JetBrains\PhpStorm\NoReturn;
 use Maatify\GoogleAuth\GoogleAuth;
 use Maatify\Json\Json;
 use Maatify\LanguagePortalHandler\DBHandler\ParentClassHandler;
@@ -44,7 +45,7 @@ class AdminTwoFactorAuthenticator extends ParentClassHandler
         return self::$instance;
     }
 
-    public function ShowAuthCode(array $admin): void
+    #[NoReturn] public function ShowAuthCode(array $admin): void
     {
         Json::Success([$this->AuthDecode($admin['auth'])]);
     }

@@ -14,6 +14,7 @@
 namespace Maatify\Portal\Setting;
 
 use \App\DB\DBS\DbPortalHandler;
+use JetBrains\PhpStorm\NoReturn;
 use Maatify\Functions\GeneralFunctions;
 use Maatify\Json\Json;
 
@@ -51,12 +52,12 @@ class Settings extends DbPortalHandler
         return self::$instance;
     }
 
-    public function JsonAll(): void
+    #[NoReturn] public function JsonAll(): void
     {
         Json::Success($this->RowsThisTable());
     }
 
-    public function Update(): void
+    #[NoReturn] public function Update(): void
     {
         $this->ValidatePostedTableId();
         if (empty($this->current_row['isEditable'])) {

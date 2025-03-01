@@ -13,6 +13,7 @@
 
 namespace Maatify\Portal\Admin;
 
+use JetBrains\PhpStorm\NoReturn;
 use Maatify\Json\Json;
 
 class AdminFailedLoginPortal extends AdminFailedLogin
@@ -37,12 +38,12 @@ class AdminFailedLoginPortal extends AdminFailedLogin
         $this->ip = $this->postValidator->Optional('ip', 'ip');
     }
 
-    public function Get(): void
+    #[NoReturn] public function Get(): void
     {
         Json::Success($this->Log($this->username, $this->ip));
     }
 
-    public function Remove(): void
+    #[NoReturn] public function Remove(): void
     {
         $this->SuccessByAdmin($this->ip, $this->username);
         Json::Success($this->Log($this->username, $this->ip));

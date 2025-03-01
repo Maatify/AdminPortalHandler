@@ -14,6 +14,7 @@
 namespace Maatify\Portal\Admin;
 
 use App\DB\Tables\PortalCacheRedis;
+use JetBrains\PhpStorm\NoReturn;
 use Maatify\Json\Json;
 use Maatify\LanguagePortalHandler\Language\DbLanguage;
 use Maatify\LanguagePortalHandler\Language\LanguagePortal;
@@ -48,7 +49,7 @@ class AdminPortalUpdates extends AdminPortal
         Json::Success($this->current_row);
     }*/
 
-    public function UserInfo(): void
+    #[NoReturn] public function UserInfo(): void
     {
         $this->ValidatePostedTableId();
 
@@ -82,7 +83,7 @@ class AdminPortalUpdates extends AdminPortal
         Json::Success($admin);
     }
 
-    public function Update(): void
+    #[NoReturn] public function Update(): void
     {
         $this->logger_sub_type = 'Info';
         $this->cols_to_edit = [

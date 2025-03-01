@@ -15,6 +15,7 @@ namespace Maatify\Portal\Admin\Email;
 
 use App\Assist\Encryptions\ConfirmEmailEncryption;
 use App\Assist\Jwt\JWTAssistance;
+use JetBrains\PhpStorm\NoReturn;
 use Maatify\CronEmail\CronEmailAdminRecord;
 use Maatify\Json\Json;
 use Maatify\Portal\Admin\AdminFailedLogin;
@@ -62,7 +63,7 @@ class AdminEmailPortal extends AdminEmail
 
     }
 
-    public function ChangeEmail(): void
+    #[NoReturn] public function ChangeEmail(): void
     {
         $password = $this->postValidator->Require('password', 'password');
         $email = $this->postValidator->Require('email', 'email');
@@ -73,7 +74,8 @@ class AdminEmailPortal extends AdminEmail
                 if($this->EmailIsExist($email)){
                     Json::Exist('email', line: $this->class_name . __LINE__);
                 }else{
-                    $this->Set(AdminLoginToken::obj()->GetAdminID(), $email, AdminLoginToken::obj()->GetAdminName(), AdminLoginToken::obj()->GetAdminUsername());
+                    $admin_id = AdminLoginToken::obj()->GetAdminID();
+                    $this->Set($admin_id, $email, AdminLoginToken::obj()->GetAdminName(), AdminLoginToken::obj()->GetAdminUsername());
                     if(!empty(AdminLoginToken::obj()->GetTelegramStatus())) {
                         if(!empty($admin['telegram_status'])) {
                             AlertAdminTelegramBot::obj()->alertMessageOfAgent(
@@ -86,7 +88,7 @@ class AdminEmailPortal extends AdminEmail
                         }
                     }
                     $this->log['email'] = ['from'=> AdminLoginToken::obj()->GetAdminEmail(), 'to'=>$email];
-                    $this->AdminLogger($this->log, [['email', AdminLoginToken::obj()->GetAdminEmail(), $email]], 'Update');
+                    $this->AdminLogger(current_admin_id: $admin_id, changes: $this->log, action: 'Update');
                     $this->Success( $this->class_name . __LINE__);
                 }
             }
@@ -96,7 +98,7 @@ class AdminEmailPortal extends AdminEmail
         }
     }
 
-    public function EmailConfirm(): void
+    #[NoReturn] public function EmailConfirm(): void
     {
         $code = $this->postValidator->Require('code', 'code');
         $this->Confirm($code);
@@ -108,19 +110,19 @@ class AdminEmailPortal extends AdminEmail
             );
         }
         $this->log['email'] = ['from' => 'Unverified', 'to' => 'Verified'];
-        $this->AdminLogger($this->log, [], 'Verify');
+        $this->AdminLogger(current_admin_id: AdminLoginToken::obj()->GetAdminID(), changes: $this->log, action: 'Verify');
         $this->Success( $this->class_name . __LINE__);
     }
 
-    public function EmailConfirmResend(): void
+    #[NoReturn] public function EmailConfirmResend(): void
     {
         $this->ConfirmToken();
         $this->log['details'] = 'Email Confirm Resend';
-        $this->AdminLogger($this->log, [], 'Resend');
+        $this->AdminLogger(current_admin_id: AdminLoginToken::obj()->GetAdminID(), changes: $this->log, action: 'Verify');
         $this->Success( $this->class_name . __LINE__);
     }
 
-    private function Success(string $line): void
+    #[NoReturn] private function Success(string $line): void
     {
         Json::Success(AdminLoginToken::obj()->HandleAdminResponse(AdminLoginToken::obj()->ValidateAdminToken()), $line);
     }

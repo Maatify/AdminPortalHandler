@@ -14,6 +14,7 @@
 namespace Maatify\Portal\Admin\TwoFactorAuthenticator;
 
 use App\Assist\Jwt\JWTAssistance;
+use JetBrains\PhpStorm\NoReturn;
 use Maatify\Json\Json;
 use Maatify\Portal\Admin\AdminLoginToken;
 use Maatify\Portal\Admin\AdminPortal;
@@ -34,7 +35,7 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
 
         return self::$instance;
     }
-    public function AllowUserToNewAuth(): void
+    #[NoReturn] public function AllowUserToNewAuth(): void
     {
         $this->row_id = $this->ValidatePostedTableId();
         $admin = AdminPortal::obj()->UserForEdit($this->row_id);
@@ -58,14 +59,14 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
         }
     }
 
-    public function Auth(): void
+    #[NoReturn] public function Auth(): void
     {
         $this->code = $this->postValidator->Require('code', 'code');
         $admin = $this->CheckCode($this->code);
         $this->logger_keys = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name]];
         $this->row_id = $admin[$this->identify_table_id_col_name];
         $log = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name], 'details' => 'Success Login with Two-Factor-Authenticator'];
-        $this->AdminLogger($log, [], 'Login');
+        $this->AdminLogger(current_admin_id: $admin[$this->identify_table_id_col_name], logger_description: $log, changes: [], action: 'Login');
         if(!empty($_ENV['IS_TELEGRAM_ACTIVATE']) && !empty($admin['telegram_status']) && !empty($admin['telegram_chat_id']) && !empty($admin['telegram_status_auth'])) {
             AdminTelegramPassPortal::obj()->sendAdminSessionStartByNewSession($admin[$this->identify_table_id_col_name], $admin['telegram_first_name'], $admin['telegram_chat_id']);
         }
@@ -73,7 +74,7 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
         Json::Success(AdminLoginToken::obj()->HandleAdminResponse($admin));
     }
 
-    public function AuthPassedViaTelegram(): void
+    #[NoReturn] public function AuthPassedViaTelegram(): void
     {
         if(!empty($_ENV['IS_TELEGRAM_ACTIVATE'])) {
             if ($admin = $this->ValideToken()) {
@@ -82,7 +83,8 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
                     $this->logger_keys = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name]];
                     $this->row_id = $admin[$this->identify_table_id_col_name];
                     $log = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name], 'details' => 'Success Login with Telegram Authenticator'];
-                    $this->AdminLogger($log, [], 'Login');
+                    $this->AdminLogger(current_admin_id: $admin[$this->identify_table_id_col_name], logger_description: $log, changes: [], action: 'Login');
+
                     if (! empty($admin['telegram_status'])) {
                         AlertAdminTelegramBot::obj()->alertMessageOfAgent(
                             $admin[$this->identify_table_id_col_name],
@@ -101,21 +103,21 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
         }
     }
 
-    public function setMyAuthSecret(): void
+    #[NoReturn] public function setMyAuthSecret(): void
     {
         $secret = $this->postValidator->Require('secret', 'digital_upper_letters');
         $this->SetAuth(AdminLoginToken::obj()->GetAdminID(),
             $secret);
     }
 
-    public function SetAuth(int $admin_id, string $secret): void
+    #[NoReturn] public function SetAuth(int $admin_id, string $secret): void
     {
         $this->NewAuthRecord($admin_id,
             $secret);
         Json::Success();
     }
 
-    public function checkMyAuthCode(): void
+    #[NoReturn] public function checkMyAuthCode(): void
     {
         if(AdminTwoFactorAuthenticatorPortal::obj()->ValidateCurrentAdminCode()){
             Json::Success(line: $this->class_name . __LINE__);
@@ -125,14 +127,14 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
     }
 
 
-    public function AuthRegister(): void
+    #[NoReturn] public function AuthRegister(): void
     {
         $this->code = $this->postValidator->Require('code', 'code');
         $admin = $this->RegisterNewCode($this->code);
         $this->logger_keys = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name]];
         $this->row_id = $admin[$this->identify_table_id_col_name];
         $log = [$this->identify_table_id_col_name => $admin[$this->identify_table_id_col_name], 'details' => 'Success Register of Two-Factor-Authenticator'];
-        $this->AdminLogger($log, [['auth', '', 'set']], 'Register');
+        $this->AdminLogger(current_admin_id: $admin[$this->identify_table_id_col_name], logger_description: $log, changes: ['auth' => 'Set'], action: 'Register');
         $admin = AdminLoginToken::obj()->ValidateAdminToken();
         if(!empty($_ENV['IS_TELEGRAM_ACTIVATE']) && !empty($admin['telegram_status'])) {
             AlertAdminTelegramBot::obj()->alertMessageOfAgent(
@@ -174,7 +176,6 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
             }
         }
         Json::ReLogin($this->class_name . __LINE__);
-        return [];
     }
 
 
@@ -198,7 +199,7 @@ Class AdminTwoFactorAuthenticatorPortal extends AdminTwoFactorAuthenticator
         else return $authCode;
     }
 
-    public function stgClearMyAuth(): void
+    #[NoReturn] public function stgClearMyAuth(): void
     {
         $admin_id = AdminLoginToken::obj()->GetAdminID();
         if(empty($admin_id)){

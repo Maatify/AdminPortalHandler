@@ -81,6 +81,7 @@ class AdminPortal extends ParentClassHandler
         $username = $this->postValidator->Require('username', 'username', $this->class_name . __LINE__);
         $password = $this->postValidator->Require('password', 'password', $this->class_name . __LINE__);
         if ($admin = $this->Login($username)) {
+            AdminLoginToken::obj()->setAdminID($admin[$this->identify_table_id_col_name]);
             if (AdminPassword::obj()->Check($admin[$this->identify_table_id_col_name], $password)) {
                 $log = [$this->identify_table_id_col_name];
                 $this->logger_keys = $log;

@@ -231,7 +231,9 @@ class AdminPortal extends ParentClassHandler
 
             $user = $this->UserForEdit();
             $user['password'] = $otp;
-            PortalCacheRedis::obj()->UsersListDelete();
+            if(!empty($_ENV['REDIS_ACTIVE'])) {
+                PortalCacheRedis::obj()->UsersListDelete();
+            }
             Json::Success($user);
         }
     }

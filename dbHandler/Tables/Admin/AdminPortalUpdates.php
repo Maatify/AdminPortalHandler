@@ -108,7 +108,9 @@ class AdminPortalUpdates extends AdminPortal
             LanguagePortal::obj()->ValidatePostedTableId();
         }
         $this->UpdateByPostedIdSilent();
-        PortalCacheRedis::obj()->UsersListDelete();
+        if(!empty($_ENV['REDIS_ACTIVE'])){
+            PortalCacheRedis::obj()->UsersListDelete();
+        }
         Json::Success(line: $this->class_name . __LINE__);
     }
 

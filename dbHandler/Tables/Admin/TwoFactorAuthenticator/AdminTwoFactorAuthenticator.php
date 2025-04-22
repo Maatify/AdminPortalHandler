@@ -64,7 +64,7 @@ class AdminTwoFactorAuthenticator extends ParentClassHandler
             JWTAssistance::obj()->TokenAuth($admin[$this->identify_table_id_col_name],
                 $admin['username'],
                 ['next' => 'Auth']);
-            $this->AdminLogger(current_admin_id: $admin[$this->identify_table_id_col_name], changes: ['detailts' => 'Go to "Auth" Method after enter correct information']);
+            $this->AdminLogger(current_admin_id: $admin[$this->identify_table_id_col_name], changes: ['details' => 'Go to "Auth" Method after enter correct information']);
             Json::GoToMethod('Auth',
                 'Please Confirm Your Google Authenticator',
                 line: $this->class_name . __FUNCTION__ . '::' . __LINE__);
@@ -74,7 +74,7 @@ class AdminTwoFactorAuthenticator extends ParentClassHandler
                 JWTAssistance::obj()->TokenAuth($admin[$this->identify_table_id_col_name],
                     $admin['username'],
                     ['secret' => $g_2fa_code, 'next' => 'AuthRegister']);
-                $this->AdminLogger(current_admin_id: $admin[$this->identify_table_id_col_name], changes: ['detailts' => 'Go to "AuthRegister" Method after enter correct information']);
+                $this->AdminLogger(current_admin_id: $admin[$this->identify_table_id_col_name], changes: ['details' => 'Go to "AuthRegister" Method after enter correct information']);
 
                 Json::GoToMethod('AuthRegister',
                     'Please Set Your Google Authenticator',

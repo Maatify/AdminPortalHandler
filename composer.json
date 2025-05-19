@@ -1,7 +1,7 @@
 {
   "name": "maatify/admin-portal-handler",
   "description": "maatify.com",
-  "version": "4.0.7",
+  "version": "5.0.1",
   "type": "library",
   "keywords": [
     "PHP",
@@ -47,29 +47,22 @@
     }
   ],
   "require": {
-    "php": ">=8.2",
-    "maatify/functions": "^1.2",
-    "maatify/json": "^1.1",
-    "maatify/db-model-v3": "^1.3",
-    "maatify/post-validator-v2": "^1.3",
-    "maatify/failed-login-handler": "^1.3",
-    "maatify/open-ssl": "^1.0",
-    "maatify/mailer": "^1.3",
-    "maatify/jwt": "^1.0",
-    "maatify/uploader": "^1.3",
+    "maatify/functions": "^5",
+    "maatify/json": "^5",
+    "maatify/db-model-v3": "^5",
+    "maatify/post-validator-v2": "^5",
+    "maatify/failed-login-handler": "^5",
+    "maatify/open-ssl": "^5",
+    "maatify/jwt": "^5",
+    "maatify/uploader": "^5",
     "ext-openssl": "*",
-    "maatify/cron-sms": "^2",
-    "maatify/cron-email": "^2",
-    "maatify/queue-manager": "^1.3",
-    "maatify/captcha-all-in-one": "^1.0",
-    "maatify/login-with-third-party": "^3",
-    "maatify/cron-telegram-bot": "^2",
-    "maatify/google-auth": "^2"
-  },
-  "config": {
-    "platform": {
-      "php": "8.2.0"
-    }
+    "maatify/cron-sms": "^5",
+    "maatify/queue-manager": "^5",
+    "maatify/captcha-all-in-one": "^5",
+    "maatify/login-with-third-party": "^5",
+    "maatify/cron-telegram-bot": "^5",
+    "maatify/google-auth": "^5",
+    "maatify/cron-email": "^5"
   },
   "autoload": {
     "psr-4": {
